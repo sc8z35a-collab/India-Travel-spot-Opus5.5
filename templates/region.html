@@ -22,7 +22,7 @@
   <div class="ch-hero-shade"></div>
   <div class="rp-hero-in wrap">
     <nav class="crumbs" aria-label="パンくず"><a href="{{ root }}index.html">TOP</a><span>/</span><a href="{{ root }}index.html#regions">5 JOURNEYS</a><span>/</span><span aria-current="page">{{ r.name }}</span></nav>
-    <p class="ch-num"><span>0{{ r.order }}</span> / 05 — {{ r.state }}</p>
+    <p class="ch-num"><span>{{ '%02d' % r.order }}</span> / {{ '%02d' % regions|length }} — {{ r.state }}</p>
     <h1 class="ch-title rp-title"><span class="ch-en">{{ split(r.name_en) }}</span><span class="ch-ja">{{ r.name }}</span></h1>
     <p class="ch-catch">{{ r.catch }}</p>
   </div>
@@ -35,7 +35,7 @@
       <p class="ch-lead reveal">{{ r.lead }}</p>
       <dl class="ch-facts">{% for f in r.keyfacts %}<div class="reveal"><dt>{{ f.k }}</dt><dd>{{ f.v }}</dd></div>{% endfor %}</dl>
     </div>
-    <p class="phrase-big reveal"><span lang="hi">{{ r.phrase.text }}</span><em>{{ r.phrase.roman }}</em><small>{{ r.phrase.meaning }}</small></p>
+    <p class="phrase-big reveal"><span lang="{{ r.phrase.lang if r.phrase.lang is defined else 'hi' }}">{{ r.phrase.text }}</span><em>{{ r.phrase.roman }}</em><small>{{ r.phrase.meaning }}</small></p>
   </div>
 </section>
 
@@ -142,7 +142,7 @@
     <h2 class="h2 reveal-lines">季節ごとの<br>おすすめ度。</h2>
     <div class="season-bars" role="list" aria-label="月別のおすすめ度（5段階）">
       {% for v in r.months %}{% set m = loop.index %}
-      <div class="sb{% if holiday_months is defined and m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--heat:{{ charts.season[r.id][loop.index0] }}">
+      <div class="sb{% if m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--heat:{{ charts.season[r.id][loop.index0] }}">
         <b>{{ v }}</b><i></i><span>{{ m }}月</span>
       </div>
       {% endfor %}
@@ -192,12 +192,12 @@
   </div>
 </section>
 
-<nav class="next-region" aria-label="次の地域">
+<nav class="next-region" aria-label="次の地域へ">
   {% set nx = next_region %}
   <a href="{{ root }}{{ nx.id }}/index.html" style="--accent:{{ nx.theme.accent }}">
     {{ pic(nx.hero, "100vw", "nr-bg") }}
     <div class="nr-shade"></div>
-    <div class="nr-in wrap"><p class="eyebrow">Next journey — 0{{ nx.order }}</p><p class="nr-t">{{ nx.name_en }}</p><p class="nr-ja">{{ nx.name }} — {{ nx.catch }}</p></div>
+    <div class="nr-in wrap"><p class="eyebrow">Next journey — {{ '%02d' % nx.order }}</p><p class="nr-t">{{ nx.name_en }}</p><p class="nr-ja">{{ nx.name }} — {{ nx.catch }}</p></div>
   </a>
 </nav>
 

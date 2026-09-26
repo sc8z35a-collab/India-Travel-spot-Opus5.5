@@ -60,7 +60,7 @@
   <div class="menu-inner">
     <ol class="menu-regions">
       {% for r in regions %}
-      <li><a href="{{ root }}{{ r.id }}/index.html" style="--accent:{{ r.theme.accent }}"><span class="mn">0{{ r.order }}</span><span class="mt">{{ r.name }}</span><span class="me">{{ r.name_en }}</span></a></li>
+      <li><a href="{{ root }}{{ r.id }}/index.html" style="--accent:{{ r.theme.accent }}"><span class="mn">{{ '%02d' % r.order }}</span><span class="mt">{{ r.name }}</span><span class="me">{{ r.name_en }}</span></a></li>
       {% endfor %}
     </ol>
     <div class="menu-links">

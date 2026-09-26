@@ -2,8 +2,8 @@
   "agent": "a8_qa_auditor",
   "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
   "ok": true,
-  "started": 1790414390.7090974,
-  "duration_s": 0.37,
+  "started": 1790423950.922297,
+  "duration_s": 0.41,
   "stats": {
     "pages": 6,
     "checks": 1965,
@@ -13,37 +13,37 @@
         "checks": 304,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.4
+        "html_kb": 84.3
       },
       "index.html": {
         "checks": 485,
         "issues": [],
         "score": 100.0,
-        "html_kb": 168.6
+        "html_kb": 169.4
       },
       "jaipur/index.html": {
         "checks": 301,
         "issues": [],
         "score": 100.0,
-        "html_kb": 82.4
+        "html_kb": 83.3
       },
       "kerala/index.html": {
         "checks": 286,
         "issues": [],
         "score": 100.0,
-        "html_kb": 82.4
+        "html_kb": 83.3
       },
       "ladakh/index.html": {
         "checks": 295,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.2
+        "html_kb": 84.0
       },
       "varanasi/index.html": {
         "checks": 294,
         "issues": [],
         "score": 100.0,
-        "html_kb": 82.7
+        "html_kb": 83.5
       }
     }
   },

@@ -259,7 +259,7 @@
   const go = (i) => {
     cur = (i + slides.length) % slides.length;
     slides.forEach((s, k) => { s.classList.toggle("is-active", k === cur); s.setAttribute("aria-hidden", k !== cur); });
-    dots.forEach((d, k) => { d.classList.toggle("is-active", k === cur); d.setAttribute("aria-selected", k === cur); d.tabIndex = k === cur ? 0 : -1; });
+    dots.forEach((d, k) => { d.classList.toggle("is-active", k === cur); d.setAttribute("aria-pressed", k === cur); });
     // restart the progress bar so it stays in sync with the (re)started timer; paused while autoplay is off
     const bar = $(".hi-bar b", dots[cur]);
     if (bar) { bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = ""; }
@@ -413,7 +413,7 @@
       if (allZero) desc.textContent = "すべての重みが0です。少なくとも1つの軸を1以上にしてください。";
     };
     const current = () => Object.fromEntries(sliders.map((s) => [s.dataset.axis, +s.value]));
-    const setActive = (id) => $$(".persona").forEach((b) => { const on = b.dataset.persona === id; b.classList.toggle("is-active", on); b.setAttribute("aria-selected", on); });
+    const setActive = (id) => $$(".persona").forEach((b) => { const on = b.dataset.persona === id; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
     const setPersona = (id) => {
       setActive(id);
       weightsBox.classList.toggle("is-open", id === "custom");
@@ -479,7 +479,7 @@
   if (axBars) {
     const descEl = $(".axis-desc");
     const show = (ax) => {
-      $$(".axis-chips .chip").forEach((b) => { const on = b.dataset.axis === ax; b.classList.toggle("is-active", on); b.setAttribute("aria-selected", on); });
+      $$(".axis-chips .chip").forEach((b) => { const on = b.dataset.axis === ax; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
       descEl.textContent = AX[ax].label + " — " + AX[ax].desc;
       const list = [...DATA.regions].sort((a, b) => b.scores[ax] - a.scores[ax] || b.balanced - a.balanced);
       axBars.innerHTML = list.map((r) => `<li style="--c:${r.accent};--v:0" data-v="${r.scores[ax]}"><span class="ab-n">${esc(r.short)}</span><span class="ab-t"><i></i></span><span class="ab-v">${r.scores[ax]}</span></li>`).join("");
