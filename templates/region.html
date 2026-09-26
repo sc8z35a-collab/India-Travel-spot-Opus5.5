@@ -13,7 +13,7 @@
 {% block bodyclass %}region-page{% endblock %}
 {% block bodystyle %}--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}{% endblock %}
 {% block preload %}{% set a = assets[r.hero] %}<link rel="preload" as="image" type="image/avif" imagesrcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.avif {{ w }}w{{ ', ' if not loop.last }}{% endfor %}" imagesizes="100vw">{% endblock %}
-{% block jsonld %}<script type="application/ld+json">{{ jsonld|safe }}</script>{% endblock %}
+{% block jsonld %}<script type="application/ld+json">{{ jsonld|replace("<", "\\u003c")|safe }}</script>{% endblock %}
 {% block main %}
 <div class="region" style="--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}">
 

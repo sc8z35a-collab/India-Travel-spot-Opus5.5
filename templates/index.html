@@ -2,7 +2,7 @@
 {% from "_macros.html" import pic, credit, split, yen with context %}
 {% block bodyclass %}home{% endblock %}
 {% block preload %}{% set a = assets[regions[0].hero] %}<link rel="preload" as="image" type="image/avif" imagesrcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.avif {{ w }}w{{ ', ' if not loop.last }}{% endfor %}" imagesizes="100vw">{% endblock %}
-{% block jsonld %}<script type="application/ld+json">{{ jsonld|safe }}</script>{% endblock %}
+{% block jsonld %}<script type="application/ld+json">{{ jsonld|replace("<", "\\u003c")|safe }}</script>{% endblock %}
 {% block tabbar %}
 <nav class="tabbar" aria-label="セクション移動">
   {% for l in nav %}<a href="#{{ l.id }}" data-tab="{{ l.id }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-{{ l.id }}"/></svg><span>{{ l.label }}</span></a>{% endfor %}
