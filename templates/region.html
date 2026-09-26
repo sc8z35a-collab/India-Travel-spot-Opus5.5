@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{% block tabbar %}
+<nav class="tabbar" aria-label="ページ内移動">
+  {% for l in rnav %}<a href="#{{ l.id }}" data-tab="{{ l.id }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-{{ l.id }}"/></svg><span>{{ l.label }}</span></a>{% endfor %}
+</nav>
+{% endblock %}
+{% set an = analysis.regions[r.id] %}
+{% block title %}{{ r.name }}（{{ r.name_en }}）— {{ r.catch }} | {{ site.title }}{% endblock %}
+{% block description %}{{ r.lead }}{% endblock %}
+{% block ogimage %}og/{{ r.id }}.jpg{% endblock %}
+{% block canonical %}{{ r.id }}/{% endblock %}
+{% block bodyclass %}region-page{% endblock %}
+{% block bodystyle %}--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}{% endblock %}
+{% block preload %}{% set a = assets[r.hero] %}<link rel="preload" as="image" type="image/avif" imagesrcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.avif {{ w }}w{{ ', ' if not loop.last }}{% endfor %}" imagesizes="100vw">{% endblock %}
+{% block jsonld %}<script type="application/ld+json">{{ jsonld|safe }}</script>{% endblock %}
+{% block main %}
+<div class="region" style="--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}">
+
+<section class="rp-hero">
+  {{ pic(r.hero, "100vw", "rp-bg", true, true) }}
+  <div class="ch-hero-shade"></div>
+  <div class="rp-hero-in wrap">
+    <nav class="crumbs" aria-label="パンくず"><a href="{{ root }}index.html">TOP</a><span>/</span><a href="{{ root }}index.html#regions">5 JOURNEYS</a><span>/</span><span aria-current="page">{{ r.name }}</span></nav>
+    <p class="ch-num"><span>0{{ r.order }}</span> / 05 — {{ r.state }}</p>
+    <h1 class="ch-title rp-title"><span class="ch-en">{{ split(r.name_en) }}</span><span class="ch-ja">{{ r.name }}</span></h1>
+    <p class="ch-catch">{{ r.catch }}</p>
+  </div>
+  {{ credit(r.hero) }}
+  </section>
+
+<section class="section rp-overview" id="overview">
+  <div class="wrap">
+    <div class="ch-intro">
+      <p class="ch-lead reveal">{{ r.lead }}</p>
+      <dl class="ch-facts">{% for f in r.keyfacts %}<div class="reveal"><dt>{{ f.k }}</dt><dd>{{ f.v }}</dd></div>{% endfor %}</dl>
+    </div>
+    <p class="phrase-big reveal"><span lang="hi">{{ r.phrase.text }}</span><em>{{ r.phrase.roman }}</em><small>{{ r.phrase.meaning }}</small></p>
+  </div>
+</section>
+
+<section class="section rp-fit" id="fit">
+  <div class="wrap">
+    <p class="eyebrow">Is it for you?</p>
+    <h2 class="h2 reveal-lines">向いている人、<br><em>向いていない人</em>。</h2>
+    <div class="fit-grid">
+      <div class="fit fit-yes reveal"><h3><i>◎</i>こんな人におすすめ</h3><ul>{% for t in r.good_for %}<li>{{ t }}</li>{% endfor %}</ul></div>
+      <div class="fit fit-no reveal"><h3><i>△</i>こんな人は要注意</h3><ul>{% for t in r.not_for %}<li>{{ t }}</li>{% endfor %}</ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="section rp-eval" id="evaluation">
+  <div class="wrap">
+    <p class="eyebrow">Multi-angle evaluation</p>
+    <h2 class="h2 reveal-lines">8つの視点で見た<br><em>{{ r.name }}</em>。</h2>
+    <div class="ch-eval">
+      <div class="ch-radar reveal">{{ charts.radar[r.id]|safe }}</div>
+      <div class="ch-verdict">
+        <p class="ch-score"><b data-count="{{ an.balanced }}" data-decimals="1">0</b><small>/100 バランス型の総合点</small></p>
+        <p class="ch-verdict-t">{{ an.verdict }}</p>
+        <p class="rp-robust">{{ "{:,}".format(analysis.robust_samples) }}通りのランダムな価値観で試すと、1位になる確率 <b>{{ an.robust.win }}%</b>・2位以内 <b>{{ an.robust.top2 }}%</b></p>
+        <div class="persona-scores">
+          {% for p in personas %}{% set pv = analysis.personas[p.id] %}
+          <div class="ps"><span class="ps-l">{{ p.label }}</span><span class="ps-bar"><i style="--w:{{ pv.totals[r.id] }}%"></i></span><span class="ps-v">{{ pv.totals[r.id] }}</span><span class="ps-rank">{{ pv.ranking.index(r.id) + 1 }}位</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="why-grid">
+      {% for a in axes %}{% set s = r.scores[a.id] %}
+      <article class="why-card reveal" style="--v:{{ s.v }}">
+        <header><h3>{{ a.label }}</h3><p class="why-v"><b>{{ s.v }}</b>/10</p></header>
+        <div class="why-meter"><i></i></div>
+        <p>{{ s.why }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section rp-highlights" id="highlights">
+  <div class="wrap">
+    <div class="spots-head">
+      <div>
+        <p class="eyebrow">Highlights</p>
+        <h2 class="h2 reveal-lines">見逃せない<br>{{ r.highlights|length }}つの場所。</h2>
+      </div>
+      <div class="deck-nav" role="group" aria-label="見どころの移動">
+        <button type="button" class="deck-prev" aria-label="前の見どころ" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="deck-next" aria-label="次の見どころ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="spots" tabindex="0" aria-label="見どころ（横にスワイプ）">
+    {% for h in r.highlights %}
+    <article class="spot{% if loop.index is even %} spot-rev{% endif %}">
+      <div class="spot-img">{{ pic(h.photo, "(orientation: landscape) %dvw, 84vw" % (40 * [1, assets[h.photo].ratio / 1.25]|max), "", false, true) }}{{ credit(h.photo) }}</div>
+      <div class="spot-text">
+        <p class="spot-n">{{ '%02d' % loop.index }}<span>{{ h.tag }}</span></p>
+        <h3 class="spot-name reveal">{{ h.name }}<small>{{ h.en }}</small></h3>
+        <p class="spot-body reveal">{{ h.text }}</p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section rp-itin" id="itinerary">
+  <div class="wrap itin-grid">
+    <div class="itin-head">
+      <p class="eyebrow">Model itinerary</p>
+      <h2 class="h2 reveal-lines">{{ r.itinerary|length }}日間の<br>モデルプラン。</h2>
+      <p class="body reveal">大学生の個人旅行を想定した、無理のない日程です。</p>
+      <div class="budget-box reveal">
+        <p class="bb-l">現地費用の目安</p>
+        <p class="bb-v">{{ yen(an.trip_jpy[0]) }}<span>〜</span>{{ yen(an.trip_jpy[1]) }}</p>
+        <p class="bb-s">{{ r.days[0] }}〜{{ r.days[1] }}日・宿／食事／移動／入場料（航空券除く）<br>1日 ₹{{ "{:,}".format(r.budget_inr[0]) }}〜{{ "{:,}".format(r.budget_inr[1]) }}（{{ yen(an.daily_jpy[0]) }}〜{{ yen(an.daily_jpy[1]) }}）</p>
+      </div>
+    </div>
+    <ol class="timeline">
+      {% for d in r.itinerary %}
+      <li class="tl reveal"><span class="tl-day">{{ d.day }}</span><h3>{{ d.title }}</h3><p>{{ d.text }}</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section rp-food" id="food">
+  <div class="wrap">
+    <p class="eyebrow">Eat</p>
+    <h2 class="h2 reveal-lines">この土地で、<br>食べるべきもの。</h2>
+    <ul class="food-list">
+      {% for f in r.foods %}<li class="reveal"><span class="fl-n">{{ '%02d' % loop.index }}</span><h3>{{ f.name }}</h3><p>{{ f.desc }}</p></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section rp-season" id="season">
+  <div class="wrap">
+    <p class="eyebrow">When to go</p>
+    <h2 class="h2 reveal-lines">季節ごとの<br>おすすめ度。</h2>
+    <div class="season-bars" role="list" aria-label="月別のおすすめ度（5段階）">
+      {% for v in r.months %}{% set m = loop.index %}
+      <div class="sb{% if holiday_months is defined and m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--heat:{{ charts.season[r.id][loop.index0] }}">
+        <b>{{ v }}</b><i></i><span>{{ m }}月</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="sb-legend"><i></i>大学の長期休み（春休み・GW・夏休み・冬休み）の目安</p>
+  </div>
+</section>
+
+<section class="section rp-access" id="access">
+  <div class="wrap access-grid">
+    <div>
+      <p class="eyebrow">Getting there</p>
+      <h2 class="h2 reveal-lines">アクセス。</h2>
+      <ul class="access-list">
+        {% for a in r.access %}
+        <li class="reveal"><span class="al-from">{{ a.from }}</span><span class="al-arrow"><i></i></span><span class="al-to">{{ a.to }}</span><span class="al-how">{{ a.how }}</span><span class="al-time">{{ a.time }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <p class="eyebrow">Tips &amp; cautions</p>
+      <h2 class="h2 reveal-lines">知っておきたいこと。</h2>
+      <ul class="tips">
+        {% for t in r.tips %}<li class="tip tip-{{ t.type }} reveal"><span class="tip-i">{{ {'warn': '!', 'info': 'i', 'good': '✓'}[t.type] }}</span><p>{{ t.text }}</p></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section rp-gallery" id="gallery">
+  <div class="wrap">
+    <p class="eyebrow">Gallery</p>
+    <div class="gallery">
+      {% for g in r.gallery %}
+      <button type="button" class="g-item" data-lightbox="{{ g }}" aria-label="写真を拡大: {{ assets[g].alt }}">{{ pic(g, "(orientation: landscape) 46vw, 100vw" if loop.index <= 2 else "(orientation: landscape) %dvw, 50vw" % (24 * [1, assets[g].ratio / 1.3]|max)) }}<span class="g-zoom" aria-hidden="true"></span></button>
+      {% endfor %}
+    </div>
+    <p class="gallery-credits">{% for g in r.gallery %}{{ credit(g) }}{% endfor %}</p>
+  </div>
+</section>
+
+<section class="section rp-sources">
+  <div class="wrap">
+    <p class="eyebrow">Sources</p>
+    <ul class="sources">{% for s in r.sources %}<li><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.label }} ↗</a></li>{% endfor %}</ul>
+    <p class="checked">情報確認日: {{ site.checked }}。最新情報は必ず公式サイトで確認してください。</p>
+  </div>
+</section>
+
+<nav class="next-region" aria-label="次の地域">
+  {% set nx = next_region %}
+  <a href="{{ root }}{{ nx.id }}/index.html" style="--accent:{{ nx.theme.accent }}">
+    {{ pic(nx.hero, "100vw", "nr-bg") }}
+    <div class="nr-shade"></div>
+    <div class="nr-in wrap"><p class="eyebrow">Next journey — 0{{ nx.order }}</p><p class="nr-t">{{ nx.name_en }}</p><p class="nr-ja">{{ nx.name }} — {{ nx.catch }}</p></div>
+  </a>
+</nav>
+
+</div>
+<div class="lightbox" hidden role="dialog" aria-modal="true" aria-label="写真の拡大表示"><div class="lb-stage"></div><button type="button" class="lb-nav lb-prev" aria-label="前の写真"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="lb-nav lb-next" aria-label="次の写真"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="lb-close" aria-label="閉じる"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+{% endblock %}

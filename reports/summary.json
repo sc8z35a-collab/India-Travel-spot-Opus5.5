@@ -1,0 +1,309 @@
+{
+  "ok": true,
+  "duration_s": 7.5,
+  "llm": {
+    "ok": false,
+    "model": "gpt-5-mini",
+    "parallel": 6,
+    "reason": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs",
+    "latency_s": 2.18
+  },
+  "crew": {
+    "①": {
+      "name": "ASSET & DEPTH",
+      "desc": "実写真の取得・最適化と深度推定"
+    },
+    "②": {
+      "name": "WORLD BUILDER",
+      "desc": "地図と3D地形の生成"
+    },
+    "③": {
+      "name": "DATA SCIENTIST",
+      "desc": "データ検証と多元評価"
+    },
+    "④": {
+      "name": "VISUAL DESIGN",
+      "desc": "チャート・OGPのデザイン"
+    },
+    "⑤": {
+      "name": "EDITORIAL & SITE",
+      "desc": "原稿レビューとサイト生成"
+    },
+    "⑥": {
+      "name": "QA LEAD",
+      "desc": "横画面スマホ実機相当QAとデザイン講評"
+    }
+  },
+  "timeline": [
+    {
+      "task": "a2",
+      "agent": "③",
+      "start": 2.19,
+      "end": 2.2,
+      "ok": true
+    },
+    {
+      "task": "a4",
+      "agent": "②",
+      "start": 2.2,
+      "end": 2.73,
+      "ok": true
+    },
+    {
+      "task": "a3",
+      "agent": "③",
+      "start": 2.2,
+      "end": 2.98,
+      "ok": true
+    },
+    {
+      "task": "a1b",
+      "agent": "①",
+      "start": 2.2,
+      "end": 3.08,
+      "ok": true
+    },
+    {
+      "task": "a7",
+      "agent": "④",
+      "start": 2.22,
+      "end": 4.11,
+      "ok": true
+    },
+    {
+      "task": "c5",
+      "agent": "⑤",
+      "start": 2.23,
+      "end": 2.24,
+      "ok": true
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "start": 2.98,
+      "end": 2.99,
+      "ok": true
+    },
+    {
+      "task": "a4b",
+      "agent": "②",
+      "start": 3.08,
+      "end": 6.86,
+      "ok": true
+    },
+    {
+      "task": "a6",
+      "agent": "⑤",
+      "start": 6.86,
+      "end": 7.13,
+      "ok": true
+    },
+    {
+      "task": "a8",
+      "agent": "⑥",
+      "start": 7.13,
+      "end": 7.49,
+      "ok": true
+    }
+  ],
+  "agents": [
+    {
+      "task": "a2",
+      "agent": "③",
+      "name": "a2_content_validator",
+      "role": "コンテンツの構造・整合性・出典チェック",
+      "ok": true,
+      "duration_s": 0.01,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "regions": 5,
+        "checks": 230,
+        "sources": 15
+      }
+    },
+    {
+      "task": "a1b",
+      "agent": "①",
+      "name": "a1b_depth_mapper",
+      "role": "単眼深度推定(Depth Anything V2)で実写真ごとに深度マップを生成し、WebGLで立体化",
+      "ok": true,
+      "duration_s": 0.35,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "depth_maps": 50,
+        "generated": 0,
+        "reused": 50,
+        "model": "Depth Anything V2 Small (ONNX int8, Apache-2.0)"
+      }
+    },
+    {
+      "task": "a4",
+      "agent": "②",
+      "name": "a4_cartographer",
+      "role": "実測国境データからインド地図SVGを生成し5地域をプロット",
+      "ok": true,
+      "duration_s": 0.51,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "rings": 4,
+        "points_raw": 1518,
+        "points_kept": 579,
+        "reduction": "62%"
+      }
+    },
+    {
+      "task": "a4b",
+      "agent": "②",
+      "name": "a4b_terrain_sculptor",
+      "role": "実標高データ(SRTM系)からインド亜大陸の3D地形(高さ・陰影・マスク)を生成",
+      "ok": true,
+      "duration_s": 3.39,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "height_px": 1024,
+        "color_px": 2048,
+        "max_elev_m": 6907,
+        "pins": 5,
+        "tiles": 16
+      }
+    },
+    {
+      "task": "a3",
+      "agent": "③",
+      "name": "a3_score_analyst",
+      "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
+      "ok": true,
+      "duration_s": 0.78,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "personas": 7,
+        "distinct_winners": [
+          "delhi-agra",
+          "ladakh",
+          "varanasi"
+        ]
+      }
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "name": "a5_chart_designer",
+      "role": "レーダーチャート・ヒートマップのSVG/配色を事前生成",
+      "ok": true,
+      "duration_s": 0.01,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "radars": 5,
+        "heat_cells": 40,
+        "season_cells": 60
+      }
+    },
+    {
+      "task": "a7",
+      "agent": "④",
+      "name": "a7_og_designer",
+      "role": "実写真から1200×630のOGP（SNS共有）画像を自動合成",
+      "ok": true,
+      "duration_s": 1.9,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "cards": 6,
+        "cjk_font": true,
+        "icons": 4
+      }
+    },
+    {
+      "task": "c5",
+      "agent": "⑤",
+      "name": "c5_copy_editor",
+      "role": "原稿の編集レビュー（LLM編集長 ＋ ルールベース校正）",
+      "ok": true,
+      "duration_s": 0.01,
+      "warnings": 1,
+      "errors": 0,
+      "stats": {
+        "mode": "rule",
+        "lint_findings": 6
+      }
+    },
+    {
+      "task": "a6",
+      "agent": "⑤",
+      "name": "a6_site_builder",
+      "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
+      "ok": true,
+      "duration_s": 0.26,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "pages": 6,
+        "build_id": "a974dea045",
+        "css_kb": 114.5,
+        "js_kb": 39.3,
+        "gl_kb": 45.3,
+        "depth_maps": 50,
+        "photos_credited": 50
+      }
+    },
+    {
+      "task": "a8",
+      "agent": "⑥",
+      "name": "a8_qa_auditor",
+      "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
+      "ok": true,
+      "duration_s": 0.37,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "pages": 6,
+        "checks": 1965,
+        "issues": 0,
+        "per_page": {
+          "delhi-agra/index.html": {
+            "checks": 304,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 83.4
+          },
+          "index.html": {
+            "checks": 485,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 168.6
+          },
+          "jaipur/index.html": {
+            "checks": 301,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 82.4
+          },
+          "kerala/index.html": {
+            "checks": 286,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 82.4
+          },
+          "ladakh/index.html": {
+            "checks": 295,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 83.2
+          },
+          "varanasi/index.html": {
+            "checks": 294,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 82.7
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "site": {
+    "title": "INDIA — 5 JOURNEYS",
+    "title_ja": "大学生のためのインド、5つの旅。",
+    "description": "日本在住の大学生に向けて、インド国内の旅行先5地域を「文化・自然・コスパ・アクセス・安心・食・体験・写真映え」の8軸で多元的に評価。デリー＆アーグラ、ジャイプル、バラナシ、ケーララ、ラダックを本物の写真とともに紹介します。",
+    "lang": "ja",
+    "base_url": "https://sc8z35a-collab.github.io/India-Travel-spot-Opus5.5/",
+    "checked": "2026-09-24"
+  },
+  "currency": {
+    "inr_to_jpy": 1.65,
+    "source": "三菱UFJリサーチ&コンサルティング / Wise 参考レート (2026年9月)",
+    "note": "1ルピー ≒ 1.65円で概算。実際の両替レートは手数料込みでこれより不利になります。"
+  },
+  "axes": [
+    {"id": "culture",  "label": "文化・歴史",   "short": "文化",   "desc": "世界遺産、宗教文化、街並みの歴史的な厚み"},
+    {"id": "nature",   "label": "自然・絶景",   "short": "自然",   "desc": "山・湖・水郷など、景観そのものの力"},
+    {"id": "budget",   "label": "コスパ",       "short": "コスパ", "desc": "現地1日あたりの費用の安さ（高いほど安い）"},
+    {"id": "access",   "label": "アクセス",     "short": "アクセス", "desc": "日本からの移動時間・乗継の少なさ"},
+    {"id": "safety",   "label": "安心・快適",   "short": "安心",   "desc": "治安・客引きの少なさ・衛生・初心者の過ごしやすさ"},
+    {"id": "food",     "label": "食",           "short": "食",     "desc": "食の多様さ・名物の強さ・食べ歩きの楽しさ"},
+    {"id": "activity", "label": "体験・アクティビティ", "short": "体験", "desc": "ここでしかできない体験の濃さ"},
+    {"id": "photo",    "label": "写真映え",     "short": "映え",   "desc": "SNS・カメラ好きが満足できる被写体の多さ"}
+  ],
+  "personas": [
+    {"id": "balanced", "label": "バランス型",       "icon": "◎", "desc": "全軸を均等に評価",
+     "weights": {"culture": 1, "nature": 1, "budget": 1, "access": 1, "safety": 1, "food": 1, "activity": 1, "photo": 1}},
+    {"id": "first",    "label": "はじめてのインド", "icon": "①", "desc": "アクセスと安心を最優先。まずは王道を",
+     "weights": {"culture": 2, "nature": 1, "budget": 1, "access": 3, "safety": 3, "food": 2, "activity": 1, "photo": 1}},
+    {"id": "history",  "label": "歴史・文化オタク", "icon": "史", "desc": "世界遺産と宗教文化を浴びたい",
+     "weights": {"culture": 4, "nature": 1, "budget": 1, "access": 1, "safety": 1, "food": 1, "activity": 2, "photo": 2}},
+    {"id": "nature",   "label": "絶景・自然派",     "icon": "山", "desc": "人より景色。非日常の風景へ",
+     "weights": {"culture": 1, "nature": 4, "budget": 1, "access": 1, "safety": 1, "food": 1, "activity": 2, "photo": 3}},
+    {"id": "saver",    "label": "節約バックパッカー", "icon": "¥", "desc": "とにかく安く、長く旅したい",
+     "weights": {"culture": 2, "nature": 1, "budget": 4, "access": 1, "safety": 1, "food": 2, "activity": 1, "photo": 1}},
+    {"id": "adventure","label": "冒険・アクティブ", "icon": "冒", "desc": "体力には自信あり。濃い体験を",
+     "weights": {"culture": 1, "nature": 3, "budget": 1, "access": 0, "safety": 1, "food": 1, "activity": 4, "photo": 2}},
+    {"id": "gourmet",  "label": "食い倒れ",         "icon": "食", "desc": "カレーだけじゃないインドを食べ尽くす",
+     "weights": {"culture": 1, "nature": 1, "budget": 2, "access": 1, "safety": 1, "food": 4, "activity": 1, "photo": 1}}
+  ],
+  "holidays": {
+    "spring": {"label": "春休み", "months": [2, 3]},
+    "summer": {"label": "夏休み", "months": [8, 9]},
+    "gw":     {"label": "GW",     "months": [5]},
+    "winter": {"label": "冬休み", "months": [12, 1]}
+  },
+  "global_facts": [
+    {"label": "ビザ", "value": "日本国籍は観光でもビザが必要。e-Visa（オンライン申請）が基本。日本国籍者はデリー・ムンバイ等6空港でビザ・オン・アライバル（現地2,000ルピー）も利用可能。", "source": "外務省 海外安全ホームページ / JAL案内", "url": "https://www.jal.co.jp/info/inter/130822.html"},
+    {"label": "e-Visa 料金目安", "value": "30日e-Tourist Visaは時期により約10〜25米ドル（別途手数料）。必ず公式サイト indianvisaonline.gov.in から申請し、代行業者の偽サイトに注意。", "source": "インド政府 e-Visa 公式 / 各種解説（2026年）", "url": "https://indianvisaonline.gov.in/evisa/"},
+    {"label": "直行便", "value": "羽田・成田からデリーへJAL・ANA・エア・インディアが直行便を運航（約9〜10時間）。JALは2026年1月に成田＝デリー線を新規開設。", "source": "JAL プレスリリース 2025/10/06", "url": "https://press.jal.co.jp/ja/release/202510/009071.html"},
+    {"label": "安全情報", "value": "インドの大部分は外務省危険レベル1（十分注意）。ラダックもレベル1だが、パキスタンとの管理ライン（LoC）付近はレベル4。レーへは陸路ではなく空路で。", "source": "外務省 海外安全ホームページ（インド危険情報）", "url": "https://www.anzen.mofa.go.jp/info/pchazardspecificinfo_2025T030.html"},
+    {"label": "たびレジ", "value": "3か月未満の渡航は外務省「たびレジ」への登録を推奨。緊急時に最新の安全情報が届きます。", "source": "外務省", "url": "https://www.ezairyu.mofa.go.jp/index.html"}
+  ]
+}

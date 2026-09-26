@@ -1,0 +1,32 @@
+{#- Responsive <picture> with AVIF → WebP → JPEG fallbacks and a blurred LQIP placeholder. -#}
+{% macro pic(id, sizes="100vw", cls="", eager=false, parallax=false) -%}
+{%- set a = assets[id] -%}
+<figure class="pic {{ cls }}{% if parallax %} js-parallax{% endif %}" style="--c:{{ a.color }};--ph:url('{{ a.lqip }}');--ar:{{ a.ratio }}">
+  <picture>
+    {%- if a.avif %}
+    <source type="image/avif" sizes="{{ sizes }}" srcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.avif {{ w }}w{{ ', ' if not loop.last }}{% endfor %}">
+    {%- endif %}
+    <source type="image/webp" sizes="{{ sizes }}" srcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.webp {{ w }}w{{ ', ' if not loop.last }}{% endfor %}">
+    {%- set jw = a.jpg if a.jpg is defined else a.variants %}
+    <img src="{{ root }}{{ a.path }}/{{ jw[-1] }}.jpg"
+         srcset="{% for w in jw %}{{ root }}{{ a.path }}/{{ w }}.jpg {{ w }}w{{ ', ' if not loop.last }}{% endfor %}"
+         sizes="{{ sizes }}" width="{{ a.width }}" height="{{ a.height }}" alt="{{ a.alt }}"
+         {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+  </picture>
+</figure>
+{%- endmacro %}
+
+{% macro credit(id) -%}
+{%- set a = assets[id] -%}
+<a class="credit" href="{{ a.link }}" target="_blank" rel="noopener" title="{{ a.title or a.alt }} — {{ a.author or a.source }} ({{ a.license }})">Photo: {{ a.author or a.source }}<span class="credit-lic"> · {{ a.license }}</span></a>
+{%- endmacro %}
+
+{% macro split(text, cls="") -%}
+<span class="split {{ cls }}" role="text" aria-label="{{ text }}">{% for word in text.split(' ') %}<span class="w" aria-hidden="true">{% for ch in word %}<span class="ch">{{ ch }}</span>{% endfor %}</span>{{ ' ' if not loop.last }}{% endfor %}</span>
+{%- endmacro %}
+
+{% macro stars(n) -%}
+<span class="meter" style="--v:{{ n }}" aria-label="{{ n }}/5">{% for i in range(5) %}<i class="{{ 'on' if i < n else '' }}"></i>{% endfor %}</span>
+{%- endmacro %}
+
+{% macro yen(v) -%}¥{{ "{:,.0f}".format(v) }}{%- endmacro %}
