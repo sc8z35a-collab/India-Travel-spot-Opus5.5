@@ -195,16 +195,17 @@
     </div>
 
     <ol class="ranking" aria-live="polite">
-      {% for r in regions %}
-      <li class="rank" data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
+      {% set bp = analysis.personas[personas[0].id] %}
+      {% for rid in bp.ranking %}{% set r = region_map[rid] %}
+      <li class="rank{% if bp.rank[rid] == 1 %} is-top{% endif %}" data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
         <a href="{{ root }}{{ r.id }}/index.html">
-          <span class="rank-pos">{{ loop.index }}</span>
+          <span class="rank-pos">{{ bp.rank[rid] }}</span>
           <div class="rank-img">{{ pic(r.hero, "72px") }}</div>
           <div class="rank-main">
             <p class="rank-name">{{ r.name }}</p>
-            <div class="rank-bar"><i></i></div>
+            <div class="rank-bar"><i style="--w:{{ bp.totals[rid] }}%"></i></div>
           </div>
-          <span class="rank-score"><b>{{ analysis.regions[r.id].balanced }}</b></span>
+          <span class="rank-score"><b>{{ bp.totals[rid] }}</b></span>
         </a>
       </li>
       {% endfor %}
@@ -229,7 +230,7 @@
       <div class="heat-row" role="row">
         <span class="heat-name" role="rowheader">{{ a.short }}</span>
         {% for r in regions %}{% set s = r.scores[a.id] %}
-        <button type="button" class="heat-cell{% if analysis.axis_leaders[a.id] == r.id %} lead{% endif %}" role="cell" style="--heat:{{ charts.heat[r.id][a.id] }};--ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点">{{ s.v }}</button>
+        <button type="button" class="heat-cell{% if r.id in analysis.axis_leaders[a.id] %} lead{% endif %}" role="cell" style="--heat:{{ charts.heat[r.id][a.id] }};--ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点{% if r.id in analysis.axis_leaders[a.id] %}（1位）{% endif %}">{{ s.v }}</button>
         {% endfor %}
       </div>
       {% endfor %}

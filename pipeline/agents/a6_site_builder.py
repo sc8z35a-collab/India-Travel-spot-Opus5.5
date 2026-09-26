@@ -159,7 +159,7 @@ class SiteBuilder(Agent):
             ld = {"@context": "https://schema.org", "@type": "TouristDestination", "name": r["name"],
                   "alternateName": r["name_en"], "description": r["lead"],
                   "touristType": [p["label"] for p in cfg["personas"]
-                                  if analysis["personas"][p["id"]]["ranking"].index(r["id"]) < 2],
+                                  if analysis["personas"][p["id"]]["rank"][r["id"]] <= 2],
                   "geo": {"@type": "GeoCoordinates", "latitude": r["coords"]["lat"], "longitude": r["coords"]["lon"]},
                   "image": cfg["site"]["base_url"] + assets[r["hero"]]["path"] + "/%d.jpg" % max(
                       [w for w in assets[r["hero"]].get("jpg", assets[r["hero"]]["variants"]) if w <= 1280]

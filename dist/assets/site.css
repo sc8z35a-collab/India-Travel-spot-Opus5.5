@@ -305,9 +305,9 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: 0; bord
   padding: 14px 18px 14px 14px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg);
   transition: border-color .4s, box-shadow .4s; will-change: transform;
 }
-.rank:first-child { border-color: var(--accent); box-shadow: 0 20px 60px -30px var(--accent); }
+.rank.is-top { border-color: var(--accent); box-shadow: 0 20px 60px -30px var(--accent); }
 .rank-pos { font-family: var(--serif-en); font-size: 44px; font-weight: 700; line-height: 1; text-align: center; color: var(--ink3); }
-.rank:first-child .rank-pos { color: var(--accent); }
+.rank.is-top .rank-pos { color: var(--accent); }
 .rank-img .pic { width: 96px; height: 64px; border-radius: 10px; }
 .rank-name { font-family: var(--serif-ja); font-weight: 700; font-size: 19px; line-height: 1.3; }
 .rank-name small { display: block; font-family: var(--serif-en); font-style: italic; font-weight: 500; font-size: 13px; color: var(--ink3); letter-spacing: .1em; }
@@ -1587,3 +1587,7 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .gl-lost .map3d-label, .gl-lost .map3d-tokyo, .gl-lost .map3d-hint { display: none !important; }
 .gl-lost body { background: var(--bg); }
 .hol-answer li span small { font-size: .7em; color: var(--ink3); margin-left: 1px; }
+
+/* ---- QA round L3 ---- */
+.ps-rank { white-space: nowrap; }
+.ps-tie { display: block; font-size: 9px; line-height: 1.1; color: var(--ink3); }

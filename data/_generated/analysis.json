@@ -2,7 +2,7 @@
   "personas": {
     "balanced": {
       "totals": {
-        "delhi-agra": 76.2,
+        "delhi-agra": 76.3,
         "jaipur": 77.5,
         "varanasi": 78.8,
         "kerala": 78.8,
@@ -15,7 +15,18 @@
         "delhi-agra",
         "ladakh"
       ],
-      "winner": "varanasi"
+      "rank": {
+        "varanasi": 1,
+        "kerala": 1,
+        "jaipur": 3,
+        "delhi-agra": 4,
+        "ladakh": 5
+      },
+      "winner": "varanasi",
+      "winners": [
+        "varanasi",
+        "kerala"
+      ]
     },
     "first": {
       "totals": {
@@ -27,12 +38,22 @@
       },
       "ranking": [
         "delhi-agra",
-        "jaipur",
         "kerala",
+        "jaipur",
         "varanasi",
         "ladakh"
       ],
-      "winner": "delhi-agra"
+      "rank": {
+        "delhi-agra": 1,
+        "kerala": 2,
+        "jaipur": 2,
+        "varanasi": 4,
+        "ladakh": 5
+      },
+      "winner": "delhi-agra",
+      "winners": [
+        "delhi-agra"
+      ]
     },
     "history": {
       "totals": {
@@ -44,12 +65,22 @@
       },
       "ranking": [
         "varanasi",
-        "delhi-agra",
         "jaipur",
+        "delhi-agra",
         "ladakh",
         "kerala"
       ],
-      "winner": "varanasi"
+      "rank": {
+        "varanasi": 1,
+        "jaipur": 2,
+        "delhi-agra": 2,
+        "ladakh": 4,
+        "kerala": 5
+      },
+      "winner": "varanasi",
+      "winners": [
+        "varanasi"
+      ]
     },
     "nature": {
       "totals": {
@@ -66,7 +97,17 @@
         "jaipur",
         "delhi-agra"
       ],
-      "winner": "ladakh"
+      "rank": {
+        "ladakh": 1,
+        "kerala": 2,
+        "varanasi": 3,
+        "jaipur": 4,
+        "delhi-agra": 5
+      },
+      "winner": "ladakh",
+      "winners": [
+        "ladakh"
+      ]
     },
     "saver": {
       "totals": {
@@ -83,7 +124,17 @@
         "kerala",
         "ladakh"
       ],
-      "winner": "varanasi"
+      "rank": {
+        "varanasi": 1,
+        "jaipur": 2,
+        "delhi-agra": 3,
+        "kerala": 4,
+        "ladakh": 5
+      },
+      "winner": "varanasi",
+      "winners": [
+        "varanasi"
+      ]
     },
     "adventure": {
       "totals": {
@@ -100,7 +151,17 @@
         "jaipur",
         "delhi-agra"
       ],
-      "winner": "ladakh"
+      "rank": {
+        "ladakh": 1,
+        "kerala": 2,
+        "varanasi": 3,
+        "jaipur": 4,
+        "delhi-agra": 5
+      },
+      "winner": "ladakh",
+      "winners": [
+        "ladakh"
+      ]
     },
     "gourmet": {
       "totals": {
@@ -117,22 +178,51 @@
         "jaipur",
         "ladakh"
       ],
-      "winner": "varanasi"
+      "rank": {
+        "varanasi": 1,
+        "kerala": 2,
+        "delhi-agra": 3,
+        "jaipur": 4,
+        "ladakh": 5
+      },
+      "winner": "varanasi",
+      "winners": [
+        "varanasi"
+      ]
     }
   },
   "axis_leaders": {
-    "culture": "delhi-agra",
-    "nature": "ladakh",
-    "budget": "varanasi",
-    "access": "delhi-agra",
-    "safety": "kerala",
-    "food": "delhi-agra",
-    "activity": "ladakh",
-    "photo": "jaipur"
+    "culture": [
+      "delhi-agra",
+      "varanasi"
+    ],
+    "nature": [
+      "ladakh"
+    ],
+    "budget": [
+      "varanasi"
+    ],
+    "access": [
+      "delhi-agra"
+    ],
+    "safety": [
+      "kerala"
+    ],
+    "food": [
+      "delhi-agra",
+      "kerala"
+    ],
+    "activity": [
+      "ladakh"
+    ],
+    "photo": [
+      "jaipur",
+      "ladakh"
+    ]
   },
   "regions": {
     "delhi-agra": {
-      "balanced": 76.2,
+      "balanced": 76.3,
       "strong": [
         "culture",
         "access"
@@ -211,7 +301,9 @@
         "safety"
       ],
       "weak": "access",
-      "persona_wins": [],
+      "persona_wins": [
+        "balanced"
+      ],
       "verdict": "自然・絶景と安心・快適が突出。弱点はアクセス（6/10）。",
       "trip_jpy": [
         23000.0,

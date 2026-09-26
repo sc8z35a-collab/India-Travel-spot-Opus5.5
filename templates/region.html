@@ -62,7 +62,7 @@
         <p class="rp-robust">{{ "{:,}".format(analysis.robust_samples) }}通りのランダムな価値観で試すと、1位になる確率 <b>{{ an.robust.win }}%</b>・2位以内 <b>{{ an.robust.top2 }}%</b></p>
         <div class="persona-scores">
           {% for p in personas %}{% set pv = analysis.personas[p.id] %}
-          <div class="ps"><span class="ps-l">{{ p.label }}</span><span class="ps-bar"><i style="--w:{{ pv.totals[r.id] }}%"></i></span><span class="ps-v">{{ pv.totals[r.id] }}</span><span class="ps-rank">{{ pv.ranking.index(r.id) + 1 }}位</span></div>
+          <div class="ps"><span class="ps-l">{{ p.label }}</span><span class="ps-bar"><i style="--w:{{ pv.totals[r.id] }}%"></i></span><span class="ps-v">{{ pv.totals[r.id] }}</span><span class="ps-rank">{{ pv.rank[r.id] }}位{% if pv.totals.values()|select('equalto', pv.totals[r.id])|list|length > 1 %}<small class="ps-tie">同点</small>{% endif %}</span></div>
           {% endfor %}
         </div>
       </div>

@@ -20,14 +20,20 @@
   const vibrate = () => { try { if (navigator.vibrate && navigator.userActivation?.hasBeenActive) navigator.vibrate(8); } catch { /* unsupported */ } };
   const emit = (name, detail) => document.dispatchEvent(new CustomEvent(name, { detail }));
   const landscape = () => matchMedia("(orientation: landscape)").matches;
+  // "/site/" and "/site/index.html" are the same page (GitHub Pages serves both)
+  const samePage = (a) => a.pathname.replace(/index\.html$/, "") === location.pathname.replace(/index\.html$/, "");
+  const byHash = (hash) => { try { return hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; } catch { return null; } };
 
   // one scroll-lock registry for every overlay: closing one never unlocks the page while another is open
   const locks = new Set();
   const lock = (k, on) => { on ? locks.add(k) : locks.delete(k); document.documentElement.style.overflow = locks.size ? "hidden" : ""; };
   // keep keyboard focus inside an open overlay
-  const trap = (root, e) => {
+  const trap = (root, e, extra = []) => {
     if (e.key !== "Tab") return;
-    const f = $$('a[href], button:not([disabled]), input, summary, [tabindex="0"]', root).filter((el) => el.offsetParent !== null);
+    // getClientRects() (not offsetParent) — offsetParent is null for position:fixed controls
+    const f = $$('a[href], button:not([disabled]), input:not([disabled]), select, textarea, summary, [tabindex]:not([tabindex="-1"])', root)
+      .concat(extra)
+      .filter((el) => el && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden");
     if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -49,6 +55,7 @@
   const finishLoader = () => {
     if (!loader) return;
     const count = $(".loader-count b", loader);
+    if (!count) return loader.classList.add("is-done");
     const heroImg = $(".hero-slide.is-active img");
     let p = 0, done = false;
     const ready = () => (done = true);
@@ -129,7 +136,7 @@
     let cur = null;
     for (const t of targets) { const r = t.getBoundingClientRect(); if (r.top <= probe && r.bottom > probe) cur = t.id; }
     tabLinks.forEach((a) => {
-      const on = !!cur && a.hash === "#" + cur && a.pathname === location.pathname;
+      const on = !!cur && a.hash === "#" + cur && samePage(a);
       a.classList.toggle("is-current", on);
       on ? a.setAttribute("aria-current", "location") : a.removeAttribute("aria-current");
     });
@@ -137,8 +144,10 @@
   let stRaf = 0;
   addEventListener("scroll", () => { if (!stRaf) stRaf = requestAnimationFrame(() => { stRaf = 0; setCurrent(); }); }, { passive: true });
   setCurrent();
-  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => { vibrate(); const t = document.getElementById(a.hash.slice(1)); if (t) revealAll(t); }));
-  if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) revealAll(t); }
+  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => { vibrate(); const t = byHash(a.hash); if (t) revealAll(t); }));
+  // a malformed hash (e.g. "#%E0") must not throw and kill every script below
+  { const t = byHash(location.hash); if (t) revealAll(t); }
+  addEventListener("hashchange", () => { const t = byHash(location.hash); if (t) revealAll(t); });
 
   /* ---------------- menu ---------------- */
   const toggle = $(".nav-toggle"), menu = $("#menu");
@@ -154,11 +163,13 @@
     onScroll();
   };
   toggle.addEventListener("click", () => setMenu(toggle.getAttribute("aria-expanded") !== "true"));
-  menu.addEventListener("keydown", (e) => trap(menu, e));
+  // the close (toggle) button lives outside the menu — keep it reachable from the keyboard
+  menu.addEventListener("keydown", (e) => trap(menu, e, [toggle]));
+  toggle.addEventListener("keydown", (e) => { if (menu.classList.contains("is-open")) trap(menu, e, [toggle]); });
   menu.addEventListener("click", (e) => { if (e.target === menu) setMenu(false); });
   $$("a", menu).forEach((a) => a.addEventListener("click", () => {
     setMenu(false);
-    const t = a.hash && a.pathname === location.pathname && document.getElementById(a.hash.slice(1));
+    const t = a.hash && samePage(a) && byHash(a.hash);
     if (t) revealAll(t);
   }));
 
@@ -168,6 +179,8 @@
   const openSheet = (html, accent, key = null) => {
     if (!sheet.classList.contains("is-open")) lastFocus = document.activeElement;
     clearTimeout(sheetT);                        // re-opening during the close animation must not blank the new content
+    // replacing a region drawer with a non-region one (e.g. a heatmap cell) must still return the 3D camera
+    if (sheetKey && sheetKey !== key && !R[key] && sheet.classList.contains("is-open")) emit("sheet:close", sheetKey);
     sheetKey = key;
     sheetBody.innerHTML = html;
     panel.scrollTop = 0;
@@ -181,7 +194,8 @@
   };
   const closeSheet = () => {
     if (sheet.hidden || !sheet.classList.contains("is-open")) return;
-    sheet.classList.remove("is-open");
+    sheet.classList.remove("is-open", "is-dragging");
+    panel.style.transform = "";                  // an inline drag offset would override the CSS slide-out
     lock("sheet", false);
     clearTimeout(sheetT);
     sheetT = setTimeout(() => { sheet.hidden = true; sheetBody.innerHTML = ""; panel.style.transform = ""; }, 450);
@@ -222,11 +236,14 @@
 
   const regionSheet = (id) => {
     const r = R[id], a = DATA.assets[r.heroId];
-    const w = a ? (a.variants.find((v) => v >= 920) || a.variants[a.variants.length - 1]) : 1280;
+    // drawer is min(460px, 56vw) wide in landscape, full width in portrait — pick for the real device density
+    const cssW = landscape() ? Math.min(460, innerWidth * 0.56) : innerWidth;
+    const need = cssW * Math.min(devicePixelRatio || 1, 3);
+    const w = a ? (a.variants.find((v) => v >= need) || a.variants[a.variants.length - 1]) : 1280;
     const facts = r.facts.map((f) => `<div><dt>${esc(f.k)}</dt><dd>${esc(f.v)}</dd></div>`).join("");
     openSheet(`
       <div class="sh-img" role="img" aria-label="${esc(a ? a.alt : r.name)}" style="background-image:url('${ROOT}${r.hero}/${w}.webp');background-color:${a?.color || "#1d1814"}"></div>
-      <p class="sh-en">0${r.order} — ${esc(r.en)}</p>
+      <p class="sh-en">${String(r.order).padStart(2, "0")} — ${esc(r.en)}</p>
       <h3 class="sh-t" id="sheet-t">${esc(r.name)}</h3>
       <p class="sh-c">${esc(r.catch)}</p>
       <div class="sh-score"><b>${r.balanced.toFixed(1)}</b><small>/100 バランス型の総合点</small></div>
@@ -415,7 +432,13 @@
     }));
     const resetBtn = document.createElement("button");
     resetBtn.type = "button"; resetBtn.className = "weights-reset"; resetBtn.textContent = "均等（すべて1）に戻す";
-    resetBtn.addEventListener("click", () => { sliders.forEach((s) => { s.value = 1; paint(s); }); desc.classList.remove("is-warn"); render(current()); });
+    resetBtn.addEventListener("click", () => {
+      sliders.forEach((s) => { s.value = 1; paint(s); });
+      setActive("custom");
+      desc.classList.remove("is-warn");
+      desc.textContent = "8つの軸の重みをすべて1（均等）に戻しました。";   // never leave the all-zero warning text behind
+      render(current());
+    });
     weightsBox.appendChild(resetBtn);
     sliders.forEach(paint);
     // first paint when visible — unless the user already interacted with the finder
@@ -439,7 +462,10 @@
     });
     c.addEventListener("keydown", (e) => {
       const n = DATA.regions.length, m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n }[e.key];
-      if (m && cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
+      if (!m) return;
+      const col = i % n;
+      if ((m === 1 && col === n - 1) || (m === -1 && col === 0)) return;   // left/right stay inside the row
+      if (cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
     });
   });
 
@@ -485,8 +511,8 @@
       $(".vs-score", vs).innerHTML = `${wa}<em>—</em>${wb}`;
       const lead = wa === wb ? "引き分け" : `${esc(wa > wb ? ra.short : rb.short)}が${Math.max(wa, wb)}軸で勝利`;
       $(".vs-verdict", vs).innerHTML = `<b>${lead}${draws ? `（同点${draws}軸）` : ""}。</b>`
-        + (winsA.length ? `${esc(ra.short)}は<b>${winsA.join("・")}</b>で優位。` : "")
-        + (winsB.length ? `${esc(rb.short)}は<b>${winsB.join("・")}</b>で優位。` : "")
+        + (winsA.length ? `${esc(ra.short)}は<b>${esc(winsA.join("・"))}</b>で優位。` : "")
+        + (winsB.length ? `${esc(rb.short)}は<b>${esc(winsB.join("・"))}</b>で優位。` : "")
         + `総合点は ${ra.balanced.toFixed(1)} 対 ${rb.balanced.toFixed(1)}。`;
     };
     $$(".vs-a .chip").forEach((c) => c.addEventListener("click", () => { A = c.dataset.id; vibrate(); draw(); }));
@@ -638,7 +664,7 @@
   // alone: entering full-screen resizes the viewport under the finger and would mis-target the tap.
   let wasFs = false;
   const firstTap = (e) => {
-    if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots")) return;
+    if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
     removeEventListener("pointerup", firstTap);
     if (canFs && !inFs() && !sessionStorage.getItem("fs-declined")) goFs();
   };

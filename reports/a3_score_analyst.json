@@ -2,12 +2,13 @@
   "agent": "a3_score_analyst",
   "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
   "ok": true,
-  "started": 1790414385.7834182,
-  "duration_s": 0.78,
+  "started": 1790423706.3459315,
+  "duration_s": 0.35,
   "stats": {
     "personas": 7,
     "distinct_winners": [
       "delhi-agra",
+      "kerala",
       "ladakh",
       "varanasi"
     ]

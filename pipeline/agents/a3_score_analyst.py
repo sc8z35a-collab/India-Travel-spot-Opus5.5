@@ -16,8 +16,26 @@ from .base import DATA, GEN, Agent, Report, load_json, save_json
 
 
 def weighted(scores: dict, weights: dict) -> float:
-    total_w = sum(weights.values()) or 1
-    return round(sum(scores[a]["v"] * w for a, w in weights.items()) / total_w * 10, 1)
+    """0-100 weighted total, rounded half-up to 0.1 with exact integer arithmetic.
+
+    Must match site.js (Math.round(s * 100 / tw) / 10): Python's round() is banker's rounding on a
+    float, which gave 76.2 on the static page but 76.3 in the interactive finder for the same data."""
+    total_w = sum(weights.values())
+    if not total_w:
+        return 0.0
+    s = sum(scores[a]["v"] * w for a, w in weights.items())
+    return (s * 200 + total_w) // (2 * total_w) / 10
+
+
+def competition_rank(order: list, totals: dict) -> dict:
+    """1224-style ranks: equal totals share a rank (same rule as the finder in site.js)."""
+    ranks, prev, rank = {}, None, 0
+    for i, k in enumerate(order):
+        if totals[k] != prev:
+            rank = i + 1
+        prev = totals[k]
+        ranks[k] = rank
+    return ranks
 
 
 class ScoreAnalyst(Agent):
@@ -30,16 +48,23 @@ class ScoreAnalyst(Agent):
         axes = {a["id"]: a for a in cfg["axes"]}
         rate = cfg["currency"]["inr_to_jpy"]
 
+        page_order = [r["id"] for r in regions]
+        balanced_w = next((p["weights"] for p in cfg["personas"] if p["id"] == "balanced"), {a: 1 for a in axes})
+        balanced = {r["id"]: weighted(r["scores"], balanced_w) for r in regions}
         personas = {}
         for p in cfg["personas"]:
             totals = {r["id"]: weighted(r["scores"], p["weights"]) for r in regions}
-            ranking = sorted(totals, key=lambda k: -totals[k])
-            personas[p["id"]] = {"totals": totals, "ranking": ranking, "winner": ranking[0]}
+            # same deterministic order as the finder: score, then balanced score, then page order
+            ranking = sorted(totals, key=lambda k: (-totals[k], -balanced[k], page_order.index(k)))
+            ranks = competition_rank(ranking, totals)
+            personas[p["id"]] = {"totals": totals, "ranking": ranking, "rank": ranks, "winner": ranking[0],
+                                 "winners": [k for k in ranking if ranks[k] == 1]}
 
+        # every region sharing the top score of an axis is a leader (ties used to star only the first)
         axis_leaders = {}
         for ax in axes:
-            best = max(regions, key=lambda r: r["scores"][ax]["v"])
-            axis_leaders[ax] = best["id"]
+            top = max(r["scores"][ax]["v"] for r in regions)
+            axis_leaders[ax] = [r["id"] for r in regions if r["scores"][ax]["v"] == top]
 
         per_region = {}
         for r in regions:
@@ -47,7 +72,7 @@ class ScoreAnalyst(Agent):
             ordered = sorted(sc, key=lambda a: -sc[a])
             strong = ordered[:2]
             weak = ordered[-1]
-            wins = [pid for pid, v in personas.items() if v["winner"] == r["id"]]
+            wins = [pid for pid, v in personas.items() if r["id"] in v["winners"]]
             d_lo, d_hi = r["days"]
             b_lo, b_hi = r["budget_inr"]
             verdict = (
@@ -55,7 +80,7 @@ class ScoreAnalyst(Agent):
                 f"弱点は{axes[weak]['label']}（{sc[weak]}/10）。"
             )
             per_region[r["id"]] = {
-                "balanced": personas["balanced"]["totals"][r["id"]],
+                "balanced": balanced[r["id"]],
                 "strong": strong,
                 "weak": weak,
                 "persona_wins": wins,
@@ -105,7 +130,7 @@ class ScoreAnalyst(Agent):
             self.log(f"{pid:10s} → winner {v['winner']:10s} {v['totals'][v['winner']]}")
         self.log("robustness (win% over random weights): "
                  + ", ".join(f"{k} {v['win']}%" for k, v in robustness.items()))
-        winners = {v["winner"] for v in personas.values()}
+        winners = {w for v in personas.values() for w in v["winners"]}
         if len(winners) < 3:
             report.warn(f"persona winners not diverse enough: {winners}")
 
