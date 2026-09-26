@@ -70,10 +70,10 @@
       <p class="body reveal">砂漠の宮殿、聖なる川、ヤシの水郷、ヒマラヤの湖。インドは「どこに行くか」で旅の性格がまるで変わる国です。日本の大学生が長期休みに行きやすい5地域を、<strong>文化・自然・コスパ・アクセス・安心・食・体験・写真映え</strong>の8軸で採点。点数にはすべて理由を書き、弱点も隠さず載せています。</p>
     </div>
     <dl class="stats">
-      <div class="stat"><dt>日本からの直行便</dt><dd><b data-count="9">0</b><small>時間〜</small></dd><p>羽田・成田 → デリー</p></div>
-      <div class="stat"><dt>評価の視点</dt><dd><b data-count="8">0</b><small>軸 × 7</small></dd><p>8つの軸 × 7タイプの旅人</p></div>
-      <div class="stat"><dt>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">0</b><small>通り</small></dd><p>ランダムな価値観で順位を検証</p></div>
-      <div class="stat"><dt>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">0</b><small>円〜</small></dd><p>宿・食・移動込み</p></div>
+      <div class="stat"><dt>日本からの直行便</dt><dd><b data-count="9">9</b><small>時間〜</small></dd><p>羽田・成田 → デリー</p></div>
+      <div class="stat"><dt>評価の視点</dt><dd><b data-count="8">8</b><small>軸 × 7</small></dd><p>8つの軸 × 7タイプの旅人</p></div>
+      <div class="stat"><dt>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">{{ "{:,}".format(analysis.robust_samples) }}</b><small>通り</small></dd><p>ランダムな価値観で順位を検証</p></div>
+      <div class="stat"><dt>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">{{ "{:,}".format(min_daily_jpy) }}</b><small>円〜</small></dd><p>宿・食・移動込み</p></div>
     </dl>
   </div>
 </section>

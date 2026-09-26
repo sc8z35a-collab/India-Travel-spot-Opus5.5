@@ -220,3 +220,4 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 /* ---- QA round L3 ---- */
 .ps-rank { white-space: nowrap; }
 .ps-tie { display: block; font-size: 9px; line-height: 1.1; color: var(--ink3); }
+.hi.is-paused .hi-bar b { animation-play-state: paused; }

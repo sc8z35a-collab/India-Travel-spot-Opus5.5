@@ -57,7 +57,7 @@
     <div class="ch-eval">
       <div class="ch-radar reveal">{{ charts.radar[r.id]|safe }}</div>
       <div class="ch-verdict">
-        <p class="ch-score"><b data-count="{{ an.balanced }}" data-decimals="1">0</b><small>/100 バランス型の総合点</small></p>
+        <p class="ch-score"><b data-count="{{ an.balanced }}" data-decimals="1">{{ "%.1f"|format(an.balanced) }}</b><small>/100 バランス型の総合点</small></p>
         <p class="ch-verdict-t">{{ an.verdict }}</p>
         <p class="rp-robust">{{ "{:,}".format(analysis.robust_samples) }}通りのランダムな価値観で試すと、1位になる確率 <b>{{ an.robust.win }}%</b>・2位以内 <b>{{ an.robust.top2 }}%</b></p>
         <div class="persona-scores">
