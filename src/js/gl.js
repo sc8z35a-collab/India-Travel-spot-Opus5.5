@@ -208,7 +208,7 @@ const HERO_FS = `
     float edge = m * (1. - m) * 4.;
     c += acc * pow(edge, 2.) * 3.2 * step(.001, uP) * step(uP, .999);
     // soft god-light sweeping across the far plane
-    float sweep = smoothstep(.35, 0., abs(vUv.x - fract(uTime * .035) * 1.6 + .3)) * (1. - d) * smoothstep(.2, 1., vUv.y);
+    float sweep = (1. - smoothstep(0., .35, abs(vUv.x - fract(uTime * .035) * 1.6 + .3))) * (1. - d) * smoothstep(.2, 1., vUv.y);
     c += acc * sweep * .10;
     gl_FragColor = vec4(c * uFade, 1.);
   }`;
@@ -231,8 +231,8 @@ const DUST_FS = `
   uniform vec3 uCol; uniform float uBokeh, uFade; varying float vA, vS;
   void main(){
     float d = length(gl_PointCoord - .5);
-    float a = uBokeh > .5 ? smoothstep(.5, .44, d) * (.25 + .75 * smoothstep(.25, .47, d)) * .22
-                          : pow(smoothstep(.5, 0., d), 1.6);
+    float a = uBokeh > .5 ? (1. - smoothstep(.44, .5, d)) * (.25 + .75 * smoothstep(.25, .47, d)) * .22
+                          : pow((1. - smoothstep(0., .5, d)), 1.6);
     if (a < .003) discard;
     vec3 c = mix(uCol, vec3(1., .93, .8), fract(vS * 7.1) * .6);
     gl_FragColor = vec4(c * a * vA * (uBokeh > .5 ? 1.2 : 2.4) * uFade, 1.);
@@ -364,7 +364,8 @@ class DepthHero {
   }
   tween(dur, fn) {
     return new Promise((res) => { const t0 = performance.now();
-      const step = () => { const k = Math.min(1, (performance.now() - t0) / 1000 / dur); fn(k); k < 1 ? requestAnimationFrame(step) : res(); };
+      // rAF is paused in background tabs: finish instantly there so `busy` can't get stuck until the tab returns
+      const step = () => { const k = document.hidden ? 1 : Math.min(1, (performance.now() - t0) / 1000 / dur); fn(k); k < 1 ? requestAnimationFrame(step) : res(); };
       step(); });
   }
   frame(dt, t) {
@@ -430,17 +431,17 @@ const TERR_FS = `
     }
     // topographic contour lines (India only)
     float cl = abs(fract(vH * 16.) - .5);
-    c += vec3(1., .8, .55) * smoothstep(.04, 0., cl) * .07 * india * (1. - vSea);
+    c += vec3(1., .8, .55) * (1. - smoothstep(0., .04, cl)) * .07 * india * (1. - vSea);
     // glowing national outline (HDR → bloom)
     c += uSaff * mk.g * (1.5 + .7 * sin(uTime * 1.3 + vUv.y * 24.));
     // radial reveal from Delhi
     float d = distance(vUv, uDelhi), R = uReveal * 1.15;
-    float shown = smoothstep(R + .01, R - .06, d);
-    float ring = smoothstep(.035, 0., abs(d - R)) * (1. - smoothstep(.85, 1., uReveal));
+    float shown = (1. - smoothstep(R - .06, R + .01, d));
+    float ring = (1. - smoothstep(0., .035, abs(d - R))) * (1. - smoothstep(.85, 1., uReveal));
     c = mix(c * .04, c, shown) + uSaff * ring * 3.;
     // fog + plane edge fade
     float fd = distance(cameraPosition, vW);
-    float edge = smoothstep(0., .12, vUv.x) * smoothstep(1., .88, vUv.x) * smoothstep(0., .12, vUv.y) * smoothstep(1., .88, vUv.y);
+    float edge = smoothstep(0., .12, vUv.x) * (1. - smoothstep(.88, 1., vUv.x)) * smoothstep(0., .12, vUv.y) * (1. - smoothstep(.88, 1., vUv.y));
     c = mix(uFog, c, edge * (1. - smoothstep(uFogN, uFogF, fd)));
     gl_FragColor = vec4(c, 1.);
   }`;
@@ -456,16 +457,16 @@ const RING_FS = `
   void main(){
     float r = length(vUv - .5) * 2.;
     float k = fract(uTime * .6 + uPh);
-    float ring = smoothstep(.07, 0., abs(r - k)) * (1. - k);
-    float core = smoothstep(.22, 0., r);
+    float ring = (1. - smoothstep(0., .07, abs(r - k))) * (1. - k);
+    float core = (1. - smoothstep(0., .22, r));
     gl_FragColor = vec4(uCol * (ring * 2.2 + core * 2.5) * (1. + uHot) * uOn, 1.);
   }`;
 const ARC_FS = `
   uniform vec3 uCol; uniform float uTime, uOn, uSpeed; varying vec2 vUv;
   void main(){
     float f = fract(vUv.x * 2.5 - uTime * uSpeed);
-    float head = smoothstep(.0, .6, f) * smoothstep(1., .92, f);
-    float grow = smoothstep(uOn, uOn - .04, vUv.x);
+    float head = smoothstep(.0, .6, f) * (1. - smoothstep(.92, 1., f));
+    float grow = (1. - smoothstep(uOn - .04, uOn, vUv.x));
     float a = (.18 + head * 1.6) * grow;
     gl_FragColor = vec4(uCol * a, 1.);
   }`;
@@ -574,7 +575,7 @@ class TerrainMap {
         void main(){ vec3 p = position; p.y += sin(uTime * .3 + aSeed * 20.) * .12; p.x += sin(uTime * .1 + aSeed * 9.) * .2;
           vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.5 + aSeed * 3.) * uPR * 6. / -mv.z; gl_Position = projectionMatrix * mv;
           vA = .4 + .6 * sin(uTime * 2. + aSeed * 50.); }`,
-      fragmentShader: `uniform float uRev; varying float vA; void main(){ float d = length(gl_PointCoord - .5); float a = smoothstep(.5, 0., d);
+      fragmentShader: `uniform float uRev; varying float vA; void main(){ float d = length(gl_PointCoord - .5); float a = (1. - smoothstep(0., .5, d));
           gl_FragColor = vec4(vec3(1., .78, .45) * a * vA * .9 * uRev, 1.); }`,
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
     this.scene.add(this.motes);
@@ -660,12 +661,19 @@ class TerrainMap {
     // horizontal drag rotates; a vertical gesture is left to the page (touch-action: pan-y); a still tap picks a pin
     this.canvas.style.touchAction = "pan-y";
     let g = null;
-    this.canvas.addEventListener("pointerdown", (e) => { g = { x: e.clientX, y: e.clientY, a0: this.azT, moved: false, id: e.pointerId }; });
+    this.canvas.addEventListener("pointerdown", (e) => {
+      if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;   // no second finger / right click
+      g = { x: e.clientX, y: e.clientY, a0: this.azT, moved: false, id: e.pointerId };
+    });
     addEventListener("pointermove", (e) => {
       if (!g || e.pointerId !== g.id) return;
       const dx = e.clientX - g.x, dy = e.clientY - g.y;
       if (!g.moved && Math.hypot(dx, dy) > 8) { g.moved = true; g.horiz = Math.abs(dx) > Math.abs(dy); }
-      if (g.moved && g.horiz) { this.azT = clamp(g.a0 - dx / innerWidth * 2.2, -0.9, 0.9); $(".map3d-hint", this.host)?.classList.add("is-used"); }
+      if (g.moved && g.horiz) {
+        // a drag during a camera flight takes over — otherwise the flight keeps overwriting azT
+        this.fly = null;
+        this.azT = clamp(g.a0 - dx / innerWidth * 2.2, -0.9, 0.9); $(".map3d-hint", this.host)?.classList.add("is-used");
+      }
     }, { passive: true });
     const up = (e) => {
       if (!g || (e && e.pointerId !== g.id)) return;
@@ -675,7 +683,9 @@ class TerrainMap {
         if (id) document.dispatchEvent(new CustomEvent("map:pick", { detail: id }));
       }
     };
-    addEventListener("pointerup", up, { passive: true }); addEventListener("pointercancel", () => (g = null), { passive: true });
+    addEventListener("pointerup", up, { passive: true });
+    // the browser took the gesture (vertical page scroll) → forget it
+    addEventListener("pointercancel", (e) => { if (g && e.pointerId === g.id) g = null; }, { passive: true });
   }
   resize() {
     const w = this.host.clientWidth, h = this.host.clientHeight;
@@ -761,7 +771,7 @@ class Ambient {
         vec3 stars(vec2 uv, float s, float par){
           vec2 g = (uv + vec2(uTilt.x, -uTilt.y) * par * .02 + vec2(0., uScroll * par)) * s;
           vec2 id = floor(g), f = fract(g) - .5; float r = h(id);
-          float b = smoothstep(.06, 0., length(f - (vec2(h(id + 3.), h(id + 7.)) - .5) * .7)) * step(.86, r);
+          float b = (1. - smoothstep(0., .06, length(f - (vec2(h(id + 3.), h(id + 7.)) - .5) * .7))) * step(.86, r);
           return vec3(1., .86, .66) * b * (.5 + .5 * sin(uTime * (1. + r * 3.) + r * 60.));
         }
         void main(){
