@@ -236,11 +236,14 @@
 
   const regionSheet = (id) => {
     const r = R[id], a = DATA.assets[r.heroId];
-    const w = a ? (a.variants.find((v) => v >= 920) || a.variants[a.variants.length - 1]) : 1280;
+    // drawer is min(460px, 56vw) wide in landscape, full width in portrait — pick for the real device density
+    const cssW = landscape() ? Math.min(460, innerWidth * 0.56) : innerWidth;
+    const need = cssW * Math.min(devicePixelRatio || 1, 3);
+    const w = a ? (a.variants.find((v) => v >= need) || a.variants[a.variants.length - 1]) : 1280;
     const facts = r.facts.map((f) => `<div><dt>${esc(f.k)}</dt><dd>${esc(f.v)}</dd></div>`).join("");
     openSheet(`
       <div class="sh-img" role="img" aria-label="${esc(a ? a.alt : r.name)}" style="background-image:url('${ROOT}${r.hero}/${w}.webp');background-color:${a?.color || "#1d1814"}"></div>
-      <p class="sh-en">0${r.order} — ${esc(r.en)}</p>
+      <p class="sh-en">${String(r.order).padStart(2, "0")} — ${esc(r.en)}</p>
       <h3 class="sh-t" id="sheet-t">${esc(r.name)}</h3>
       <p class="sh-c">${esc(r.catch)}</p>
       <div class="sh-score"><b>${r.balanced.toFixed(1)}</b><small>/100 バランス型の総合点</small></div>
@@ -429,7 +432,13 @@
     }));
     const resetBtn = document.createElement("button");
     resetBtn.type = "button"; resetBtn.className = "weights-reset"; resetBtn.textContent = "均等（すべて1）に戻す";
-    resetBtn.addEventListener("click", () => { sliders.forEach((s) => { s.value = 1; paint(s); }); desc.classList.remove("is-warn"); render(current()); });
+    resetBtn.addEventListener("click", () => {
+      sliders.forEach((s) => { s.value = 1; paint(s); });
+      setActive("custom");
+      desc.classList.remove("is-warn");
+      desc.textContent = "8つの軸の重みをすべて1（均等）に戻しました。";   // never leave the all-zero warning text behind
+      render(current());
+    });
     weightsBox.appendChild(resetBtn);
     sliders.forEach(paint);
     // first paint when visible — unless the user already interacted with the finder
@@ -453,7 +462,10 @@
     });
     c.addEventListener("keydown", (e) => {
       const n = DATA.regions.length, m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n }[e.key];
-      if (m && cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
+      if (!m) return;
+      const col = i % n;
+      if ((m === 1 && col === n - 1) || (m === -1 && col === 0)) return;   // left/right stay inside the row
+      if (cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
     });
   });
 
@@ -499,8 +511,8 @@
       $(".vs-score", vs).innerHTML = `${wa}<em>—</em>${wb}`;
       const lead = wa === wb ? "引き分け" : `${esc(wa > wb ? ra.short : rb.short)}が${Math.max(wa, wb)}軸で勝利`;
       $(".vs-verdict", vs).innerHTML = `<b>${lead}${draws ? `（同点${draws}軸）` : ""}。</b>`
-        + (winsA.length ? `${esc(ra.short)}は<b>${winsA.join("・")}</b>で優位。` : "")
-        + (winsB.length ? `${esc(rb.short)}は<b>${winsB.join("・")}</b>で優位。` : "")
+        + (winsA.length ? `${esc(ra.short)}は<b>${esc(winsA.join("・"))}</b>で優位。` : "")
+        + (winsB.length ? `${esc(rb.short)}は<b>${esc(winsB.join("・"))}</b>で優位。` : "")
         + `総合点は ${ra.balanced.toFixed(1)} 対 ${rb.balanced.toFixed(1)}。`;
     };
     $$(".vs-a .chip").forEach((c) => c.addEventListener("click", () => { A = c.dataset.id; vibrate(); draw(); }));
@@ -652,7 +664,7 @@
   // alone: entering full-screen resizes the viewport under the finger and would mis-target the tap.
   let wasFs = false;
   const firstTap = (e) => {
-    if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots")) return;
+    if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
     removeEventListener("pointerup", firstTap);
     if (canFs && !inFs() && !sessionStorage.getItem("fs-declined")) goFs();
   };
