@@ -51,10 +51,16 @@ const col = (hex) => new THREE.Color(hex);
 Gov.init();
 
 function glSupported() {
-  try { const c = document.createElement("canvas"); return !!c.getContext("webgl2"); } catch { return false; }
+  try {
+    const c = document.createElement("canvas"), g = c.getContext("webgl2");
+    if (!g) return false;
+    g.getExtension("WEBGL_lose_context")?.loseContext();   // release the probe context (browsers cap live contexts)
+    return true;
+  } catch { return false; }
 }
-if (!glSupported()) { html.classList.add("gl-off"); throw new Error("WebGL2 unavailable — static fallback"); }
-html.classList.add("gl-on");
+const GL_OK = glSupported();
+// the static fallback is an expected path — no uncaught exception in the console
+html.classList.add(GL_OK ? "gl-on" : "gl-off");
 
 /* ============================ INPUT (gyro + touch) ============================ */
 const Input = {
@@ -105,6 +111,15 @@ const FINAL_SHADER = {
     }`,
 };
 
+// a restored context has lost every texture/program → rebuild once (several canvases may fire)
+let reloading = false;
+function onRestore(canvas) {
+  canvas.addEventListener("webglcontextrestored", () => {
+    if (reloading) return; reloading = true;
+    try { sessionStorage.setItem("gl-scroll", String(scrollY)); } catch { /* private mode */ }
+    location.reload();
+  });
+}
 function makeRenderer(canvas, { alpha = false } = {}) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: false, alpha, powerPreference: "high-performance", stencil: false });
   canvas.addEventListener("webglcontextlost", (e) => {
@@ -112,7 +127,7 @@ function makeRenderer(canvas, { alpha = false } = {}) {
     html.classList.add("gl-lost");                    // CSS reveals the static <picture>/SVG underneath
     console.warn("[gl] context lost — static fallback shown");
   });
-  canvas.addEventListener("webglcontextrestored", () => location.reload());
+  onRestore(canvas);
   r.setPixelRatio(DPR);
   r.outputColorSpace = THREE.SRGBColorSpace;
   r.toneMapping = THREE.NeutralToneMapping;
@@ -142,7 +157,7 @@ function loadTex(url, { srgb = true } = {}) {
     t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
     t.generateMipmaps = true; t.anisotropy = 8; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     return t;
-  });
+  }, (e) => { texCache.delete(url); throw e; });   // a failed (offline) load must be retryable, not cached forever
   texCache.set(url, p);
   return p;
 }
@@ -246,14 +261,13 @@ class DepthHero {
     this.scene.add(this.mesh);
     this.dust = this.makeDust(1600, false);
     this.bokeh = this.makeDust(46, true);
-    const pc = this.renderer.getSize(new THREE.Vector2());
     Object.assign(this, makeComposer(this.renderer, this.scene, this.camera, { bloom: [0.55, 0.7, 0.86] }));
     this.resize();
     new ResizeObserver(() => this.resize()).observe(host);
-    Gov.listeners.add(() => { this.renderer.setPixelRatio(DPR); this.composer.setPixelRatio?.(DPR); this.resize(); });
+    Gov.listeners.add(() => this.resize());
     new IntersectionObserver((es) => es.forEach((e) => (this.visible = e.isIntersecting)), { threshold: 0 }).observe(host);
     this.show(0, true);
-    if (cycle) this.cycle = true;
+    this.cycle = cycle;
   }
   makeDust(n, bokeh) {
     const g = new THREE.BufferGeometry();
@@ -312,6 +326,7 @@ class DepthHero {
   }
   async show(i, first = false) {
     if (this.busy) { this.queue = i; return; }
+    if (!first && this.ready && i === this.cur) return;   // re-showing the current photo must not replay the dissolve
     this.busy = true;
     try {
       const { tex, dep, it } = await this.load(i);
@@ -341,6 +356,7 @@ class DepthHero {
     } catch (e) {
       console.warn("[gl] hero texture failed", e);
       if (first) { html.classList.remove("gl-hero-on"); this.host.classList.remove("gl-ready"); this.ready = false; }
+      else this.u.uP.value = 0;                          // never freeze half-way through a dissolve
     }
     this.busy = false;
     if (this.queue !== null && this.queue !== this.cur) { const q = this.queue; this.queue = null; this.show(q); }
@@ -669,6 +685,7 @@ class TerrainMap {
     this.final.uniforms.uRes.value.set(w * DPR, h * DPR);
     this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
     this.w = w; this.h = h;
+    if (this.motes) this.motes.material.uniforms.uPR.value = DPR;   // point sprites follow the DPR governor
     this.fitAll();
   }
   frame(dt, now) {
@@ -713,6 +730,7 @@ class TerrainMap {
     });
     if (this.tokyoLabel) {
       v.copy(this.tokyoAnchor).project(this.camera);
+      this.tokyoLabel.style.visibility = v.z < 1 && Math.abs(v.x) < 1.2 && Math.abs(v.y) < 1.2 ? "" : "hidden";
       this.tokyoLabel.style.transform = `translate3d(${((v.x * 0.5 + 0.5) * this.w).toFixed(1)}px, ${((-v.y * 0.5 + 0.5) * this.h).toFixed(1)}px, 0)`;
     }
     this.composer.render(dt);
@@ -726,6 +744,8 @@ class Ambient {
     canvas.className = "gl-ambient"; canvas.setAttribute("aria-hidden", "true");
     document.body.prepend(canvas);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "low-power" });
+    canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); html.classList.add("gl-lost"); });
+    onRestore(canvas);
     this.renderer.setPixelRatio(Math.min(DPR, 1) * 0.6);
     this.scene = new THREE.Scene(); this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     this.u = { uTime: { value: 0 }, uScroll: { value: 0 }, uAcc: { value: col(accent) }, uRes: { value: new THREE.Vector2() },
@@ -775,12 +795,13 @@ class Ambient {
 /* ============================ boot ============================ */
 const scenes = [];
 let ambient = null, hero = null, terrain = null;
-try {
+if (GL_OK) try {
   const heroHost = $(".hero, .rp-hero");
   if (heroHost && DATA.depth) {
-    const ids = DATA.current ? [DATA.regions.find((r) => r.id === DATA.current).heroId]
+    const curR = DATA.current && DATA.regions.find((r) => r.id === DATA.current);
+    const ids = curR ? [curR.heroId]
                              : DATA.regions.map((r) => r.heroId);
-    const items = ids.filter((id) => DATA.depth[id]).map((id) => {
+    const items = ids.filter((id) => DATA.depth[id] && DATA.assets[id]).map((id) => {
       const r = DATA.regions.find((x) => x.heroId === id);
       const a = DATA.assets[id];
       return { id, depth: DATA.depth[id], accent: r ? r.accent : "#e8a24a", ratio: a.w / a.h };
@@ -788,12 +809,16 @@ try {
     if (items.length) {
       hero = new DepthHero(heroHost, items);
       scenes.push(hero);
-      document.addEventListener("hero:go", (e) => hero.show(e.detail));
+      // slide index → item index by photo id (regions without a depth map are skipped in `items`)
+      document.addEventListener("hero:go", (e) => {
+        const r = DATA.regions[e.detail]; const k = r ? items.findIndex((it) => it.id === r.heroId) : -1;
+        if (k >= 0) hero.show(k);
+      });
     }
   }
   const mapHost = $(".map3d");
   if (mapHost && DATA.terrain) { terrain = new TerrainMap(mapHost, DATA.terrain); scenes.push(terrain); }
-  const accent = DATA.current ? DATA.regions.find((r) => r.id === DATA.current).accent : "#e8a24a";
+  const accent = DATA.regions.find((r) => r.id === DATA.current)?.accent || "#e8a24a";
   ambient = new Ambient(accent);
   // section accents drive the ambient nebula tint
   const secIO = new IntersectionObserver((es) => es.forEach((e) => {
@@ -802,17 +827,22 @@ try {
     if (a.startsWith("#")) ambient.accT.set(a);
   }), { rootMargin: "-45% 0px -45% 0px" });
   $$("main section, .card").forEach((s) => secIO.observe(s));
-} catch (e) { console.warn("[gl] init failed", e); html.classList.add("gl-off"); }
+} catch (e) {
+  console.warn("[gl] init failed", e);
+  html.classList.remove("gl-on", "gl-hero-on", "gl-map-on", "gl-amb-on");
+  html.classList.add("gl-off");
+  scenes.length = 0; ambient = null;
+}
 
 let last = performance.now(), cssT = 0, running = true;
 let rafId = 0;
 document.addEventListener("visibilitychange", () => {
   running = !document.hidden;
   cancelAnimationFrame(rafId);                       // never run two loops after a hide/show cycle
-  if (running) { last = performance.now(); rafId = requestAnimationFrame(loop); }
+  if (running && GL_OK) { last = performance.now(); rafId = requestAnimationFrame(loop); }
 });
 function loop(now) {
-  if (!running) return;
+  if (!running || !GL_OK || (!scenes.length && !ambient)) return;
   if (html.classList.contains("gl-lost")) return;
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   Input.update(dt);
@@ -825,3 +855,6 @@ function loop(now) {
 }
 rafId = requestAnimationFrame(loop);
 window.__gl = { hero, terrain, ambient, Input, Gov, get dpr() { return DPR; } };
+
+// restore the reading position after a context-restore reload
+try { const y = sessionStorage.getItem("gl-scroll"); if (y !== null) { sessionStorage.removeItem("gl-scroll"); scrollTo(0, +y); } } catch { /* ignore */ }
