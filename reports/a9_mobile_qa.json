@@ -1,0 +1,12 @@
+{
+  "agent": "a9_mobile_qa",
+  "role": "横画面Androidフラッグシップ相当(915×412・タッチ・WebGL2)での表示/操作/3D描画監査",
+  "ok": false,
+  "started": 1790400050.0629578,
+  "duration_s": 227.38,
+  "stats": {},
+  "warnings": [],
+  "errors": [
+    "TimeoutError: Page.screenshot: Timeout 90000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+  ]
+}

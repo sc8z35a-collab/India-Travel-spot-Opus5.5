@@ -1,0 +1,15 @@
+{
+  "agent": "a1b_depth_mapper",
+  "role": "単眼深度推定(Depth Anything V2)で実写真ごとに深度マップを生成し、WebGLで立体化",
+  "ok": true,
+  "started": 1790414386.2381825,
+  "duration_s": 0.35,
+  "stats": {
+    "depth_maps": 50,
+    "generated": 0,
+    "reused": 50,
+    "model": "Depth Anything V2 Small (ONNX int8, Apache-2.0)"
+  },
+  "warnings": [],
+  "errors": []
+}

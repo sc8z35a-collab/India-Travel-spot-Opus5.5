@@ -1,0 +1,218 @@
+/* =====================================================================
+   POLISH LAYER — QA round L2 (landscape flagship Android, 915×412 CSS px)
+   Loaded last. Fixes layout / clipping / overlap bugs found in the
+   full-page audit and adds the styles for new interactive affordances.
+   ===================================================================== */
+
+/* ---- typography: never break Latin words, balance headings ---- */
+.split .w { display: inline-block; white-space: nowrap; }
+.h2, .h3, .ch-catch, .card-catch, .sh-t, .spot-name, .nr-ja { word-break: auto-phrase; text-wrap: balance; }
+.body, .ch-lead, .spot-body, .why-card p { text-wrap: pretty; }
+
+/* ---- photo credits: author + licence, never overflowing ---- */
+.credit { max-width: min(62vw, 420px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.credit-lic { opacity: .72; }
+
+/* ---- map list "+" icon drawn in CSS (crisp at any DPR) ---- */
+.map-list button i { position: relative; }
+.map-list button i::before, .map-list button i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 1.6px; margin: -.8px 0 0 -5px; border-radius: 2px; background: currentColor; transition: transform .35s var(--ease); }
+.map-list button i::after { transform: rotate(90deg); }
+.map-list button.is-hot i::after { transform: rotate(0deg); }
+
+/* ---- deck navigation buttons (region deck, highlights) ---- */
+.spots-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.deck-nav { display: flex; gap: 8px; flex: 0 0 auto; }
+.deck-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line2); display: grid; place-items: center; color: var(--ink);
+                   background: rgba(20,16,13,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .25s, color .25s, opacity .25s; }
+.deck-nav button svg { width: 18px; height: 18px; }
+.deck-nav button:not(:disabled):active, .deck-nav button:not(:disabled):hover { background: var(--accent, var(--saffron)); color: #140d07; }
+.deck-nav button:disabled { opacity: .3; cursor: default; }
+.deck-dots i { cursor: pointer; }
+
+/* ---- finder ---- */
+.rank-tie { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 99px; font-size: 10px; font-family: var(--sans); font-weight: 700; letter-spacing: .04em;
+            color: var(--ink2); border: 1px solid var(--line2); vertical-align: middle; }
+.weights-reset { grid-column: 1 / -1; justify-self: start; min-height: 36px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line2); font-size: 12px; color: var(--ink2); }
+.weights-reset:hover, .weights-reset:active { color: var(--ink); border-color: var(--saffron); }
+input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
+
+/* ---- heatmap: WCAG ink colour computed per cell ---- */
+.heat-cell { color: var(--ink, #fff); text-shadow: none; }
+.axis-chips { flex-wrap: wrap; overflow: visible; }
+
+/* ---- VS swap button ---- */
+.vs-mark { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto; border-radius: 50%; border: 1px solid var(--line2); background: rgba(20,16,13,.6);
+           font-family: var(--serif-en); font-style: italic; font-size: 17px; color: var(--ink2); line-height: 1; gap: 0; transition: transform .5s var(--ease), border-color .3s, color .3s; }
+.vs-mark i { font-style: normal; font-size: 11px; color: var(--saffron); line-height: 1; }
+.vs-mark:hover, .vs-mark:active { transform: rotate(180deg); border-color: var(--saffron); color: var(--ink); }
+.vs-pick .chip:disabled { opacity: .28; cursor: not-allowed; }
+
+/* ---- radar compare hint ---- */
+.radar-compare .h3 small { display: block; margin-top: 4px; font-family: var(--sans); font-size: 11.5px; font-weight: 500; color: var(--ink3); letter-spacing: 0; }
+
+/* ---- robustness names: never wrap into bars ---- */
+.rb-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* ---- season calendar ---- */
+.cal-row { grid-template-columns: 64px repeat(12, minmax(0, 1fr)); }
+.cal-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ht small { display: block; font-size: 10px; font-weight: 500; opacity: .7; line-height: 1.2; letter-spacing: 0; }
+.ht { flex-direction: column; line-height: 1.25; }
+
+/* ---- credits list with licence pill ---- */
+.credit-list li { display: flex; align-items: center; gap: 10px; }
+.credit-list li > a:first-child { flex: 1 1 auto; min-width: 0; }
+.credit-list li > a:first-child span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.credit-list li > a:first-child small { flex: 0 0 auto; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink3); }
+.credit-list .lic { flex: 0 0 auto; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--line2); font-size: 10px; letter-spacing: .03em; color: var(--ink2); white-space: nowrap; }
+.credit-list a.lic:hover { color: var(--ink); border-color: var(--saffron); }
+
+/* ---- region: season bars show the value, holidays outlined ---- */
+.sb { grid-template-rows: auto 1fr auto; gap: 6px; }
+.sb b { font-family: var(--serif-en); font-size: 12px; font-weight: 700; color: var(--ink3); line-height: 1; }
+.sb.hol i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.75); }
+.sb.hol span { color: var(--ink); font-weight: 700; }
+
+/* ---- gallery zoom affordance ---- */
+.g-item .pic { height: 100%; }
+.g-zoom { position: absolute; right: 10px; bottom: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.45); backdrop-filter: blur(6px); pointer-events: none; }
+.g-zoom::before { content: ""; position: absolute; left: 9px; top: 9px; width: 11px; height: 11px; border: 2px solid #fff; border-radius: 50%; }
+.g-zoom::after { content: ""; position: absolute; left: 21px; top: 21px; width: 6px; height: 2px; background: #fff; transform: rotate(45deg); transform-origin: 0 50%; }
+
+/* ---- lightbox controls ---- */
+.lightbox { touch-action: pan-y pinch-zoom; }
+.lb-close, .lb-nav { position: absolute; z-index: 2; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line2); display: grid; place-items: center; color: #fff;
+                     background: rgba(20,16,13,.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 0; transition: background .25s, color .25s; }
+.lb-close svg, .lb-nav svg { width: 20px; height: 20px; }
+.lb-close { top: calc(14px + env(safe-area-inset-top)); right: calc(16px + var(--safe-r, 0px)); }
+.lb-nav { top: 50%; margin-top: -24px; }
+.lb-prev { left: calc(16px + var(--safe-l, 0px)); }
+.lb-next { right: calc(16px + var(--safe-r, 0px)); }
+.lb-close:hover, .lb-nav:hover, .lb-close:active, .lb-nav:active { background: #fff; color: #000; }
+.lb-stage { display: grid; place-items: center; gap: 10px; }
+.lb-stage picture { display: block; }
+.lb-cap { max-width: 80vw; text-align: center; font-size: 12.5px; color: var(--ink2); line-height: 1.5; }
+.lb-cap span { display: block; font-size: 11px; color: var(--ink3); }
+.lb-cap a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.lightbox.is-loading::after { content: ""; position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px; border-radius: 50%; border: 2px solid var(--line2); border-top-color: var(--saffron); animation: lbspin .8s linear infinite; }
+@keyframes lbspin { to { transform: rotate(360deg); } }
+
+/* ---- sheet: finger-tracking drag ---- */
+.sheet.is-dragging .sheet-panel { transition: none !important; }
+.sheet-panel:focus { outline: none; }
+
+/* ---- map: 3D label collision leader + hint ---- */
+.map3d-label { transition: opacity .6s, background .3s, box-shadow .3s, filter .3s; }
+.map3d-label.is-dim { opacity: .38 !important; filter: saturate(.6); }
+.map3d-label::before { content: ""; position: absolute; left: 20px; top: 100%; width: 1px; height: var(--lead, 0px); background: linear-gradient(var(--accent), transparent); opacity: .7; pointer-events: none; }
+.map3d-hint { display: none; position: absolute; z-index: 3; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 7px 14px 7px 10px; border-radius: 99px;
+              align-items: center; gap: 8px; font-size: 11px; color: var(--ink2); background: rgba(10,8,7,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+              border: 1px solid var(--line); white-space: nowrap; pointer-events: none; transition: opacity .6s; }
+.map3d-hint i { width: 18px; height: 10px; border: 1.5px solid currentColor; border-radius: 99px; position: relative; }
+.map3d-hint i::after { content: ""; position: absolute; top: 1.5px; left: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--saffron); animation: hintdrag 1.8s var(--ease) infinite; }
+@keyframes hintdrag { 50% { left: 9px; } }
+.gl-map-on .map3d-hint { display: inline-flex; }
+.map3d-hint.is-used { opacity: 0; }
+
+/* ---- short / no-GL fallbacks ---- */
+.gl-off .hero-shade { background: linear-gradient(90deg, rgba(8,6,5,.75) 0%, rgba(8,6,5,.25) 60%, transparent), linear-gradient(180deg, transparent 60%, rgba(8,6,5,.85)); }
+.persona-desc.is-warn { color: #f08b9b; }
+
+/* =====================================================================
+   LANDSCAPE LAYOUT FIXES
+   ===================================================================== */
+@media (orientation: landscape) {
+  /* rail: tabs never collide with logo / menu / fullscreen buttons */
+  .tabbar { top: 62px; bottom: 124px; justify-content: flex-start; overflow-y: auto; scrollbar-width: none; }
+  .tabbar::-webkit-scrollbar { display: none; }
+  .tabbar a.is-current::before { top: 3px; height: 28px; }
+  .nav { z-index: 126; pointer-events: none; }
+  .nav > * { pointer-events: auto; }
+  .nav-toggle { position: fixed; left: calc(var(--safe-l) + 16px); bottom: 70px; z-index: 131; margin: 0; width: 44px; height: 44px; }
+  .menu { z-index: 124; overflow-y: auto; overscroll-behavior: contain; }
+  .menu-inner { min-height: 100%; }
+
+  /* hero: long titles wrap by word instead of overflowing, tab labels fully visible */
+  .hero-title { white-space: normal; }
+  .hi-t { overflow: visible; text-overflow: clip; white-space: nowrap; }
+  .hero-credit .credit { max-width: 40vw; }
+
+  /* region hero: long English names (e.g. “Delhi & Agra”) fit */
+  .rp-title .ch-en { font-size: clamp(44px, 8.6vw, 104px); line-height: .92; }
+  .rp-hero-in { max-width: 78%; }
+
+  .marquee span { -webkit-text-stroke-color: rgba(244,237,227,.42); }
+  .sec-head .h2 .rl-line { display: inline-block; }
+
+  /* map fallback (no WebGL) fills the stage */
+  .mapsec-grid { min-height: 100vh; min-height: 100dvh; height: auto; }
+  .map3d .map { height: calc(100dvh - 24px); max-height: none; }
+
+  /* region deck: body stretches, CTA pinned to bottom, card fits one screen */
+  .regions .wrap { display: block; }
+  .regions .spots-head { align-items: flex-end; }
+  .card { max-height: none; }
+  .card-body { display: flex; flex-direction: column; min-height: 0; }
+  .card-cta { margin-top: auto; align-self: flex-start; }
+  .card-chips { flex-wrap: wrap; }
+
+  /* finder weights: 4 columns, slider full width with label row */
+  .weights { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 16px; position: static; }
+  .weights:not(.is-open) { max-height: 0; padding-top: 0; padding-bottom: 0; border-color: transparent; margin: 0; visibility: hidden; }
+  .weights.is-open { max-height: 400px; padding: 16px 18px; visibility: visible; margin-bottom: 12px; }
+  .weight { grid-template-columns: 1fr auto; grid-template-rows: auto 30px; gap: 0 6px; }
+  .weight input { grid-column: 1 / -1; grid-row: 2; }
+  .weight .w-l { grid-column: 1; grid-row: 1; }
+  .weight output { grid-column: 2; grid-row: 1; font-size: 16px; text-align: right; }
+
+  /* VS / radar */
+  .vs-pick .chips { flex-wrap: wrap; justify-content: center; }
+  .radar-compare { grid-template-columns: 1fr 1fr; }
+  .rc-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rc-controls .chip { justify-content: flex-start; }
+
+  /* credits + footer compact */
+  .credit-list { columns: 2; column-gap: 28px; margin-top: 18px; }
+  .footer-top { grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: end; }
+  .footer-big { font-size: clamp(30px, 4.6vw, 48px); }
+  .footer-grid { grid-template-columns: 1fr 1fr 1.6fr; gap: 26px; padding: 28px 0; }
+
+  /* region page */
+  .why-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .spots-head { padding-right: 0; }
+  .spot, .spot-rev { flex: 0 0 min(72vw, 660px); grid-template-columns: 1.05fr 1fr; }
+  .spot-rev .spot-img { order: 0; }
+  .spot-rev .spot-text { order: 1; }
+  .season-bars { height: 190px; margin-top: 24px; gap: 6px; }
+  .gallery { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; aspect-ratio: 16 / 7; gap: 10px; margin-top: 16px; }
+  .g-item:nth-child(n) { grid-column: auto; grid-row: auto; aspect-ratio: auto; min-height: 0; }
+  .g-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .g-item:nth-child(2) { grid-column: span 2; }
+  .lb-stage img { max-height: calc(100dvh - 76px); max-width: calc(100vw - 150px); }
+}
+
+/* short landscape phones (≤ 400 px tall) */
+@media (orientation: landscape) and (max-height: 400px) {
+  .tabbar { top: 58px; bottom: 118px; }
+  .tabbar a { height: 46px; }
+  .hero-content { padding-bottom: 60px; }
+  .hero-ja { font-size: 15px; }
+  .card-radar { width: 92px; }
+  .card-score b { font-size: 34px; }
+  .card-body { padding: 14px 16px 14px 12px; gap: 0; }
+  .card-en { font-size: 24px; }
+  .card-catch { font-size: 13px; margin-top: 4px; }
+  .card-chips { margin-top: 6px; gap: 4px; }
+  .card-chips li { padding: 3px 9px; font-size: 11px; }
+  .card-meta { margin-top: 6px; padding-top: 6px; font-size: 11px; }
+  .card-cta { margin-top: 8px; padding: 8px 14px; font-size: 12.5px; }
+  .card-img { min-height: 0; }
+  .season-bars { height: 160px; }
+}
+
+/* WebGL context lost (GPU reset / memory pressure): show the static layers again */
+.gl-lost .gl-canvas, .gl-lost .gl-ambient { display: none !important; }
+.gl-lost .hero-slides, .gl-lost .rp-hero .rp-bg, .gl-lost .map3d .map-wrap { opacity: 1 !important; pointer-events: auto !important; }
+.gl-lost .map3d-label, .gl-lost .map3d-tokyo, .gl-lost .map3d-hint { display: none !important; }
+.gl-lost body { background: var(--bg); }
+.hol-answer li span small { font-size: .7em; color: var(--ink3); margin-left: 1px; }

@@ -1,0 +1,41 @@
+{
+  "checked": true,
+  "ok": false,
+  "reason": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs",
+  "model": "gpt-5-mini",
+  "parallel": 6,
+  "latency_s": 2.18,
+  "results": [
+    {
+      "agent": 1,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    },
+    {
+      "agent": 2,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    },
+    {
+      "agent": 3,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    },
+    {
+      "agent": 4,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    },
+    {
+      "agent": 5,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    },
+    {
+      "agent": 6,
+      "ok": false,
+      "error": "RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / LLM proxy. Please visit https://www.genspark.ai/pricing?fromurl=credit_exhausted&entry=llm_proxy to subs"
+    }
+  ],
+  "checked_at": "2026-09-26 09:19:45"
+}

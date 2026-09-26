@@ -1,0 +1,258 @@
+{
+  "radar": {
+    "delhi-agra": "<svg class=\"radar\" viewBox=\"0 0 360 360\" role=\"img\" aria-label=\"文化10、自然4、コスパ7、アクセス10、安心6、食9、体験6、映え9\"><defs><radialGradient id=\"rgrad-delhi-agra\"><stop offset=\"0%\" stop-color=\"#e8a24a\" stop-opacity=\".15\"/><stop offset=\"100%\" stop-color=\"#e8a24a\" stop-opacity=\".55\"/></radialGradient></defs><g class=\"rgrid\"><polygon class=\"rg\" points=\"180.0,156.4 196.69,163.31 203.6,180.0 196.69,196.69 180.0,203.6 163.31,196.69 156.4,180.0 163.31,163.31\"/><polygon class=\"rg\" points=\"180.0,132.8 213.38,146.62 227.2,180.0 213.38,213.38 180.0,227.2 146.62,213.38 132.8,180.0 146.62,146.62\"/><polygon class=\"rg\" points=\"180.0,109.2 230.06,129.94 250.8,180.0 230.06,230.06 180.0,250.8 129.94,230.06 109.2,180.0 129.94,129.94\"/><polygon class=\"rg\" points=\"180.0,85.6 246.75,113.25 274.4,180.0 246.75,246.75 180.0,274.4 113.25,246.75 85.6,180.0 113.25,113.25\"/><polygon class=\"rg\" points=\"180.0,62.0 263.44,96.56 298.0,180.0 263.44,263.44 180.0,298.0 96.56,263.44 62.0,180.0 96.56,96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"62.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"298.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"298.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"62.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"96.56\"/></g><polygon class=\"rp\" points=\"180.0,62.0 213.38,146.62 262.6,180.0 263.44,263.44 180.0,250.8 104.91,255.09 109.2,180.0 104.91,104.91\" fill=\"url(#rgrad-delhi-agra)\" stroke=\"#e8a24a\" style=\"transform-origin:180.0px 180.0px\"/><g class=\"rdots\" fill=\"#e8a24a\"><circle class=\"rd\" cx=\"180.0\" cy=\"62.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"213.38\" cy=\"146.62\" r=\"3.5\"/><circle class=\"rd\" cx=\"262.6\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"263.44\" cy=\"263.44\" r=\"3.5\"/><circle class=\"rd\" cx=\"180.0\" cy=\"250.8\" r=\"3.5\"/><circle class=\"rd\" cx=\"104.91\" cy=\"255.09\" r=\"3.5\"/><circle class=\"rd\" cx=\"109.2\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"104.91\" cy=\"104.91\" r=\"3.5\"/></g><g class=\"rlabels\"><text class=\"rl\" x=\"180.0\" y=\"32.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">文化<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"284.65\" y=\"75.35\" text-anchor=\"start\" dominant-baseline=\"middle\">自然<tspan class=\"rv\" dx=\"4\">4</tspan></text><text class=\"rl\" x=\"328.0\" y=\"180.0\" text-anchor=\"start\" dominant-baseline=\"middle\">コスパ<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"284.65\" y=\"284.65\" text-anchor=\"start\" dominant-baseline=\"middle\">アクセス<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"180.0\" y=\"328.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">安心<tspan class=\"rv\" dx=\"4\">6</tspan></text><text class=\"rl\" x=\"75.35\" y=\"284.65\" text-anchor=\"end\" dominant-baseline=\"middle\">食<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"32.0\" y=\"180.0\" text-anchor=\"end\" dominant-baseline=\"middle\">体験<tspan class=\"rv\" dx=\"4\">6</tspan></text><text class=\"rl\" x=\"75.35\" y=\"75.35\" text-anchor=\"end\" dominant-baseline=\"middle\">映え<tspan class=\"rv\" dx=\"4\">9</tspan></text></g></svg>",
+    "jaipur": "<svg class=\"radar\" viewBox=\"0 0 360 360\" role=\"img\" aria-label=\"文化9、自然5、コスパ8、アクセス8、安心7、食8、体験7、映え10\"><defs><radialGradient id=\"rgrad-jaipur\"><stop offset=\"0%\" stop-color=\"#e0677a\" stop-opacity=\".15\"/><stop offset=\"100%\" stop-color=\"#e0677a\" stop-opacity=\".55\"/></radialGradient></defs><g class=\"rgrid\"><polygon class=\"rg\" points=\"180.0,156.4 196.69,163.31 203.6,180.0 196.69,196.69 180.0,203.6 163.31,196.69 156.4,180.0 163.31,163.31\"/><polygon class=\"rg\" points=\"180.0,132.8 213.38,146.62 227.2,180.0 213.38,213.38 180.0,227.2 146.62,213.38 132.8,180.0 146.62,146.62\"/><polygon class=\"rg\" points=\"180.0,109.2 230.06,129.94 250.8,180.0 230.06,230.06 180.0,250.8 129.94,230.06 109.2,180.0 129.94,129.94\"/><polygon class=\"rg\" points=\"180.0,85.6 246.75,113.25 274.4,180.0 246.75,246.75 180.0,274.4 113.25,246.75 85.6,180.0 113.25,113.25\"/><polygon class=\"rg\" points=\"180.0,62.0 263.44,96.56 298.0,180.0 263.44,263.44 180.0,298.0 96.56,263.44 62.0,180.0 96.56,96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"62.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"298.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"298.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"62.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"96.56\"/></g><polygon class=\"rp\" points=\"180.0,73.8 221.72,138.28 274.4,180.0 246.75,246.75 180.0,262.6 113.25,246.75 97.4,180.0 96.56,96.56\" fill=\"url(#rgrad-jaipur)\" stroke=\"#e0677a\" style=\"transform-origin:180.0px 180.0px\"/><g class=\"rdots\" fill=\"#e0677a\"><circle class=\"rd\" cx=\"180.0\" cy=\"73.8\" r=\"3.5\"/><circle class=\"rd\" cx=\"221.72\" cy=\"138.28\" r=\"3.5\"/><circle class=\"rd\" cx=\"274.4\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"246.75\" cy=\"246.75\" r=\"3.5\"/><circle class=\"rd\" cx=\"180.0\" cy=\"262.6\" r=\"3.5\"/><circle class=\"rd\" cx=\"113.25\" cy=\"246.75\" r=\"3.5\"/><circle class=\"rd\" cx=\"97.4\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"96.56\" cy=\"96.56\" r=\"3.5\"/></g><g class=\"rlabels\"><text class=\"rl\" x=\"180.0\" y=\"32.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">文化<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"284.65\" y=\"75.35\" text-anchor=\"start\" dominant-baseline=\"middle\">自然<tspan class=\"rv\" dx=\"4\">5</tspan></text><text class=\"rl\" x=\"328.0\" y=\"180.0\" text-anchor=\"start\" dominant-baseline=\"middle\">コスパ<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"284.65\" y=\"284.65\" text-anchor=\"start\" dominant-baseline=\"middle\">アクセス<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"180.0\" y=\"328.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">安心<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"75.35\" y=\"284.65\" text-anchor=\"end\" dominant-baseline=\"middle\">食<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"32.0\" y=\"180.0\" text-anchor=\"end\" dominant-baseline=\"middle\">体験<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"75.35\" y=\"75.35\" text-anchor=\"end\" dominant-baseline=\"middle\">映え<tspan class=\"rv\" dx=\"4\">10</tspan></text></g></svg>",
+    "varanasi": "<svg class=\"radar\" viewBox=\"0 0 360 360\" role=\"img\" aria-label=\"文化10、自然5、コスパ10、アクセス7、安心5、食8、体験9、映え9\"><defs><radialGradient id=\"rgrad-varanasi\"><stop offset=\"0%\" stop-color=\"#f07b2c\" stop-opacity=\".15\"/><stop offset=\"100%\" stop-color=\"#f07b2c\" stop-opacity=\".55\"/></radialGradient></defs><g class=\"rgrid\"><polygon class=\"rg\" points=\"180.0,156.4 196.69,163.31 203.6,180.0 196.69,196.69 180.0,203.6 163.31,196.69 156.4,180.0 163.31,163.31\"/><polygon class=\"rg\" points=\"180.0,132.8 213.38,146.62 227.2,180.0 213.38,213.38 180.0,227.2 146.62,213.38 132.8,180.0 146.62,146.62\"/><polygon class=\"rg\" points=\"180.0,109.2 230.06,129.94 250.8,180.0 230.06,230.06 180.0,250.8 129.94,230.06 109.2,180.0 129.94,129.94\"/><polygon class=\"rg\" points=\"180.0,85.6 246.75,113.25 274.4,180.0 246.75,246.75 180.0,274.4 113.25,246.75 85.6,180.0 113.25,113.25\"/><polygon class=\"rg\" points=\"180.0,62.0 263.44,96.56 298.0,180.0 263.44,263.44 180.0,298.0 96.56,263.44 62.0,180.0 96.56,96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"62.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"298.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"298.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"62.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"96.56\"/></g><polygon class=\"rp\" points=\"180.0,62.0 221.72,138.28 298.0,180.0 238.41,238.41 180.0,239.0 113.25,246.75 73.8,180.0 104.91,104.91\" fill=\"url(#rgrad-varanasi)\" stroke=\"#f07b2c\" style=\"transform-origin:180.0px 180.0px\"/><g class=\"rdots\" fill=\"#f07b2c\"><circle class=\"rd\" cx=\"180.0\" cy=\"62.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"221.72\" cy=\"138.28\" r=\"3.5\"/><circle class=\"rd\" cx=\"298.0\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"238.41\" cy=\"238.41\" r=\"3.5\"/><circle class=\"rd\" cx=\"180.0\" cy=\"239.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"113.25\" cy=\"246.75\" r=\"3.5\"/><circle class=\"rd\" cx=\"73.8\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"104.91\" cy=\"104.91\" r=\"3.5\"/></g><g class=\"rlabels\"><text class=\"rl\" x=\"180.0\" y=\"32.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">文化<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"284.65\" y=\"75.35\" text-anchor=\"start\" dominant-baseline=\"middle\">自然<tspan class=\"rv\" dx=\"4\">5</tspan></text><text class=\"rl\" x=\"328.0\" y=\"180.0\" text-anchor=\"start\" dominant-baseline=\"middle\">コスパ<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"284.65\" y=\"284.65\" text-anchor=\"start\" dominant-baseline=\"middle\">アクセス<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"180.0\" y=\"328.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">安心<tspan class=\"rv\" dx=\"4\">5</tspan></text><text class=\"rl\" x=\"75.35\" y=\"284.65\" text-anchor=\"end\" dominant-baseline=\"middle\">食<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"32.0\" y=\"180.0\" text-anchor=\"end\" dominant-baseline=\"middle\">体験<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"75.35\" y=\"75.35\" text-anchor=\"end\" dominant-baseline=\"middle\">映え<tspan class=\"rv\" dx=\"4\">9</tspan></text></g></svg>",
+    "kerala": "<svg class=\"radar\" viewBox=\"0 0 360 360\" role=\"img\" aria-label=\"文化7、自然9、コスパ6、アクセス6、安心9、食9、体験8、映え9\"><defs><radialGradient id=\"rgrad-kerala\"><stop offset=\"0%\" stop-color=\"#3fb68b\" stop-opacity=\".15\"/><stop offset=\"100%\" stop-color=\"#3fb68b\" stop-opacity=\".55\"/></radialGradient></defs><g class=\"rgrid\"><polygon class=\"rg\" points=\"180.0,156.4 196.69,163.31 203.6,180.0 196.69,196.69 180.0,203.6 163.31,196.69 156.4,180.0 163.31,163.31\"/><polygon class=\"rg\" points=\"180.0,132.8 213.38,146.62 227.2,180.0 213.38,213.38 180.0,227.2 146.62,213.38 132.8,180.0 146.62,146.62\"/><polygon class=\"rg\" points=\"180.0,109.2 230.06,129.94 250.8,180.0 230.06,230.06 180.0,250.8 129.94,230.06 109.2,180.0 129.94,129.94\"/><polygon class=\"rg\" points=\"180.0,85.6 246.75,113.25 274.4,180.0 246.75,246.75 180.0,274.4 113.25,246.75 85.6,180.0 113.25,113.25\"/><polygon class=\"rg\" points=\"180.0,62.0 263.44,96.56 298.0,180.0 263.44,263.44 180.0,298.0 96.56,263.44 62.0,180.0 96.56,96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"62.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"298.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"298.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"62.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"96.56\"/></g><polygon class=\"rp\" points=\"180.0,97.4 255.09,104.91 250.8,180.0 230.06,230.06 180.0,286.2 104.91,255.09 85.6,180.0 104.91,104.91\" fill=\"url(#rgrad-kerala)\" stroke=\"#3fb68b\" style=\"transform-origin:180.0px 180.0px\"/><g class=\"rdots\" fill=\"#3fb68b\"><circle class=\"rd\" cx=\"180.0\" cy=\"97.4\" r=\"3.5\"/><circle class=\"rd\" cx=\"255.09\" cy=\"104.91\" r=\"3.5\"/><circle class=\"rd\" cx=\"250.8\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"230.06\" cy=\"230.06\" r=\"3.5\"/><circle class=\"rd\" cx=\"180.0\" cy=\"286.2\" r=\"3.5\"/><circle class=\"rd\" cx=\"104.91\" cy=\"255.09\" r=\"3.5\"/><circle class=\"rd\" cx=\"85.6\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"104.91\" cy=\"104.91\" r=\"3.5\"/></g><g class=\"rlabels\"><text class=\"rl\" x=\"180.0\" y=\"32.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">文化<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"284.65\" y=\"75.35\" text-anchor=\"start\" dominant-baseline=\"middle\">自然<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"328.0\" y=\"180.0\" text-anchor=\"start\" dominant-baseline=\"middle\">コスパ<tspan class=\"rv\" dx=\"4\">6</tspan></text><text class=\"rl\" x=\"284.65\" y=\"284.65\" text-anchor=\"start\" dominant-baseline=\"middle\">アクセス<tspan class=\"rv\" dx=\"4\">6</tspan></text><text class=\"rl\" x=\"180.0\" y=\"328.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">安心<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"75.35\" y=\"284.65\" text-anchor=\"end\" dominant-baseline=\"middle\">食<tspan class=\"rv\" dx=\"4\">9</tspan></text><text class=\"rl\" x=\"32.0\" y=\"180.0\" text-anchor=\"end\" dominant-baseline=\"middle\">体験<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"75.35\" y=\"75.35\" text-anchor=\"end\" dominant-baseline=\"middle\">映え<tspan class=\"rv\" dx=\"4\">9</tspan></text></g></svg>",
+    "ladakh": "<svg class=\"radar\" viewBox=\"0 0 360 360\" role=\"img\" aria-label=\"文化8、自然10、コスパ5、アクセス4、安心7、食5、体験10、映え10\"><defs><radialGradient id=\"rgrad-ladakh\"><stop offset=\"0%\" stop-color=\"#5aa9e6\" stop-opacity=\".15\"/><stop offset=\"100%\" stop-color=\"#5aa9e6\" stop-opacity=\".55\"/></radialGradient></defs><g class=\"rgrid\"><polygon class=\"rg\" points=\"180.0,156.4 196.69,163.31 203.6,180.0 196.69,196.69 180.0,203.6 163.31,196.69 156.4,180.0 163.31,163.31\"/><polygon class=\"rg\" points=\"180.0,132.8 213.38,146.62 227.2,180.0 213.38,213.38 180.0,227.2 146.62,213.38 132.8,180.0 146.62,146.62\"/><polygon class=\"rg\" points=\"180.0,109.2 230.06,129.94 250.8,180.0 230.06,230.06 180.0,250.8 129.94,230.06 109.2,180.0 129.94,129.94\"/><polygon class=\"rg\" points=\"180.0,85.6 246.75,113.25 274.4,180.0 246.75,246.75 180.0,274.4 113.25,246.75 85.6,180.0 113.25,113.25\"/><polygon class=\"rg\" points=\"180.0,62.0 263.44,96.56 298.0,180.0 263.44,263.44 180.0,298.0 96.56,263.44 62.0,180.0 96.56,96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"62.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"96.56\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"298.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"263.44\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"180.0\" y2=\"298.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"263.44\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"62.0\" y2=\"180.0\"/><line class=\"rs\" x1=\"180.0\" y1=\"180.0\" x2=\"96.56\" y2=\"96.56\"/></g><polygon class=\"rp\" points=\"180.0,85.6 263.44,96.56 239.0,180.0 213.38,213.38 180.0,262.6 138.28,221.72 62.0,180.0 96.56,96.56\" fill=\"url(#rgrad-ladakh)\" stroke=\"#5aa9e6\" style=\"transform-origin:180.0px 180.0px\"/><g class=\"rdots\" fill=\"#5aa9e6\"><circle class=\"rd\" cx=\"180.0\" cy=\"85.6\" r=\"3.5\"/><circle class=\"rd\" cx=\"263.44\" cy=\"96.56\" r=\"3.5\"/><circle class=\"rd\" cx=\"239.0\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"213.38\" cy=\"213.38\" r=\"3.5\"/><circle class=\"rd\" cx=\"180.0\" cy=\"262.6\" r=\"3.5\"/><circle class=\"rd\" cx=\"138.28\" cy=\"221.72\" r=\"3.5\"/><circle class=\"rd\" cx=\"62.0\" cy=\"180.0\" r=\"3.5\"/><circle class=\"rd\" cx=\"96.56\" cy=\"96.56\" r=\"3.5\"/></g><g class=\"rlabels\"><text class=\"rl\" x=\"180.0\" y=\"32.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">文化<tspan class=\"rv\" dx=\"4\">8</tspan></text><text class=\"rl\" x=\"284.65\" y=\"75.35\" text-anchor=\"start\" dominant-baseline=\"middle\">自然<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"328.0\" y=\"180.0\" text-anchor=\"start\" dominant-baseline=\"middle\">コスパ<tspan class=\"rv\" dx=\"4\">5</tspan></text><text class=\"rl\" x=\"284.65\" y=\"284.65\" text-anchor=\"start\" dominant-baseline=\"middle\">アクセス<tspan class=\"rv\" dx=\"4\">4</tspan></text><text class=\"rl\" x=\"180.0\" y=\"328.0\" text-anchor=\"middle\" dominant-baseline=\"middle\">安心<tspan class=\"rv\" dx=\"4\">7</tspan></text><text class=\"rl\" x=\"75.35\" y=\"284.65\" text-anchor=\"end\" dominant-baseline=\"middle\">食<tspan class=\"rv\" dx=\"4\">5</tspan></text><text class=\"rl\" x=\"32.0\" y=\"180.0\" text-anchor=\"end\" dominant-baseline=\"middle\">体験<tspan class=\"rv\" dx=\"4\">10</tspan></text><text class=\"rl\" x=\"75.35\" y=\"75.35\" text-anchor=\"end\" dominant-baseline=\"middle\">映え<tspan class=\"rv\" dx=\"4\">10</tspan></text></g></svg>"
+  },
+  "heat": {
+    "delhi-agra": {
+      "culture": "#f2c14e",
+      "nature": "#37274a",
+      "budget": "#ac4d3a",
+      "access": "#f2c14e",
+      "safety": "#823844",
+      "food": "#e5983c",
+      "activity": "#823844",
+      "photo": "#e5983c"
+    },
+    "jaipur": {
+      "culture": "#e5983c",
+      "nature": "#552e50",
+      "budget": "#d06f32",
+      "access": "#d06f32",
+      "safety": "#ac4d3a",
+      "food": "#d06f32",
+      "activity": "#ac4d3a",
+      "photo": "#f2c14e"
+    },
+    "varanasi": {
+      "culture": "#f2c14e",
+      "nature": "#552e50",
+      "budget": "#f2c14e",
+      "access": "#ac4d3a",
+      "safety": "#552e50",
+      "food": "#d06f32",
+      "activity": "#e5983c",
+      "photo": "#e5983c"
+    },
+    "kerala": {
+      "culture": "#ac4d3a",
+      "nature": "#e5983c",
+      "budget": "#823844",
+      "access": "#823844",
+      "safety": "#e5983c",
+      "food": "#e5983c",
+      "activity": "#d06f32",
+      "photo": "#e5983c"
+    },
+    "ladakh": {
+      "culture": "#d06f32",
+      "nature": "#f2c14e",
+      "budget": "#552e50",
+      "access": "#37274a",
+      "safety": "#ac4d3a",
+      "food": "#552e50",
+      "activity": "#f2c14e",
+      "photo": "#f2c14e"
+    }
+  },
+  "heat_ink": {
+    "delhi-agra": {
+      "culture": "#1a1109",
+      "nature": "#fffaf2",
+      "budget": "#fffaf2",
+      "access": "#1a1109",
+      "safety": "#fffaf2",
+      "food": "#1a1109",
+      "activity": "#fffaf2",
+      "photo": "#1a1109"
+    },
+    "jaipur": {
+      "culture": "#1a1109",
+      "nature": "#fffaf2",
+      "budget": "#fffaf2",
+      "access": "#fffaf2",
+      "safety": "#fffaf2",
+      "food": "#fffaf2",
+      "activity": "#fffaf2",
+      "photo": "#1a1109"
+    },
+    "varanasi": {
+      "culture": "#1a1109",
+      "nature": "#fffaf2",
+      "budget": "#1a1109",
+      "access": "#fffaf2",
+      "safety": "#fffaf2",
+      "food": "#fffaf2",
+      "activity": "#1a1109",
+      "photo": "#1a1109"
+    },
+    "kerala": {
+      "culture": "#fffaf2",
+      "nature": "#1a1109",
+      "budget": "#fffaf2",
+      "access": "#fffaf2",
+      "safety": "#1a1109",
+      "food": "#1a1109",
+      "activity": "#fffaf2",
+      "photo": "#1a1109"
+    },
+    "ladakh": {
+      "culture": "#fffaf2",
+      "nature": "#1a1109",
+      "budget": "#fffaf2",
+      "access": "#fffaf2",
+      "safety": "#fffaf2",
+      "food": "#fffaf2",
+      "activity": "#1a1109",
+      "photo": "#1a1109"
+    }
+  },
+  "season": {
+    "delhi-agra": [
+      "#f2c14e",
+      "#f2c14e",
+      "#d9782e",
+      "#4a2a52",
+      "#1d2140",
+      "#1d2140",
+      "#4a2a52",
+      "#4a2a52",
+      "#9a3b3b",
+      "#d9782e",
+      "#f2c14e",
+      "#d9782e"
+    ],
+    "jaipur": [
+      "#f2c14e",
+      "#f2c14e",
+      "#d9782e",
+      "#4a2a52",
+      "#1d2140",
+      "#1d2140",
+      "#4a2a52",
+      "#4a2a52",
+      "#9a3b3b",
+      "#d9782e",
+      "#f2c14e",
+      "#f2c14e"
+    ],
+    "varanasi": [
+      "#f2c14e",
+      "#f2c14e",
+      "#d9782e",
+      "#4a2a52",
+      "#1d2140",
+      "#1d2140",
+      "#1d2140",
+      "#1d2140",
+      "#4a2a52",
+      "#d9782e",
+      "#f2c14e",
+      "#f2c14e"
+    ],
+    "kerala": [
+      "#f2c14e",
+      "#f2c14e",
+      "#d9782e",
+      "#9a3b3b",
+      "#4a2a52",
+      "#1d2140",
+      "#1d2140",
+      "#4a2a52",
+      "#9a3b3b",
+      "#9a3b3b",
+      "#d9782e",
+      "#f2c14e"
+    ],
+    "ladakh": [
+      "#1d2140",
+      "#1d2140",
+      "#1d2140",
+      "#4a2a52",
+      "#9a3b3b",
+      "#f2c14e",
+      "#f2c14e",
+      "#f2c14e",
+      "#f2c14e",
+      "#9a3b3b",
+      "#1d2140",
+      "#1d2140"
+    ]
+  },
+  "radar_js": {
+    "size": 360,
+    "r": 118,
+    "labels": [
+      "文化",
+      "自然",
+      "コスパ",
+      "アクセス",
+      "安心",
+      "食",
+      "体験",
+      "映え"
+    ],
+    "series": {
+      "delhi-agra": [
+        10,
+        4,
+        7,
+        10,
+        6,
+        9,
+        6,
+        9
+      ],
+      "jaipur": [
+        9,
+        5,
+        8,
+        8,
+        7,
+        8,
+        7,
+        10
+      ],
+      "varanasi": [
+        10,
+        5,
+        10,
+        7,
+        5,
+        8,
+        9,
+        9
+      ],
+      "kerala": [
+        7,
+        9,
+        6,
+        6,
+        9,
+        9,
+        8,
+        9
+      ],
+      "ladakh": [
+        8,
+        10,
+        5,
+        4,
+        7,
+        5,
+        10,
+        10
+      ]
+    },
+    "colors": {
+      "delhi-agra": "#e8a24a",
+      "jaipur": "#e0677a",
+      "varanasi": "#f07b2c",
+      "kerala": "#3fb68b",
+      "ladakh": "#5aa9e6"
+    }
+  }
+}

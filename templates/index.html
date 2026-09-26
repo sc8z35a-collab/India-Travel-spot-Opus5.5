@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{% block bodyclass %}home{% endblock %}
+{% block preload %}{% set a = assets[regions[0].hero] %}<link rel="preload" as="image" type="image/avif" imagesrcset="{% for w in a.variants %}{{ root }}{{ a.path }}/{{ w }}.avif {{ w }}w{{ ', ' if not loop.last }}{% endfor %}" imagesizes="100vw">{% endblock %}
+{% block jsonld %}<script type="application/ld+json">{{ jsonld|safe }}</script>{% endblock %}
+{% block tabbar %}
+<nav class="tabbar" aria-label="セクション移動">
+  {% for l in nav %}<a href="#{{ l.id }}" data-tab="{{ l.id }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-{{ l.id }}"/></svg><span>{{ l.label }}</span></a>{% endfor %}
+</nav>
+{% endblock %}
+{% block main %}
+
+{# ================= LOADER ================= #}
+<div class="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <svg class="loader-mandala" viewBox="0 0 200 200">
+      {% for i in range(16) %}<ellipse cx="100" cy="52" rx="10" ry="40" transform="rotate({{ i * 22.5 }} 100 100)"/>{% endfor %}
+      <circle cx="100" cy="100" r="20"/><circle cx="100" cy="100" r="88"/>
+    </svg>
+    <p class="loader-word"><span>नमस्ते</span></p>
+    <p class="loader-count"><b>0</b>%</p>
+  </div>
+</div>
+
+{# ================= HERO ================= #}
+<section class="hero" id="top" aria-label="イントロダクション">
+  <div class="hero-slides">
+    {% for r in regions %}
+    <div class="hero-slide{% if loop.first %} is-active{% endif %}" data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
+      {{ pic(r.hero, "100vw", "hero-pic", loop.first) }}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="hero-shade"></div>
+  <div class="hero-content wrap">
+    <p class="eyebrow hero-eyebrow"><span class="dot"></span>For university students in Japan</p>
+    <h1 class="hero-title">
+      <span class="line">{{ split("INDIA,") }}</span>
+      <span class="line line-it">{{ split("five journeys.") }}</span>
+    </h1>
+    <p class="hero-ja">大学生のためのインド、5つの旅。<br><span>8つの視点 × 7タイプの旅人で評価した、本当に行くべき場所。</span></p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#finder">30秒でタイプ診断</a>
+      <a class="btn btn-ghost" href="#regions">5つの地域を見る</a>
+    </div>
+  </div>
+  <div class="hero-index wrap" role="tablist" aria-label="ヒーロー写真の切り替え">
+    {% for r in regions %}
+    <button type="button" class="hi{% if loop.first %} is-active{% endif %}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ 0 if loop.first else -1 }}" data-go="{{ loop.index0 }}" style="--accent:{{ r.theme.accent }}" aria-label="{{ r.name }}">
+      <span class="hi-n">0{{ r.order }}</span><span class="hi-t">{{ r.short }}</span><i class="hi-bar"><b></b></i>
+    </button>
+    {% endfor %}
+  </div>
+  <div class="hero-credit">{% for r in regions %}<span data-credit="{{ loop.index0 }}"{% if not loop.first %} hidden{% endif %}>{{ credit(r.hero) }}</span>{% endfor %}</div>
+</section>
+
+{# ================= MARQUEE ================= #}
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {% for _ in range(2) %}{% for r in regions %}<span>{{ r.name_en }}</span><em>✦</em><span class="mq-ja">{{ r.name }}</span><em>✦</em>{% endfor %}{% endfor %}
+  </div>
+</div>
+
+{# ================= INTRO / NUMBERS ================= #}
+<section class="intro section" id="intro">
+  <div class="wrap intro-grid">
+    <div class="intro-text">
+      <p class="eyebrow">01 — Why India</p>
+      <h2 class="h2 reveal-lines">国土は日本の約9倍。<br>ひとつの国に、<br><em>いくつもの世界</em>。</h2>
+      <p class="body reveal">砂漠の宮殿、聖なる川、ヤシの水郷、ヒマラヤの湖。インドは「どこに行くか」で旅の性格がまるで変わる国です。日本の大学生が長期休みに行きやすい5地域を、<strong>文化・自然・コスパ・アクセス・安心・食・体験・写真映え</strong>の8軸で採点。点数にはすべて理由を書き、弱点も隠さず載せています。</p>
+    </div>
+    <dl class="stats">
+      <div class="stat"><dt>日本からの直行便</dt><dd><b data-count="9">0</b><small>時間〜</small></dd><p>羽田・成田 → デリー</p></div>
+      <div class="stat"><dt>評価の視点</dt><dd><b data-count="8">0</b><small>軸 × 7</small></dd><p>8つの軸 × 7タイプの旅人</p></div>
+      <div class="stat"><dt>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">0</b><small>通り</small></dd><p>ランダムな価値観で順位を検証</p></div>
+      <div class="stat"><dt>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">0</b><small>円〜</small></dd><p>宿・食・移動込み</p></div>
+    </dl>
+  </div>
+</section>
+
+{# ================= MAP ================= #}
+<section class="mapsec section" id="map">
+  <div class="wrap mapsec-grid">
+    <div class="sec-head">
+      <p class="eyebrow">02 — The map</p>
+      <h2 class="h2 reveal-lines">北はヒマラヤ、<br>南はアラビア海。</h2>
+      <p class="body reveal">実際の標高データから立ち上げたインド亜大陸。5つの目的地はデリーを起点に国内線や特急でつながります。<b class="hint-tap">光の柱をタップ</b>するとカメラが飛び、概要が開きます。<span class="gl-only">横にドラッグで回転。</span></p>
+      <ol class="map-list" aria-label="5つの目的地">
+        {% for r in regions %}
+        <li><button type="button" data-pin="{{ r.id }}" style="--accent:{{ r.theme.accent }}"><span>0{{ r.order }}</span><b>{{ r.name }}</b><small>{{ r.state }}</small><i aria-hidden="true"></i></button></li>
+        {% endfor %}
+      </ol>
+    </div>
+    <div class="map3d" aria-label="インドの3D地形図と5つの目的地">
+      <div class="map-wrap">
+      <svg class="map" viewBox="0 0 {{ map.w }} {{ map.h }}" role="img" aria-label="インドの地図と5つの目的地">
+        <defs>
+          <linearGradient id="mapfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a221c"/><stop offset="1" stop-color="#1a1512"/></linearGradient>
+        </defs>
+        <g class="map-land">{% for d in map.paths %}<path d="{{ d }}"/>{% endfor %}</g>
+        <g class="map-routes">
+          {% for p in map.pins %}{% if p.id != 'delhi-agra' %}
+          <path class="route" d="M{{ map.delhi[0] }},{{ map.delhi[1] }} Q{{ (map.delhi[0] + p.x) / 2 + (p.y - map.delhi[1]) * 0.25 }},{{ (map.delhi[1] + p.y) / 2 - (p.x - map.delhi[0]) * 0.25 }} {{ p.x }},{{ p.y }}"/>
+          {% endif %}{% endfor %}
+        </g>
+        <g class="map-pins">
+          {% for p in map.pins %}{% set r = region_map[p.id] %}
+          <g class="pin" data-pin="{{ p.id }}" transform="translate({{ p.x }},{{ p.y }})" style="--accent:{{ r.theme.accent }}" tabindex="0" role="button" aria-label="{{ p.label }}の概要を開く">
+            <circle class="pin-hit" r="34"/>
+            <circle class="pin-pulse" r="16"/><circle class="pin-dot" r="8"/>
+            {% set left = (p.x < map.delhi[0] - 8 and p.y < map.delhi[1] + 90) %}<text class="pin-label" x="{{ -18 if left else 18 }}" y="8" text-anchor="{{ 'end' if left else 'start' }}">{{ r.short }}</text>
+          </g>
+          {% endfor %}
+        </g>
+      </svg>
+      </div>
+      <div class="map3d-labels">
+        {% for r in regions %}
+        <button type="button" class="map3d-label" data-pin="{{ r.id }}" style="--accent:{{ r.theme.accent }}" aria-label="{{ r.name }}の概要を開く"><i></i><span class="ml-n">0{{ r.order }}</span><b>{{ r.short }}</b></button>
+        {% endfor %}
+        <p class="map3d-tokyo" aria-hidden="true"><span>TOKYO</span>直行便 約9〜10時間</p>
+      </div>
+      <button type="button" class="map3d-reset" aria-label="全体表示に戻す">全体</button>
+      <p class="map3d-hint" aria-hidden="true"><i></i>ドラッグで回転 · ピンをタップ</p>
+      <p class="map3d-src">Relief: SRTM/GMTED via AWS Terrain Tiles · Natural Earth</p>
+    </div>
+  </div>
+</section>
+
+{# ================= REGIONS (swipe deck) ================= #}
+<section class="regions section" id="regions" aria-label="5つの地域">
+  <div class="wrap">
+    <p class="eyebrow">03 — Five journeys</p>
+    <div class="spots-head">
+      <h2 class="h2 reveal-lines">5つの旅先を、<br><em>スワイプ</em>で。</h2>
+      <div class="deck-nav" role="group" aria-label="地域カードの移動">
+        <button type="button" class="deck-prev" aria-label="前の地域" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="deck-next" aria-label="次の地域"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="deck" tabindex="0" aria-label="5つの地域カード（横にスワイプ）">
+    {% for r in regions %}{% set an = analysis.regions[r.id] %}
+    <article class="card" id="region-{{ r.id }}" style="--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}">
+      <a class="card-link" href="{{ root }}{{ r.id }}/index.html" aria-label="{{ r.name }}の詳しいガイドへ"></a>
+      <div class="card-img">{{ pic(r.hero, "(orientation: landscape) %dvw, 88vw" % (34 * [1, assets[r.hero].ratio / 0.85]|max)) }}<span class="card-num">0{{ r.order }}<small>/05</small></span></div>
+      <div class="card-body">
+        <p class="card-en">{{ r.name_en }}</p>
+        <h3 class="card-ja">{{ r.name }}</h3>
+        <p class="card-catch">{{ r.catch }}</p>
+        <div class="card-score">
+          <p><b>{{ an.balanced }}</b><small>/100</small></p>
+          <div class="card-radar">{{ charts.radar[r.id]|safe }}</div>
+        </div>
+        <ul class="card-chips">
+          {% for s in an.strong %}<li class="up">▲ {{ axes_map[s].short }} {{ r.scores[s].v }}</li>{% endfor %}
+          <li class="down">▼ {{ axes_map[an.weak].short }} {{ r.scores[an.weak].v }}</li>
+        </ul>
+        <p class="card-for"><span>こんな人に</span>{{ r.good_for[0] }}</p>
+        <p class="card-meta"><span>{{ r.keyfacts[1].v }}</span><span>{{ r.days[0] }}〜{{ r.days[1] }}日</span><span>{{ yen(an.daily_jpy[0]) }}〜/日</span></p>
+        <span class="card-cta">詳しいガイドを読む <i>→</i></span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="deck-dots wrap" aria-hidden="true">{% for r in regions %}<i data-i="{{ loop.index0 }}" style="--accent:{{ r.theme.accent }}"{% if loop.first %} class="on"{% endif %}></i>{% endfor %}</div>
+</section>
+
+{# ================= FINDER ================= #}
+<section class="finder section" id="finder">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">04 — Find your India</p>
+    <h2 class="h2 reveal-lines">あなたはどんな旅人？<br><em>タイプ別</em>ランキング。</h2>
+    <p class="body reveal">同じ8軸の点数でも、何を重視するかで1位は変わります。タイプを選ぶと、その重みで総合点（100点満点）を再計算。「カスタム」で自分だけの重みも作れます。</p>
+    </div>
+    <div class="sec-body">
+
+    <div class="personas" role="tablist" aria-label="旅のタイプ">
+      {% for p in personas %}
+      <button type="button" class="persona{% if loop.first %} is-active{% endif %}" role="tab" aria-controls="weights" aria-selected="{{ 'true' if loop.first else 'false' }}" data-persona="{{ p.id }}">
+        <span class="p-icon">{{ p.icon }}</span><span class="p-label">{{ p.label }}</span>
+      </button>
+      {% endfor %}
+      <button type="button" class="persona" role="tab" aria-controls="weights" aria-selected="false" data-persona="custom"><span class="p-icon">⚙</span><span class="p-label">カスタム</span></button>
+    </div>
+    <p class="persona-desc" aria-live="polite">{{ personas[0].desc }}</p>
+
+    <div class="weights" id="weights" role="group" aria-label="8軸の重みの調整（0〜4）">
+      {% for a in axes %}
+      <label class="weight"><span class="w-l">{{ a.short }}</span>
+        <input type="range" min="0" max="4" step="1" value="1" data-axis="{{ a.id }}" aria-label="{{ a.label }}の重み">
+        <output>1</output></label>
+      {% endfor %}
+    </div>
+
+    <ol class="ranking" aria-live="polite">
+      {% for r in regions %}
+      <li class="rank" data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
+        <a href="{{ root }}{{ r.id }}/index.html">
+          <span class="rank-pos">{{ loop.index }}</span>
+          <div class="rank-img">{{ pic(r.hero, "72px") }}</div>
+          <div class="rank-main">
+            <p class="rank-name">{{ r.name }}</p>
+            <div class="rank-bar"><i></i></div>
+          </div>
+          <span class="rank-score"><b>{{ analysis.regions[r.id].balanced }}</b></span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    </div>
+  </div>
+</section>
+
+{# ================= COMPARE: heatmap + axis explorer ================= #}
+<section class="compare section" id="compare">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">05 — Multi-angle evaluation</p>
+    <h2 class="h2 reveal-lines">8つの視点で、<br>正直に比べる。</h2>
+    <p class="body reveal">10点満点。<b class="hint-tap">マスをタップ</b>すると採点の理由が読めます。★は各軸の1位。完璧な場所はありません。</p>
+    </div>
+    <div class="sec-body">
+
+    <div class="heat" role="table" aria-label="8軸×5地域の評価表">
+      <div class="heat-row heat-head" role="row"><span role="columnheader"></span>{% for r in regions %}<span role="columnheader" style="--accent:{{ r.theme.accent }}">{{ r.short }}</span>{% endfor %}</div>
+      {% for a in axes %}{% set ai = loop.index0 %}
+      <div class="heat-row" role="row">
+        <span class="heat-name" role="rowheader">{{ a.short }}</span>
+        {% for r in regions %}{% set s = r.scores[a.id] %}
+        <button type="button" class="heat-cell{% if analysis.axis_leaders[a.id] == r.id %} lead{% endif %}" role="cell" style="--heat:{{ charts.heat[r.id][a.id] }};--ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点">{{ s.v }}</button>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div class="heat-row heat-total" role="row"><span class="heat-name" role="rowheader">総合</span>{% for r in regions %}<span role="cell" style="--accent:{{ r.theme.accent }}">{{ analysis.regions[r.id].balanced }}</span>{% endfor %}</div>
+    </div>
+
+    <div class="axis-x">
+      <h3 class="h3 sub">軸ごとに見る</h3>
+      <div class="chips axis-chips" role="tablist" aria-label="評価軸">
+        {% for a in axes %}<button type="button" class="chip{% if loop.first %} is-active{% endif %}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" data-axis="{{ a.id }}">{{ a.short }}</button>{% endfor %}
+      </div>
+      <p class="axis-desc" aria-live="polite"></p>
+      <ol class="axis-bars" aria-live="polite"></ol>
+    </div>
+    </div>
+  </div>
+</section>
+
+{# ================= VS + RADAR ================= #}
+<section class="vs section" id="vs">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">06 — Head to head</p>
+    <h2 class="h2 reveal-lines">迷ったら、<br><em>1対1</em>で比べる。</h2>
+    <p class="body reveal">2つの地域を選ぶと、8軸それぞれでどちらが勝つかを左右に並べて表示します。</p>
+    </div>
+    <div class="sec-body">
+    <div class="vs-pick">
+      <div class="chips vs-a" role="group" aria-label="左の地域">{% for r in regions %}<button type="button" class="chip{% if loop.index == 1 %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.index == 1 else 'false' }}"{% if loop.index == 4 %} disabled{% endif %} data-id="{{ r.id }}" style="--accent:{{ r.theme.accent }}">{{ r.short }}</button>{% endfor %}</div>
+      <button type="button" class="vs-mark" aria-label="左右を入れ替える"><span>VS</span><i aria-hidden="true">⇄</i></button>
+      <div class="chips vs-b" role="group" aria-label="右の地域">{% for r in regions %}<button type="button" class="chip{% if loop.index == 4 %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.index == 4 else 'false' }}"{% if loop.index == 1 %} disabled{% endif %} data-id="{{ r.id }}" style="--accent:{{ r.theme.accent }}">{{ r.short }}</button>{% endfor %}</div>
+    </div>
+    <div class="vs-board" aria-live="polite">
+      <div class="vs-head"><p class="vs-na"></p><p class="vs-score"></p><p class="vs-nb"></p></div>
+      <ul class="vs-rows">
+        {% for a in axes %}
+        <li data-axis="{{ a.id }}"><span class="vs-bar vs-l"><i></i><b></b></span><span class="vs-ax">{{ a.short }}</span><span class="vs-bar vs-r"><i></i><b></b></span></li>
+        {% endfor %}
+      </ul>
+      <p class="vs-verdict"></p>
+    </div>
+
+    <div class="radar-compare">
+      <h3 class="h3 sub">レーダーで重ねる<small>地域をタップして表示を切り替え（最大5つ）</small></h3>
+      <div class="rc-chart"><svg class="rc-svg" viewBox="-40 -10 {{ charts.radar_js.size + 80 }} {{ charts.radar_js.size + 20 }}" role="img" aria-label="レーダーチャート比較"></svg></div>
+      <div class="chips rc-controls">
+        {% for r in regions %}
+        <label class="chip rc-toggle" style="--accent:{{ r.theme.accent }}"><input type="checkbox" value="{{ r.id }}" {% if loop.index in [1, 5] %}checked{% endif %}><span>{{ r.short }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+{# ================= ROBUSTNESS ================= #}
+<section class="robust section" id="robust">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">07 — Stress test</p>
+    <h2 class="h2 reveal-lines">{{ "{:,}".format(analysis.robust_samples) }}通りの<br>価値観で試した。</h2>
+    <p class="body reveal">7つのタイプだけでは偏りが出るかもしれません。そこで8軸の重みをランダムに{{ "{:,}".format(analysis.robust_samples) }}通り生成し、それぞれで1位になった回数を数えました。「誰にとっても外しにくい旅先」がわかります。</p>
+    </div>
+    <div class="sec-body">
+    <ul class="robust-list">
+      {% for r in robust_order %}{% set rb = analysis.regions[r.id].robust %}
+      <li class="reveal" style="--accent:{{ r.theme.accent }};--w:{{ rb.win }};--w2:{{ rb.top2 }}">
+        <p class="rb-name">{{ r.name }}</p>
+        <div class="rb-bars"><span class="rb-top2"><i></i></span><span class="rb-win"><i></i></span></div>
+        <p class="rb-v"><b>{{ rb.win }}<small>%</small></b><span>1位率</span><em>{{ rb.top2 }}%<span>2位以内</span></em></p>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="note">乱数シード固定・指数分布による重みづけ（ビルドごとに再現可能）。</p>
+    </div>
+  </div>
+</section>
+
+{# ================= SEASON ================= #}
+<section class="season section" id="season">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">08 — When to go</p>
+    <h2 class="h2 reveal-lines">春休み、夏休み。<br><em>いつ</em>、どこへ？</h2>
+    <p class="body reveal">北インドの平原は10〜3月が快適、4〜6月は40℃超の酷暑。ラダックは逆に6〜9月だけが旅の季節。休みを選ぶと答えが出ます。</p>
+    </div>
+    <div class="sec-body">
+    <div class="chips holiday-tabs" role="group" aria-label="休みの時期">
+      <button type="button" class="chip ht is-active" aria-pressed="true" data-hol="all">すべて</button>
+      {% for k, h in holidays.items() %}<button type="button" class="chip ht" aria-pressed="false" data-hol="{{ k }}" data-months="{{ h.months|join(',') }}">{{ h.label }}<small>{{ h.months|join('・') }}月</small></button>{% endfor %}
+    </div>
+    <div class="cal" role="table" aria-label="月別のおすすめ度（5段階）">
+      <div class="cal-row cal-head" role="row"><span></span>{% for m in range(1, 13) %}<span role="columnheader" data-m="{{ m }}">{{ m }}</span>{% endfor %}</div>
+      {% for r in regions %}
+      <div class="cal-row" role="row" style="--accent:{{ r.theme.accent }}"><span class="cal-name" role="rowheader">{{ r.short }}</span>
+        {% for v in r.months %}<span class="cal-cell" role="cell" data-m="{{ loop.index }}" data-v="{{ v }}" style="--heat:{{ charts.season[r.id][loop.index0] }}" aria-label="{{ loop.index }}月 おすすめ度{{ v }}"></span>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="cal-legend" aria-hidden="true"><span>おすすめ度</span>{% for i in range(1, 6) %}<i style="--heat:{{ season_ramp[i - 1] }}"></i>{% endfor %}<span>低 → 高　◎最適 ○良い</span></div>
+    <div class="hol-answer" aria-live="polite"><p>休みを選ぶと、おすすめの行き先を表示します。</p></div>
+    </div>
+  </div>
+</section>
+
+{# ================= PREP ================= #}
+<section class="prep section" id="prep">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">09 — Before you fly</p>
+    <h2 class="h2 reveal-lines">出発前に、<br>これだけは。</h2>
+    </div>
+    <div class="sec-body">
+    <div class="acc">
+      {% for f in facts %}
+      <details class="acc-item"{% if loop.first %} open{% endif %}>
+        <summary><span class="prep-n">{{ '%02d' % loop.index }}</span><h3>{{ f.label }}</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>{{ f.value }}</p><a href="{{ f.url }}" target="_blank" rel="noopener" class="src">出典: {{ f.source }} ↗</a></div>
+      </details>
+      {% endfor %}
+      <details class="acc-item">
+        <summary><span class="prep-n">{{ '%02d' % (facts|length + 1) }}</span><h3>大学生の予算感</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>航空券（往復・直行便）は時期により約8〜15万円前後。現地費用は1日{{ yen(min_daily_jpy) }}〜が目安。国際学生証（ISIC）や、デリー・メトロの乗車カードで移動費を抑えられます。</p><span class="src">1ルピー＝{{ currency.inr_to_jpy }}円で概算（{{ currency.source }}）</span></div>
+      </details>
+      <details class="acc-item">
+        <summary><span class="prep-n">{{ '%02d' % (facts|length + 2) }}</span><h3>体を守る</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>水はボトル入りのみ。生野菜・カットフルーツ・氷は慎重に。整腸剤、経口補水塩、虫除けは必携。渡航前にトラベルクリニックで予防接種（A型肝炎など）の相談を。海外旅行保険には必ず加入を。</p><a href="https://www.forth.go.jp/" target="_blank" rel="noopener" class="src">出典: 厚生労働省検疫所 FORTH ↗</a></div>
+      </details>
+    </div>
+    </div>
+  </div>
+</section>
+
+{# ================= CREDITS ================= #}
+<section class="credits" id="credits">
+  <div class="wrap">
+    <details class="credits-box">
+      <summary><span class="eyebrow">Photo credits</span><h2 class="h3">写真クレジット（{{ credit_list|length }}点）</h2><i aria-hidden="true"></i></summary>
+      <p class="body">写真はすべて、クリエイティブ・コモンズ／パブリックドメイン等で公開されている実写真です（AI生成画像は不使用）。撮影者・ライセンスを明記し、各写真の出典ページとライセンス条文へリンクしています。CC BY-SA の写真はリサイズ・トリミングのみ行い、同じライセンスで提供しています。</p>
+      <ul class="credit-list">
+        {% for a in credit_list %}<li><a href="{{ a.link }}" target="_blank" rel="noopener"><span>{{ a.title or a.alt }}</span><small>{{ a.author or a.source }}{% if a.author %} / {{ a.source }}{% endif %}</small></a>{% if a.license_url %}<a class="lic" href="{{ a.license_url }}" target="_blank" rel="noopener license">{{ a.license }}</a>{% else %}<span class="lic">{{ a.license }}</span>{% endif %}</li>{% endfor %}
+      </ul>
+    </details>
+  </div>
+</section>
+
+{% endblock %}
