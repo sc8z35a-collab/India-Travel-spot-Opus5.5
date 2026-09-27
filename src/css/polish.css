@@ -105,7 +105,7 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- map: 3D label collision leader + hint ---- */
 .map3d-label { transition: opacity .6s, background .3s, box-shadow .3s, filter .3s; }
-.map3d-label.is-dim { opacity: .38 !important; filter: saturate(.6); }
+.map3d-label.is-on.is-dim { opacity: .38; filter: saturate(.6); }
 .map3d-label::before { content: ""; position: absolute; left: 20px; top: 100%; width: 1px; height: var(--lead, 0px); background: linear-gradient(var(--accent), transparent); opacity: .7; pointer-events: none; }
 .map3d-hint { display: none; position: absolute; z-index: 3; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 7px 14px 7px 10px; border-radius: 99px;
               align-items: center; gap: 8px; font-size: 11px; color: var(--ink2); background: rgba(10,8,7,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);

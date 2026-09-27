@@ -142,7 +142,7 @@
     <h2 class="h2 reveal-lines">季節ごとの<br>おすすめ度。</h2>
     <div class="season-bars" role="list" aria-label="月別のおすすめ度（5段階）">
       {% for v in r.months %}{% set m = loop.index %}
-      <div class="sb{% if m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--heat:{{ charts.season[r.id][loop.index0] }}">
+      <div class="sb{% if m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--m:{{ loop.index0 }};--heat:{{ charts.season[r.id][loop.index0] }}">
         <b>{{ v }}</b><i></i><span>{{ m }}月</span>
       </div>
       {% endfor %}
