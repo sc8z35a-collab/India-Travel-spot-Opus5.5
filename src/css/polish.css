@@ -38,6 +38,8 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- heatmap: WCAG ink colour computed per cell ---- */
 .heat-cell { color: var(--ink, #fff); text-shadow: none; }
+.heat-td { display: grid; min-width: 0; }
+.heat-td > .heat-cell { width: 100%; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
 
 /* ---- VS swap button ---- */

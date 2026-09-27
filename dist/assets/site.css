@@ -87,7 +87,8 @@ ol, ul { list-style: none; }
 .pic { position: relative; overflow: hidden; background: var(--c) var(--ph) center / cover no-repeat; }
 .pic picture, .pic img { width: 100%; height: 100%; }
 .pic img { object-fit: cover; opacity: 0; transition: opacity 1s var(--ease), transform 1.4s var(--ease); }
-.pic img.is-loaded, .no-js .pic img { opacity: 1; }
+/* the fade-in only applies while JS runs (html.js) — without JS every photo is visible */
+html:not(.js) .pic img, .pic img.is-loaded { opacity: 1; }
 .credit {
   position: absolute; right: 12px; bottom: 10px; z-index: 3; font-size: 10.5px; letter-spacing: .04em;
   color: rgba(255,255,255,.72); background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
@@ -154,7 +155,7 @@ ol, ul { list-style: none; }
 
 /* ---------- Loader ------------------------------------------------------- */
 .loader { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: grid; place-items: center; }
-.no-js .loader, .loader.is-done { display: none; }
+html:not(.js) .loader, .loader.is-done { display: none; }
 .loader-inner { display: grid; place-items: center; gap: 18px; }
 .loader-mandala { width: 120px; height: 120px; fill: none; stroke: var(--saffron); stroke-width: 1.1; animation: spin 14s linear infinite; }
 .loader-mandala ellipse, .loader-mandala circle { stroke-dasharray: 300; stroke-dashoffset: 300; animation: draw 1.6s var(--ease) forwards; }
@@ -257,6 +258,7 @@ ol, ul { list-style: none; }
 .map.is-drawn .route { opacity: 1; animation: dash 30s linear infinite; }
 @keyframes dash { to { stroke-dashoffset: -400; } }
 .pin { cursor: pointer; outline: none; }
+.pin:focus-visible .pin-dot { stroke: var(--ink); stroke-width: 3; }
 .pin-dot { fill: var(--accent); stroke: #0d0b0a; stroke-width: 2; transition: r .3s; }
 .pin-pulse { fill: var(--accent); opacity: .25; transform-box: fill-box; transform-origin: center; animation: pulse 2.4s var(--ease) infinite; }
 @keyframes pulse { 0% { transform: scale(.4); opacity: .6; } 100% { transform: scale(2.2); opacity: 0; } }
@@ -486,7 +488,7 @@ a.src:hover { color: var(--saffron); }
 .footer-big em { color: var(--saffron); }
 .footer-ja { font-family: var(--serif-ja); font-weight: 700; font-size: clamp(16px, 1.5vw, 20px); line-height: 2; color: var(--ink2); }
 .footer-grid { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 40px; padding: 50px 0; }
-.footer h3 { font-family: var(--serif-en); font-size: 13px; letter-spacing: .2em; color: var(--saffron); margin-bottom: 16px; font-weight: 600; }
+.footer h3, .footer .footer-h { font-family: var(--serif-en); font-size: 13px; letter-spacing: .2em; color: var(--saffron); margin-bottom: 16px; font-weight: 600; }
 .footer li { margin-bottom: 8px; font-size: 14px; }
 .footer li a { color: var(--ink2); transition: color .3s; }
 .footer li a:hover { color: var(--ink); }
@@ -1409,6 +1411,8 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- heatmap: WCAG ink colour computed per cell ---- */
 .heat-cell { color: var(--ink, #fff); text-shadow: none; }
+.heat-td { display: grid; min-width: 0; }
+.heat-td > .heat-cell { width: 100%; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
 
 /* ---- VS swap button ---- */

@@ -488,7 +488,7 @@ a.src:hover { color: var(--saffron); }
 .footer-big em { color: var(--saffron); }
 .footer-ja { font-family: var(--serif-ja); font-weight: 700; font-size: clamp(16px, 1.5vw, 20px); line-height: 2; color: var(--ink2); }
 .footer-grid { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 40px; padding: 50px 0; }
-.footer h3 { font-family: var(--serif-en); font-size: 13px; letter-spacing: .2em; color: var(--saffron); margin-bottom: 16px; font-weight: 600; }
+.footer h3, .footer .footer-h { font-family: var(--serif-en); font-size: 13px; letter-spacing: .2em; color: var(--saffron); margin-bottom: 16px; font-weight: 600; }
 .footer li { margin-bottom: 8px; font-size: 14px; }
 .footer li a { color: var(--ink2); transition: color .3s; }
 .footer li a:hover { color: var(--ink); }
