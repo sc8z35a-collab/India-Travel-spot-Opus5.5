@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 1.2,
+  "duration_s": 1.0,
   "llm": {
     "ok": false,
     "model": null,
@@ -36,31 +36,38 @@
   },
   "timeline": [
     {
+      "task": "a2",
+      "agent": "③",
+      "start": 0.0,
+      "end": 0.0,
+      "ok": true
+    },
+    {
       "task": "a3",
       "agent": "③",
       "start": 0.0,
-      "end": 0.41,
+      "end": 0.33,
       "ok": true
     },
     {
       "task": "a5",
       "agent": "④",
-      "start": 0.41,
-      "end": 0.41,
+      "start": 0.33,
+      "end": 0.33,
       "ok": true
     },
     {
       "task": "a6",
       "agent": "⑤",
-      "start": 0.41,
-      "end": 0.6,
+      "start": 0.33,
+      "end": 0.52,
       "ok": true
     },
     {
       "task": "a8",
       "agent": "⑥",
-      "start": 0.6,
-      "end": 1.16,
+      "start": 0.52,
+      "end": 1.0,
       "ok": true
     }
   ],
@@ -68,12 +75,27 @@
   "skipped": [],
   "agents": [
     {
+      "task": "a2",
+      "agent": "③",
+      "name": "a2_content_validator",
+      "role": "コンテンツの構造・整合性・出典チェック",
+      "ok": true,
+      "duration_s": 0.0,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "regions": 5,
+        "checks": 230,
+        "sources": 15
+      }
+    },
+    {
       "task": "a3",
       "agent": "③",
       "name": "a3_score_analyst",
       "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
       "ok": true,
-      "duration_s": 0.41,
+      "duration_s": 0.32,
       "warnings": 0,
       "errors": 0,
       "stats": {
@@ -126,7 +148,7 @@
       "name": "a8_qa_auditor",
       "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
       "ok": true,
-      "duration_s": 0.55,
+      "duration_s": 0.48,
       "warnings": 0,
       "errors": 0,
       "stats": {
