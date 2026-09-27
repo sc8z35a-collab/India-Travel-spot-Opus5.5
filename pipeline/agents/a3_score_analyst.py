@@ -102,9 +102,18 @@ class ScoreAnalyst(Agent):
             w = {a: rng.expovariate(1.0) for a in ax_ids}
             tot = {r["id"]: sum(r["scores"][a]["v"] * w[a] for a in ax_ids) for r in regions}
             order = sorted(tot, key=lambda k: -tot[k])
-            win_count[order[0]] += 1
-            for k in order[:2]:
+            top = tot[order[0]]
+            # exact ties (possible: integer scores) are split, not credited to whoever comes first in page order
+            best = [k for k in order if abs(tot[k] - top) < 1e-9]
+            for k in best:
+                win_count[k] += 1 / len(best)
+            cut = tot[order[1]]
+            inside = [k for k in order if tot[k] > cut + 1e-9]
+            edge = [k for k in order if abs(tot[k] - cut) < 1e-9]
+            for k in inside:
                 top2_count[k] += 1
+            for k in edge:
+                top2_count[k] += (2 - len(inside)) / len(edge)
         robustness = {rid: {"win": round(win_count[rid] * 100 / N, 1), "top2": round(top2_count[rid] * 100 / N, 1)}
                       for rid in win_count}
 

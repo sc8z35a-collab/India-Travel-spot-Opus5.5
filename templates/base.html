@@ -98,11 +98,11 @@
     </div>
     <div class="footer-grid">
       <div>
-        <h3>5 JOURNEYS</h3>
+        <h2 class="footer-h">{{ regions|length }} JOURNEYS</h2>
         <ul>{% for r in regions %}<li><a href="{{ root }}{{ r.id }}/index.html">{{ r.name }}</a></li>{% endfor %}</ul>
       </div>
       <div>
-        <h3>公式情報</h3>
+        <h2 class="footer-h">公式情報</h2>
         <ul>
           <li><a href="https://www.anzen.mofa.go.jp/" target="_blank" rel="noopener">外務省 海外安全ホームページ</a></li>
           <li><a href="https://www.ezairyu.mofa.go.jp/index.html" target="_blank" rel="noopener">たびレジ</a></li>
@@ -111,12 +111,12 @@
         </ul>
       </div>
       <div class="footer-note">
-        <h3>ご利用にあたって</h3>
+        <h2 class="footer-h">ご利用にあたって</h2>
         <p>掲載情報は{{ site.checked }}時点で確認したものです。料金・運行・入域規制・安全情報は予告なく変わります。渡航前に必ず公式情報を確認してください。為替は1ルピー＝{{ currency.inr_to_jpy }}円で概算しています。地図は位置関係を示すための簡略図で、国境線は公式な見解を示すものではありません。写真はすべてクリエイティブ・コモンズ／パブリックドメイン等で公開された実写真で、撮影者とライセンスを各写真および<a href="{{ root }}index.html#credits">クレジット一覧</a>に明記しています。AI生成画像は使用していません。</p>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© {{ year }} INDIA — 5 JOURNEYS</span>
+      <span>© {{ year }} {{ site.title }}</span>
       <a href="{{ root }}index.html#credits">Photo credits</a>
     </div>
   </div>

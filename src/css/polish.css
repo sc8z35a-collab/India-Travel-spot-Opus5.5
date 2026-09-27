@@ -38,6 +38,8 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- heatmap: WCAG ink colour computed per cell ---- */
 .heat-cell { color: var(--ink, #fff); text-shadow: none; }
+.heat-td { display: grid; min-width: 0; }
+.heat-td > .heat-cell { width: 100%; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
 
 /* ---- VS swap button ---- */
@@ -103,7 +105,7 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- map: 3D label collision leader + hint ---- */
 .map3d-label { transition: opacity .6s, background .3s, box-shadow .3s, filter .3s; }
-.map3d-label.is-dim { opacity: .38 !important; filter: saturate(.6); }
+.map3d-label.is-on.is-dim { opacity: .38; filter: saturate(.6); }
 .map3d-label::before { content: ""; position: absolute; left: 20px; top: 100%; width: 1px; height: var(--lead, 0px); background: linear-gradient(var(--accent), transparent); opacity: .7; pointer-events: none; }
 .map3d-hint { display: none; position: absolute; z-index: 3; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 7px 14px 7px 10px; border-radius: 99px;
               align-items: center; gap: 8px; font-size: 11px; color: var(--ink2); background: rgba(10,8,7,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -221,3 +223,12 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .ps-rank { white-space: nowrap; }
 .ps-tie { display: block; font-size: 9px; line-height: 1.1; color: var(--ink3); }
 .hi.is-paused .hi-bar b { animation-play-state: paused; }
+
+/* ---- QA round L4 ---- */
+/* stat notes are <dd> now (a <p> directly inside a <dl> group is invalid HTML) — undo the big-number dd styling */
+.stat dd.stat-note { font-family: var(--sans); font-size: 11px; font-weight: 400; line-height: 1.5; color: var(--ink3); }
+/* map hint: WebGL wording only when the 3D terrain actually runs (the static SVG has no light beams to tap) */
+.gl-only, .gl-map-on .gl-no, .gl-lost .gl-only { display: none !important; }
+.gl-map-on:not(.gl-lost) .gl-only { display: inline !important; }
+/* spot text inside the landscape highlight carousel: never wait for a vertical reveal that off-screen slides never get */
+.spots .reveal { opacity: 1; transform: none; }

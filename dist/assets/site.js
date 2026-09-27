@@ -23,6 +23,11 @@
   // "/site/" and "/site/index.html" are the same page (GitHub Pages serves both)
   const samePage = (a) => a.pathname.replace(/index\.html$/, "") === location.pathname.replace(/index\.html$/, "");
   const byHash = (hash) => { try { return hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; } catch { return null; } };
+  // storage throws when cookies/storage are blocked — an event handler must never die on it
+  const store = {
+    get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* unavailable */ } },
+  };
 
   // one scroll-lock registry for every overlay: closing one never unlocks the page while another is open
   const locks = new Set();
@@ -96,13 +101,19 @@
   $$(".heat-row").forEach((row, r) => $$(".heat-cell", row).forEach((c, i) => c.style.setProperty("--i", r * 2 + i)));
   $$(".cal-row").forEach((row, r) => $$(".cal-cell", row).forEach((c, i) => c.style.setProperty("--d", r * 4 + i)));
   // anchor jumps must land on content that is already visible (no blank-then-fade)
-  const revealAll = (root) => { if (root.matches?.(REVEAL)) root.classList.add("is-in"); $$(REVEAL, root).forEach((el) => el.classList.add("is-in")); };
+  const revealAll = (root) => {
+    if (root.matches?.(REVEAL)) root.classList.add("is-in"); $$(REVEAL, root).forEach((el) => el.classList.add("is-in"));
+    // the footer "Photo credits" links jumped to a collapsed <details> — open it (and any closed ancestor)
+    if (root.id === "credits") $$("details", root).forEach((d) => (d.open = true));
+    for (let d = root.closest?.("details"); d; d = d.parentElement?.closest("details")) d.open = true;
+  };
 
   /* ---------------- count-up ---------------- */
   const countUp = (el) => {
     const to = parseFloat(el.dataset.count), dec = +(el.dataset.decimals || 0), grp = el.dataset.format === "yen";
     const fmt = (v) => grp ? Math.round(v).toLocaleString("ja-JP") : v.toFixed(dec);
     if (reduced || !isFinite(to)) return;         // the server-rendered text already holds the final value
+    if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", fmt(to));   // AT never hears the transient 0…n
     el.textContent = fmt(0);
     const t0 = performance.now(), dur = 1500;
     const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = fmt(to * (1 - Math.pow(1 - k, 4))); if (k < 1) requestAnimationFrame(step); };
@@ -145,28 +156,38 @@
   let stRaf = 0;
   addEventListener("scroll", () => { if (!stRaf) stRaf = requestAnimationFrame(() => { stRaf = 0; setCurrent(); }); }, { passive: true });
   setCurrent();
-  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => { vibrate(); const t = byHash(a.hash); if (t) revealAll(t); }));
+  // the landscape rail sits above the open menu (z 125 > 124): a tab tap must close the menu too, otherwise the
+  // page scrolled underneath while the menu and its scroll lock stayed on
+  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => {
+    vibrate();
+    if (document.body.classList.contains("menu-open")) setMenu(false);
+    const t = byHash(a.hash); if (t) revealAll(t);
+  }));
   // a malformed hash (e.g. "#%E0") must not throw and kill every script below
   { const t = byHash(location.hash); if (t) revealAll(t); }
   addEventListener("hashchange", () => { const t = byHash(location.hash); if (t) revealAll(t); });
 
   /* ---------------- menu ---------------- */
   const toggle = $(".nav-toggle"), menu = $("#menu");
-  let menuT = 0;
-  const setMenu = (open) => {
+  let menuT = 0, menuRaf = 0;
+  function setMenu(open) {
     toggle.setAttribute("aria-expanded", open);
     toggle.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
     document.body.classList.toggle("menu-open", open);
     lock("menu", open);
-    clearTimeout(menuT);
-    if (open) { menu.hidden = false; requestAnimationFrame(() => { menu.classList.add("is-open"); $("a", menu)?.focus({ preventScroll: true }); }); }
+    clearTimeout(menuT); cancelAnimationFrame(menuRaf);
+    if (open) { menu.hidden = false; menuRaf = requestAnimationFrame(() => { menu.classList.add("is-open"); $("a", menu)?.focus({ preventScroll: true }); }); }
     else { menu.classList.remove("is-open"); menuT = setTimeout(() => (menu.hidden = true), 800); }
     onScroll();
-  };
-  toggle.addEventListener("click", () => setMenu(toggle.getAttribute("aria-expanded") !== "true"));
+  }
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    if (open && sheetOpen) closeSheet();          // two stacked modal dialogs: the drawer would trap focus behind the menu
+    setMenu(open);
+  });
   // the close (toggle) button lives outside the menu — keep it reachable from the keyboard
   menu.addEventListener("keydown", (e) => trap(menu, e, [toggle]));
-  toggle.addEventListener("keydown", (e) => { if (menu.classList.contains("is-open")) trap(menu, e, [toggle]); });
+  toggle.addEventListener("keydown", (e) => { if (document.body.classList.contains("menu-open")) trap(menu, e, [toggle]); });
   menu.addEventListener("click", (e) => { if (e.target === menu) setMenu(false); });
   $$("a", menu).forEach((a) => a.addEventListener("click", () => {
     setMenu(false);
@@ -176,12 +197,14 @@
 
   /* ---------------- side drawer / bottom sheet ---------------- */
   const sheet = $(".sheet"), sheetBody = $(".sheet-body", sheet), panel = $(".sheet-panel", sheet);
-  let lastFocus = null, sheetT = 0, sheetKey = null;
+  // explicit state: `is-open` is only added two frames after opening, so it can't be the source of truth
+  let lastFocus = null, sheetT = 0, sheetKey = null, sheetOpen = false, sheetRaf = 0;
   const openSheet = (html, accent, key = null) => {
-    if (!sheet.classList.contains("is-open")) lastFocus = document.activeElement;
+    if (!sheetOpen) lastFocus = document.activeElement;
     clearTimeout(sheetT);                        // re-opening during the close animation must not blank the new content
     // replacing a region drawer with a non-region one (e.g. a heatmap cell) must still return the 3D camera
-    if (sheetKey && sheetKey !== key && !R[key] && sheet.classList.contains("is-open")) emit("sheet:close", sheetKey);
+    if (sheetKey && sheetKey !== key && !R[key] && sheetOpen) emit("sheet:close", sheetKey);
+    sheetOpen = true;
     sheetKey = key;
     sheetBody.innerHTML = html;
     panel.scrollTop = 0;
@@ -189,12 +212,14 @@
     panel.style.setProperty("--accent", accent || "");
     sheet.hidden = false;
     lock("sheet", true);
-    requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add("is-open")));
+    cancelAnimationFrame(sheetRaf);
+    sheetRaf = requestAnimationFrame(() => (sheetRaf = requestAnimationFrame(() => { if (sheetOpen) sheet.classList.add("is-open"); })));
     $(".sheet-close", sheet).focus({ preventScroll: true });
     vibrate();
   };
   const closeSheet = () => {
-    if (sheet.hidden || !sheet.classList.contains("is-open")) return;
+    if (!sheetOpen) return;
+    sheetOpen = false; cancelAnimationFrame(sheetRaf);
     sheet.classList.remove("is-open", "is-dragging");
     panel.style.transform = "";                  // an inline drag offset would override the CSS slide-out
     lock("sheet", false);
@@ -204,27 +229,34 @@
     $$(".map-list button.is-hot, .pin.is-hot").forEach((x) => x.classList.remove("is-hot"));
     emit("sheet:close", sheetKey);
     sheetKey = null;
-    lastFocus?.focus?.({ preventScroll: true });
+    // the opener may be gone or hidden by now (3D label culled, pin re-rendered) → fall back to <main>
+    if (lastFocus && lastFocus.isConnected && lastFocus.getClientRects().length) lastFocus.focus({ preventScroll: true });
+    else if (sheet.contains(document.activeElement)) document.activeElement.blur();
+    lastFocus = null;
   };
   $$("[data-close]", sheet).forEach((b) => b.addEventListener("click", closeSheet));
   sheet.addEventListener("keydown", (e) => trap(sheet, e));
   addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if (!sheet.hidden) closeSheet();
+    if (sheetOpen) closeSheet();
     else if (document.body.classList.contains("menu-open")) { setMenu(false); toggle.focus({ preventScroll: true }); }
   });
   // swipe to dismiss: rightwards for the landscape drawer, downwards for the portrait sheet
   let g0 = null;
   panel.addEventListener("touchstart", (e) => {
+    if (e.touches.length > 1) { g0 = null; return; }
     const t = e.touches[0];
-    g0 = { x: t.clientX, y: t.clientY, top: panel.scrollTop, axis: null, d: 0 };
+    g0 = { x: t.clientX, y: t.clientY, top: panel.scrollTop, left: 0, axis: null, d: 0 };
   }, { passive: true });
   panel.addEventListener("touchmove", (e) => {
     if (!g0) return;
+    if (e.touches.length > 1) { g0 = null; sheet.classList.remove("is-dragging"); panel.style.transform = ""; return; }
     const t = e.touches[0], dx = t.clientX - g0.x, dy = t.clientY - g0.y;
     if (!g0.axis && Math.hypot(dx, dy) > 8) g0.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-    if (landscape() && g0.axis === "x" && dx > 0) { g0.d = dx; sheet.classList.add("is-dragging"); panel.style.transform = `translateX(${dx}px)`; }
-    else if (!landscape() && g0.axis === "y" && dy > 0 && g0.top <= 0) { g0.d = dy; sheet.classList.add("is-dragging"); panel.style.transform = `translateY(${dy}px)`; }
+    // follow the finger both ways: dragging back past the start used to keep the last positive offset,
+    // so a swipe the user reversed still closed the drawer on release
+    if (landscape() && g0.axis === "x") { g0.d = Math.max(0, dx); sheet.classList.add("is-dragging"); panel.style.transform = `translateX(${g0.d}px)`; }
+    else if (!landscape() && g0.axis === "y" && g0.top <= 0) { g0.d = Math.max(0, dy); sheet.classList.add("is-dragging"); panel.style.transform = `translateY(${g0.d}px)`; }
   }, { passive: true });
   const gEnd = () => {
     if (!g0) return;
@@ -243,7 +275,7 @@
     const w = a ? (a.variants.find((v) => v >= need) || a.variants[a.variants.length - 1]) : 1280;
     const facts = r.facts.map((f) => `<div><dt>${esc(f.k)}</dt><dd>${esc(f.v)}</dd></div>`).join("");
     openSheet(`
-      <div class="sh-img" role="img" aria-label="${esc(a ? a.alt : r.name)}" style="background-image:url('${ROOT}${r.hero}/${w}.webp');background-color:${a?.color || "#1d1814"}"></div>
+      <div class="sh-img" style="background-color:${a?.color || "#1d1814"}"><picture>${a?.avif ? `<source type="image/avif" srcset="${ROOT}${r.hero}/${w}.avif">` : ""}<source type="image/webp" srcset="${ROOT}${r.hero}/${w}.webp"><img src="${ROOT}${r.hero}/${a ? (a.jpg.filter((v) => v <= w).pop() || a.jpg[0]) : w}.jpg" alt="${esc(a ? a.alt : r.name)}" decoding="async"></picture></div>
       <p class="sh-en">${String(r.order).padStart(2, "0")} — ${esc(r.en)}</p>
       <h3 class="sh-t" id="sheet-t">${esc(r.name)}</h3>
       <p class="sh-c">${esc(r.catch)}</p>
@@ -267,7 +299,7 @@
     credits.forEach((c, k) => (c.hidden = k !== cur));
     const img = $("img", slides[cur]); if (img && img.loading === "lazy") img.loading = "eager";
     clearTimeout(timer);
-    timer = reduced || !heroVisible || document.hidden ? 0 : setTimeout(() => go(cur + 1), DUR);
+    timer = reduced || !heroVisible || document.hidden ? 0 : setTimeout(() => (locks.size ? go(cur) : go(cur + 1)), DUR);
     emit("hero:go", cur);
   };
   if (slides.length > 1) {
@@ -337,8 +369,11 @@
       raf = 0;
       const i = current(), max = track.scrollWidth - track.clientWidth;
       dotEls.forEach((d, k) => d.classList.toggle("on", k === i));
+      const focused = document.activeElement;
       if (prev) prev.disabled = track.scrollLeft <= 4;
       if (next) next.disabled = track.scrollLeft >= max - 4;
+      // a button that just became disabled drops keyboard focus to <body> → hand it to the sibling
+      if (focused && focused.disabled && (focused === prev || focused === next)) (focused === prev ? next : prev)?.focus({ preventScroll: true });
     };
     track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
     addEventListener("resize", sync);
@@ -349,6 +384,8 @@
       if (e.target !== track) return;
       if (e.key === "ArrowRight") { e.preventDefault(); to(current() + 1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); to(current() - 1); }
+      if (e.key === "Home") { e.preventDefault(); to(0); }
+      if (e.key === "End") { e.preventDefault(); to(items.length - 1); }
     });
     sync();
   };
@@ -370,7 +407,7 @@
     };
     const paint = (s) => {
       s.style.setProperty("--p", (s.value / s.max) * 100 + "%");
-      s.nextElementSibling.textContent = s.value;
+      const o = s.parentElement.querySelector("output"); if (o) o.textContent = s.value;
       s.setAttribute("aria-valuetext", `重み${s.value}`);
     };
     const shown = {}, anim = {};                 // displayed value per row → interrupted animations resume smoothly
@@ -407,10 +444,12 @@
       });
       if (!reduced) order.forEach((id) => {
         const li = rows[id], dy = first[id] - li.getBoundingClientRect().top;
+        li.getAnimations?.().forEach((a) => a.cancel());
         if (dy) li.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 650, easing: "cubic-bezier(.22,1,.36,1)" });
       });
       desc.classList.toggle("is-warn", allZero);
       if (allZero) desc.textContent = "すべての重みが0です。少なくとも1つの軸を1以上にしてください。";
+      ranking.setAttribute("aria-label", allZero ? "タイプ別ランキング" : `タイプ別ランキング（1位: ${order.filter((id) => totals[id] === totals[order[0]]).map((id) => R[id].name).join("・")}）`);
     };
     const current = () => Object.fromEntries(sliders.map((s) => [s.dataset.axis, +s.value]));
     const setActive = (id) => $$(".persona").forEach((b) => { const on = b.dataset.persona === id; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
@@ -447,14 +486,19 @@
     weightsBox.appendChild(resetBtn);
     sliders.forEach(paint);
     // first paint when visible — unless the user already interacted with the finder
+    // keyboard and slider input count too — a keyboard user's choice was overwritten by the deferred first paint
     let touched = false;
-    $(".finder").addEventListener("pointerdown", () => (touched = true), { once: true, capture: true });
+    ["pointerdown", "keydown", "input"].forEach((t) => $(".finder").addEventListener(t, () => (touched = true), { once: true, capture: true }));
     new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { if (!touched) setPersona("balanced"); o.disconnect(); } }), { threshold: 0.2 }).observe(ranking);
   }
 
   /* ---------------- heatmap cells → drawer (+ arrow-key grid navigation) ---------------- */
   const cells = $$(".heat-cell");
+  // grid pattern: a single tab stop for the 40 cells (roving tabindex) instead of 40 Tab presses to get past it
+  const rove = (k) => cells.forEach((x, j) => (x.tabIndex = j === k ? 0 : -1));
+  if (cells.length) rove(0);
   cells.forEach((c, i) => {
+    c.addEventListener("focus", () => rove(i));
     c.addEventListener("click", () => {
       $$(".is-sel").forEach((x) => x.classList.remove("is-sel"));
       c.classList.add("is-sel");
@@ -466,11 +510,12 @@
         <p class="sh-b">${esc(c.dataset.why)}</p>`, c.dataset.accent, "heat");
     });
     c.addEventListener("keydown", (e) => {
-      const n = DATA.regions.length, m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n }[e.key];
-      if (!m) return;
-      const col = i % n;
+      const n = DATA.regions.length, col = i % n;
+      const m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n, Home: -col, End: n - 1 - col }[e.key];
+      if (m === undefined) return;
+      e.preventDefault();                          // arrows at the grid edge must not scroll the page
       if ((m === 1 && col === n - 1) || (m === -1 && col === 0)) return;   // left/right stay inside the row
-      if (cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
+      if (cells[i + m]) cells[i + m].focus();
     });
   });
 
@@ -578,7 +623,7 @@
       const when = `${esc(label)}（${months.join("・")}月）`;
       const head = best.length
         ? `${when}なら <b>${best.map(([r]) => esc(r.short)).join("・")}</b> がベスト。`
-        : `${when}は暑さ・雨の季節。比較的おすすめは <b>${esc(avg[0][0].short)}</b>。`;
+        : `${when}は暑さ・雨の季節。比較的おすすめは <b>${avg.filter(([, v]) => v === avg[0][1]).map(([r]) => esc(r.short)).join("・")}</b>。`;   // ties share the top
       ans.innerHTML = `<p class="ha-t">${head}</p><ol>${avg.map(([r, v]) => `<li style="--c:${r.accent};--v:${v.toFixed(1)}"><a href="${ROOT}${r.url}">${esc(r.name)}</a><span>${v.toFixed(1)}<small>/5</small></span><div class="ha-bar"><i></i></div></li>`).join("")}</ol>`;
     }));
   }
@@ -587,6 +632,8 @@
   const lb = $(".lightbox");
   if (lb) {
     const stage = $(".lb-stage", lb), items = $$("[data-lightbox]");
+    const live = document.createElement("p");
+    live.className = "sr-only"; live.setAttribute("aria-live", "polite"); lb.appendChild(live);
     let idx = 0, last = null;
     // the browser already negotiated AVIF for the page's own <picture>s — reuse that answer for preloads
     const AVIF = () => $$(".pic img").some((im) => /\.avif(\?|$)/.test(im.currentSrc || ""));
@@ -596,12 +643,13 @@
     };
     const show = (i) => {
       idx = (i + items.length) % items.length;
-      const a = DATA.assets[items[idx].dataset.lightbox], w = pick(a), jw = a.jpg.filter((v) => v <= w).pop() || a.jpg[0];
+      const a = DATA.assets[items[idx].dataset.lightbox], w = pick(a), jw = a.jpg.find((v) => v >= w) || a.jpg[a.jpg.length - 1];   // was: smallest (640px) JPEG for any pick above 1920
       lb.classList.add("is-loading");
       stage.innerHTML = `<picture>${a.avif ? `<source type="image/avif" srcset="${ROOT}${a.path}/${w}.avif">` : ""}<source type="image/webp" srcset="${ROOT}${a.path}/${w}.webp"><img src="${ROOT}${a.path}/${jw}.jpg" alt="${esc(a.alt)}" width="${a.w}" height="${a.h}" style="background:${a.color || "#111"}"></picture>`
-        + `<p class="lb-cap" aria-live="polite">${esc(a.alt)}<span>${idx + 1} / ${items.length} · <a href="${esc(a.link)}" target="_blank" rel="noopener">Photo: ${esc(a.credit)}</a></span></p>`;
+        + `<p class="lb-cap">${esc(a.alt)}<span>${idx + 1} / ${items.length} · <a href="${esc(a.link)}" target="_blank" rel="noopener">Photo: ${esc(a.credit)}</a></span></p>`;
+      if (live) live.textContent = `${idx + 1} / ${items.length}: ${a.alt}`;
       const img = $("img", stage);
-      const done = () => lb.classList.remove("is-loading");
+      const done = () => { if ($("img", stage) === img) lb.classList.remove("is-loading"); };
       if (img.complete && img.naturalWidth) done(); else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
       const multi = items.length > 1;
       $$(".lb-nav", lb).forEach((b) => (b.hidden = !multi));
@@ -610,7 +658,7 @@
       if (items.length > 1) [idx + 1, idx - 1].forEach((k) => { const n = DATA.assets[items[(k + items.length) % items.length].dataset.lightbox]; const im = new Image(); im.src = `${ROOT}${n.path}/${pick(n)}.${n.avif && AVIF() ? "avif" : "webp"}`; });
     };
     const open = (i, btn) => { if (!lb.hidden) return; last = btn; show(i); lb.hidden = false; lock("lightbox", true); $(".lb-close", lb).focus({ preventScroll: true }); };
-    const close = () => { if (lb.hidden) return; lb.hidden = true; stage.innerHTML = ""; lock("lightbox", false); last?.focus({ preventScroll: true }); };
+    const close = () => { if (lb.hidden) return; lb.hidden = true; stage.innerHTML = ""; live.textContent = ""; lb.classList.remove("is-loading"); lock("lightbox", false); last?.focus({ preventScroll: true }); };
     items.forEach((b, i) => b.addEventListener("click", () => open(i, b)));
     $(".lb-close", lb).addEventListener("click", close);
     $(".lb-prev", lb)?.addEventListener("click", () => show(idx - 1));
@@ -628,6 +676,7 @@
     lb.addEventListener("touchend", (e) => {
       if (lx === null) return;
       const dx = e.changedTouches[0].clientX - lx, dy = e.changedTouches[0].clientY - ly; lx = null;
+      if ((window.visualViewport?.scale || 1) > 1.05) return;       // pinch-zoomed: the finger is panning the photo
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(idx + (dx < 0 ? 1 : -1));
       else if (dy > 100 && Math.abs(dy) > Math.abs(dx)) close();
     });
@@ -652,7 +701,7 @@
       const img = $("img", el);
       gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
     });
-    if ($(".deck")) gsap.from(".card", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, clearProps: "opacity,transform", scrollTrigger: { trigger: ".deck", start: "top 85%", once: true } });
+    if ($(".deck")) gsap.from(".card", { translate: "0 60px", opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, clearProps: "opacity,translate", scrollTrigger: { trigger: ".deck", start: "top 85%", once: true } });
     addEventListener("load", () => ScrollTrigger.refresh());
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
   };
@@ -666,7 +715,8 @@
   const goFs = async () => {
     try {
       if (!inFs()) await (fsEl.requestFullscreen ? fsEl.requestFullscreen({ navigationUI: "hide" }) : fsEl.webkitRequestFullscreen());
-      await screen.orientation?.lock?.("landscape").catch(() => {});
+      // lock() is missing on some engines → `undefined.catch` threw; wrap it so the result is always a promise
+      await Promise.resolve().then(() => screen.orientation?.lock?.("landscape")).catch(() => {});
     } catch { /* user gesture / browser policy */ }
     syncFs();
   };
@@ -679,12 +729,12 @@
   const firstTap = (e) => {
     if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
     removeEventListener("pointerup", firstTap);
-    if (canFs && !inFs() && !sessionStorage.getItem("fs-declined")) goFs();
+    if (canFs && !inFs() && !store.get("fs-declined")) goFs();
   };
   addEventListener("pointerup", firstTap, { passive: true });
   document.addEventListener("fullscreenchange", () => {
     if (inFs()) wasFs = true;
-    else if (wasFs) sessionStorage.setItem("fs-declined", "1");   // only a real exit counts as "declined"
+    else if (wasFs) store.set("fs-declined", "1");   // only a real exit counts as "declined"
   });
   syncFs();
 

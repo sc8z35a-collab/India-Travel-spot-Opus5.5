@@ -2,8 +2,8 @@
   "agent": "a2_content_validator",
   "role": "コンテンツの構造・整合性・出典チェック",
   "ok": true,
-  "started": 1790414385.7692952,
-  "duration_s": 0.01,
+  "started": 1790506507.4763973,
+  "duration_s": 0.0,
   "stats": {
     "regions": 5,
     "checks": 230,

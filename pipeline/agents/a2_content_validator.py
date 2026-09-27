@@ -49,6 +49,8 @@ class ContentValidator(Agent):
                     report.error(f"{rid}: score {ax}={s['v']} out of range")
                 if len(s.get("why", "")) < 20:
                     report.warn(f"{rid}: weak justification for '{ax}'")
+            if any(k not in r for k in ("hero", "gallery", "highlights", "months", "budget_inr", "sources")):
+                continue                              # already reported as missing — don't crash on the checks below
             photo_refs = [r["hero"], *r["gallery"], *[h["photo"] for h in r["highlights"]]]
             for pid in photo_refs:
                 checks += 1
@@ -61,6 +63,11 @@ class ContentValidator(Agent):
             heroes[r["hero"]] = rid
             if len(r["months"]) != 12 or not all(1 <= m <= 5 for m in r["months"]):
                 report.error(f"{rid}: months must be 12 values in 1..5")
+            d_lo, d_hi = r.get("days", [0, 0])
+            if not (1 <= d_lo <= d_hi <= 30):
+                report.error(f"{rid}: implausible days {d_lo}-{d_hi}")
+            if len(r.get("itinerary", [])) > d_hi:
+                report.warn(f"{rid}: itinerary has {len(r['itinerary'])} days but the stay is at most {d_hi}")
             lo, hi = r["budget_inr"]
             if not (500 <= lo <= hi <= 20000):
                 report.error(f"{rid}: implausible budget {lo}-{hi}")
@@ -76,13 +83,13 @@ class ContentValidator(Agent):
             if len(used) < len(photo_refs):
                 report.warn(f"{rid}: some photos repeated within the page")
 
-        orders = [r["order"] for r in regions]
-        if sorted(orders) != list(range(1, len(regions) + 1)):
+        orders = [r.get("order") for r in regions]
+        if sorted(o or 0 for o in orders) != list(range(1, len(regions) + 1)):
             report.error(f"region order not contiguous: {orders}")
         if len(regions) != 5:
             report.error(f"expected 5 regions, found {len(regions)}")
 
-        regions.sort(key=lambda r: r["order"])
+        regions.sort(key=lambda r: r.get("order") or 0)
         save_json(GEN / "regions.json", regions)
         report.stats = {"regions": len(regions), "checks": checks,
                         "sources": sum(len(r["sources"]) for r in regions)}

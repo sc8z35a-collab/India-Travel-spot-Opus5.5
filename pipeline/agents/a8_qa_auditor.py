@@ -56,6 +56,14 @@ class QaAuditor(Agent):
             need(md and 50 <= len(md.get("content", "")) <= 200, "meta description length not 50-200")
             need(soup.find("meta", attrs={"property": "og:image"}) is not None, "missing og:image")
             need(len(soup.find_all("h1")) == 1, f"expected 1 h1, found {len(soup.find_all('h1'))}")
+            ids = [el["id"] for el in soup.select("[id]")]
+            dup = sorted({i for i in ids if ids.count(i) > 1})
+            need(not dup, f"duplicate id(s): {', '.join(dup[:5])}")
+            for el in soup.select("[aria-labelledby], [aria-controls]"):
+                for attr in ("aria-labelledby", "aria-controls"):
+                    for ref in (el.get(attr) or "").split():
+                        # the drawer's title (#sheet-t) is rendered at runtime by site.js
+                        need(ref in ids_by_page[p] or ref == "sheet-t", f"{attr} → missing #{ref}")
 
             # heading order
             last = 1
@@ -73,7 +81,9 @@ class QaAuditor(Agent):
             for tag in soup.find_all(["img", "source"]):
                 for part in (tag.get("srcset") or "").split(","):
                     url = part.strip().split(" ")[0]
-                    if url:
+                    if url.startswith(("http://", "https://", "data:")):
+                        need(False, f"external/inline srcset image {url[:60]}")
+                    elif url:
                         need((p.parent / url).resolve().exists(), f"missing srcset file {url}")
                 if tag.name == "img" and tag.get("src"):
                     need((p.parent / tag["src"]).resolve().exists(), f"missing img {tag['src']}")
@@ -88,7 +98,10 @@ class QaAuditor(Agent):
                 if href.startswith(("mailto:", "tel:")):
                     continue
                 path, frag = urldefrag(href)
-                target = p if not path else (p.parent / path).resolve()
+                path = path.split("?")[0]
+                target = p if not path else ((DIST / path.lstrip("/")) if path.startswith("/") else (p.parent / path)).resolve()
+                if target.is_dir():
+                    target = target / "index.html"
                 need(target.exists(), f"broken link {href}")
                 if frag and target.exists() and target in ids_by_page:
                     need(frag in ids_by_page[target], f"broken anchor {href}")
@@ -96,6 +109,10 @@ class QaAuditor(Agent):
             # scripts / css exist
             for s in soup.find_all("script", src=True):
                 need((p.parent / s["src"].split("?")[0]).resolve().exists(), f"missing script {s['src']}")
+            for l in soup.find_all("link", href=True):
+                kind = " ".join(l.get("rel") or [])
+                if kind in ("modulepreload", "manifest", "icon", "apple-touch-icon") and not l["href"].startswith("http"):
+                    need((p.parent / l["href"].split("?")[0]).resolve().exists(), f"missing {kind} {l['href']}")
             for l in soup.find_all("link", rel="stylesheet"):
                 href = l["href"]
                 if not href.startswith("http"):

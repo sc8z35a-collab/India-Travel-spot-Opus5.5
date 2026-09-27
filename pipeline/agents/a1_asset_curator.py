@@ -158,7 +158,10 @@ class AssetCurator(Agent):
                 raise
             # primary (usually Wikimedia, rate-limited) unavailable → previous licensed photo, not cached
             self.log(f"{photo['id']}: using fallback source {fb['source']}")
-            photo = {**photo, **fb, "hires": None}
+            # the fallback is a different photo by a different author: drop the primary's attribution first,
+            # or the credit shows the primary's author / licence URL (wrong attribution)
+            base = {k: v for k, v in photo.items() if k not in ("author", "license", "license_url", "title", "alt", "link", "source")}
+            photo = {**base, **fb, "hires": None}
             img, nw, nh, _ = self.source(photo)
             partial = used_fb = True
         src_key = [photo.get("hires"), photo["url"]]  # the source actually used (depth map follows it)

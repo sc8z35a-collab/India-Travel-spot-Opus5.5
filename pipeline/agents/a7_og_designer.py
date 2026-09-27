@@ -6,6 +6,7 @@ typography (Noto CJK if available) and photo credit.
 """
 from __future__ import annotations
 
+import functools
 import glob
 import math
 
@@ -16,6 +17,7 @@ from .base import DIST, GEN, Agent, Report, load_json
 W, H = 1200, 630
 
 
+@functools.lru_cache(maxsize=None)
 def _font(size: int, bold: bool = True):
     pats = ["/usr/share/fonts/**/NotoSerifCJK*Bold*", "/usr/share/fonts/**/NotoSansCJK*Bold*",
             "/usr/share/fonts/**/*CJK*", "/usr/share/fonts/**/DejaVuSerif-Bold.ttf",

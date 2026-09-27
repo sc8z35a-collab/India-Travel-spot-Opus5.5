@@ -100,6 +100,9 @@ def main() -> int:
     ap.add_argument("--no-llm", action="store_true")
     args = ap.parse_args()
     only = {x.strip() for x in args.only.split(",") if x.strip()}
+    unknown = only - set(TASKS)
+    if unknown:
+        ap.error(f"unknown task(s): {', '.join(sorted(unknown))} (known: {', '.join(TASKS)})")
     selected = {k for k in TASKS if (not only or k in only) and not (args.skip_assets and k == "a1")}
 
     t0 = time.time()
@@ -126,11 +129,18 @@ def main() -> int:
         start = time.time() - t0
         if key in HEAVY and heavy_cap == 1:
             # isolated process → its memory is fully released afterwards
-            subprocess.run([sys.executable, "-m", "pipeline.task", key], cwd=ROOT)
+            rp = REPORTS / f"{cls.name}.json"
+            rp.unlink(missing_ok=True)             # never read back a stale report from a previous build
+            proc = subprocess.run([sys.executable, "-m", "pipeline.task", key], cwd=ROOT)
             from .agents.base import Report, load_json as _lj
-            d = _lj(REPORTS / f"{cls.name}.json")
-            rep = Report(agent=d["agent"], role=d["role"])
-            rep.__dict__.update(d)
+            if rp.exists():
+                d = _lj(rp)
+                rep = Report(agent=d["agent"], role=d["role"])
+                rep.__dict__.update(d)
+            else:
+                rep = Report(agent=cls.name, role=cls.role)
+            if proc.returncode != 0 and rep.ok:
+                rep.error(f"task process exited with code {proc.returncode}")
         else:
             rep = cls().execute()
         with lock:
@@ -156,8 +166,14 @@ def main() -> int:
                 break
             fin, _ = wait(list(running), return_when=FIRST_COMPLETED)
             for f in fin:
-                running.pop(f)
-                key, rep = f.result()
+                k0 = running.pop(f)
+                try:
+                    key, rep = f.result()
+                except Exception as exc:  # noqa: BLE001 — one crashed worker must not abort the whole crew
+                    from .agents.base import Report
+                    key, rep = k0, Report(agent=TASKS[k0][1].name, role=TASKS[k0][1].role)
+                    rep.error(f"{type(exc).__name__}: {exc}")
+                    timeline.append({"task": key, "agent": TASKS[key][0], "start": 0, "end": round(time.time() - t0, 2), "ok": False})
                 reports.append((key, rep))
                 (done if rep.ok else failed).add(key)
 
@@ -169,6 +185,7 @@ def main() -> int:
         "llm": {k: llm._state.get(k) for k in ("ok", "model", "parallel", "reason", "latency_s")},
         "crew": {k: {"name": n, "desc": d} for k, (n, d) in CREW.items()},
         "timeline": sorted(timeline, key=lambda t: t["start"]),
+        "failed": sorted(failed), "skipped": sorted(failed - {k for k, _ in reports}),
         "agents": [{"task": k, "agent": TASKS[k][0], "name": r.agent, "role": r.role, "ok": r.ok,
                     "duration_s": r.duration_s, "warnings": len(r.warnings), "errors": len(r.errors),
                     "stats": r.stats} for k, r in reports],
@@ -186,9 +203,11 @@ def main() -> int:
           + (f"  failed: {sorted(failed)}" if failed else "") + "\n" + "━" * 70)
 
     if args.commit and ok:
-        subprocess.run(["git", "add", "-A"], cwd=ROOT)
-        subprocess.run(["git", "commit", "-qm", "build: regenerate site via 6-agent crew"], cwd=ROOT)
-        subprocess.run(["git", "push", "-q"], cwd=ROOT)
+        subprocess.run(["git", "add", "-A"], cwd=ROOT, check=True)
+        if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=ROOT).returncode:
+            subprocess.run(["git", "commit", "-qm", "build: regenerate site via 6-agent crew"], cwd=ROOT, check=True)
+            if subprocess.run(["git", "push", "-q"], cwd=ROOT).returncode:
+                print("  ⚠ git push failed — commit kept locally")
     return 0 if ok else 1
 
 

@@ -61,6 +61,7 @@
   .tabbar a.is-current::before { top: 4px; width: 44px; height: 30px; }
   .tabbar a.is-current::after { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
   .progress { left: calc(var(--rail) + var(--safe-l)); }
+  .skip { left: calc(var(--rail) + var(--safe-l) + 12px); }
   .footer { padding-bottom: 36px; }
   .menu-inner { padding: 30px calc(var(--pad) + var(--safe-r)) 30px calc(var(--rail) + var(--pad) + var(--safe-l)); display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; align-items: center; }
   .menu-regions a { padding: 10px 0; }
