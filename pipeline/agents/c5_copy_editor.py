@@ -69,7 +69,10 @@ class CopyEditor(Agent):
                 try:
                     txt = llm.chat(RUBRIC, json.dumps(payload, ensure_ascii=False))
                     m = re.search(r"\{.*\}", txt, re.S)
-                    return r["id"], json.loads(m.group(0)) if m else {"raw": txt}
+                    try:
+                        return r["id"], json.loads(m.group(0)) if m else {"raw": txt}
+                    except json.JSONDecodeError:   # prose around braces / trailing commas: keep the raw answer
+                        return r["id"], {"raw": txt[:4000]}
                 except Exception as e:  # noqa: BLE001
                     return r["id"], {"error": str(e)[:200]}
 

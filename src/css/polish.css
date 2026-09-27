@@ -37,7 +37,7 @@
 input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 
 /* ---- heatmap: WCAG ink colour computed per cell ---- */
-.heat-cell { color: var(--ink, #fff); text-shadow: none; }
+.heat-cell { color: var(--cell-ink, #fff); text-shadow: none; }   /* --ink is the global text token — a per-cell --ink leaked into the sheet/tooltips */
 .heat-td { display: grid; min-width: 0; }
 .heat-td > .heat-cell { width: 100%; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
@@ -82,7 +82,7 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .g-zoom::after { content: ""; position: absolute; left: 21px; top: 21px; width: 6px; height: 2px; background: #fff; transform: rotate(45deg); transform-origin: 0 50%; }
 
 /* ---- lightbox controls ---- */
-.lightbox { touch-action: pan-y pinch-zoom; }
+.lightbox { touch-action: pinch-zoom; overscroll-behavior: contain; }   /* horizontal swipes page the photos; pan-y let the browser keep them */
 .lb-close, .lb-nav { position: absolute; z-index: 2; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line2); display: grid; place-items: center; color: #fff;
                      background: rgba(20,16,13,.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 0; transition: background .25s, color .25s; }
 .lb-close svg, .lb-nav svg { width: 20px; height: 20px; }
@@ -232,3 +232,14 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .gl-map-on:not(.gl-lost) .gl-only { display: inline !important; }
 /* spot text inside the landscape highlight carousel: never wait for a vertical reveal that off-screen slides never get */
 .spots .reveal { opacity: 1; transform: none; }
+
+/* ---- QA round L5 ---- */
+/* map list: the selected destination was only styled for <a>; the list is made of <button>s */
+.map-list button { transition: color .3s, padding .4s var(--ease), background .3s; }
+.map-list button.is-hot { color: var(--accent); padding-left: 8px; }
+/* radar toggles replace the checkbox visually → show keyboard focus on the chip */
+.rc-toggle:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* focusable carousels (tabindex=0) need a visible focus ring */
+.deck:focus-visible, .spots:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* context lost: controls that only steer the 3D camera are meaningless */
+.gl-lost .gl-only, .gl-lost .map3d-reset { display: none !important; }

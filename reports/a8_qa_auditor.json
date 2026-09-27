@@ -2,8 +2,8 @@
   "agent": "a8_qa_auditor",
   "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
   "ok": true,
-  "started": 1790514396.219085,
-  "duration_s": 0.53,
+  "started": 1790514537.0710385,
+  "duration_s": 0.47,
   "stats": {
     "pages": 6,
     "checks": 2017,
@@ -19,7 +19,7 @@
         "checks": 502,
         "issues": [],
         "score": 100.0,
-        "html_kb": 172.3
+        "html_kb": 172.5
       },
       "jaipur/index.html": {
         "checks": 308,
@@ -43,7 +43,7 @@
         "checks": 301,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.9
+        "html_kb": 83.8
       }
     }
   },

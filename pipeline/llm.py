@@ -42,6 +42,8 @@ def chat(system: str, user: str, *, model: str | None = None) -> str:
     r = _client().chat.completions.create(model=model or MODEL,
                                           messages=[{"role": "system", "content": system},
                                                     {"role": "user", "content": user}])
+    if not getattr(r, "choices", None):     # some proxies answer 200 with an empty choices list
+        raise RuntimeError("LLM proxy returned no choices")
     text = (r.choices[0].message.content or "").strip()
     usage = getattr(r, "usage", None)
     if any(m in text for m in _FAIL_MARKERS) or (usage is not None and usage.total_tokens == 0):
@@ -67,9 +69,9 @@ def probe(n: int = 6) -> dict:
             results = list(pool.map(one, range(n)))
     except Exception as e:  # noqa: BLE001
         results = [{"agent": 0, "ok": False, "error": str(e)}]
-    ok = all(r["ok"] for r in results)
+    ok = bool(results) and all(r["ok"] for r in results)
     _state.update(checked=True, ok=ok, model=MODEL, parallel=n, latency_s=round(time.time() - t0, 2),
-                  results=results, reason="ok" if ok else (results[0].get("error") or "failed"),
+                  results=results, reason="ok" if ok else next((x.get("error") for x in results if not x["ok"]), "failed"),
                   checked_at=time.strftime("%F %T"))
     from .agents.base import REPORTS
 

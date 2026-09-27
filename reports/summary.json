@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 0.8,
+  "duration_s": 1.0,
   "llm": {
     "ok": false,
     "model": null,
@@ -36,17 +36,31 @@
   },
   "timeline": [
     {
+      "task": "a3",
+      "agent": "③",
+      "start": 0.0,
+      "end": 0.36,
+      "ok": true
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "start": 0.36,
+      "end": 0.37,
+      "ok": true
+    },
+    {
       "task": "a6",
       "agent": "⑤",
-      "start": 0.0,
-      "end": 0.27,
+      "start": 0.37,
+      "end": 0.56,
       "ok": true
     },
     {
       "task": "a8",
       "agent": "⑥",
-      "start": 0.27,
-      "end": 0.8,
+      "start": 0.56,
+      "end": 1.03,
       "ok": true
     }
   ],
@@ -54,20 +68,54 @@
   "skipped": [],
   "agents": [
     {
+      "task": "a3",
+      "agent": "③",
+      "name": "a3_score_analyst",
+      "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
+      "ok": true,
+      "duration_s": 0.36,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "personas": 7,
+        "distinct_winners": [
+          "delhi-agra",
+          "kerala",
+          "ladakh",
+          "varanasi"
+        ]
+      }
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "name": "a5_chart_designer",
+      "role": "レーダーチャート・ヒートマップのSVG/配色を事前生成",
+      "ok": true,
+      "duration_s": 0.0,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "radars": 5,
+        "heat_cells": 40,
+        "season_cells": 60
+      }
+    },
+    {
       "task": "a6",
       "agent": "⑤",
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.27,
+      "duration_s": 0.2,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "20eb8779d1",
-        "css_kb": 117.0,
-        "js_kb": 46.7,
-        "gl_kb": 49.1,
+        "build_id": "4409f7ff7a",
+        "css_kb": 117.9,
+        "js_kb": 47.3,
+        "gl_kb": 49.8,
         "depth_maps": 50,
         "photos_credited": 50
       }
@@ -78,7 +126,7 @@
       "name": "a8_qa_auditor",
       "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
       "ok": true,
-      "duration_s": 0.53,
+      "duration_s": 0.47,
       "warnings": 0,
       "errors": 0,
       "stats": {
@@ -96,7 +144,7 @@
             "checks": 502,
             "issues": [],
             "score": 100.0,
-            "html_kb": 172.3
+            "html_kb": 172.5
           },
           "jaipur/index.html": {
             "checks": 308,
@@ -120,7 +168,7 @@
             "checks": 301,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.9
+            "html_kb": 83.8
           }
         }
       }

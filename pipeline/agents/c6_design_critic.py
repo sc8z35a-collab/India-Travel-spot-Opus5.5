@@ -20,7 +20,8 @@ from .base import REPORTS, Agent, Report, load_json, save_json
 
 
 def profile(path) -> dict:
-    im = Image.open(path).convert("RGB")
+    with Image.open(path) as src:
+        im = src.convert("RGB")
     im.thumbnail((640, 640))
     a = np.asarray(im, np.float32)
     lum = a @ np.array([0.2126, 0.7152, 0.0722])
@@ -29,7 +30,8 @@ def profile(path) -> dict:
     edges = np.asarray(im.convert("L").filter(ImageFilter.FIND_EDGES), np.float32)
     # dead space: 32px blocks with ~no variance
     g = lum[: lum.shape[0] // 32 * 32, : lum.shape[1] // 32 * 32]
-    blocks = g.reshape(g.shape[0] // 32, 32, g.shape[1] // 32, 32).std(axis=(1, 3))
+    # images smaller than one block gave an empty array → NaN in the report
+    blocks = g.reshape(g.shape[0] // 32, 32, g.shape[1] // 32, 32).std(axis=(1, 3)) if g.size else np.ones(1)
     return {"mean_lum": round(float(lum.mean()), 1), "crushed": round(float((lum < 6).mean()), 3),
             "blown": round(float((lum > 250).mean()), 3), "colorfulness": round(colorful, 1),
             "edge_density": round(float((edges > 40).mean()), 3), "dead_space": round(float((blocks < 2).mean()), 3)}

@@ -81,14 +81,16 @@ class SiteBuilder(Agent):
             "description": cfg["site"]["description"], "start_url": "./", "scope": "./",
             "display": "fullscreen", "display_override": ["fullscreen", "standalone"],
             "orientation": "landscape", "background_color": "#0d0b0a", "theme_color": "#0d0b0a",
-            "icons": [{"src": "og/icon-192.png", "sizes": "192x192", "type": "image/png"},
-                      {"src": "og/icon-512.png", "sizes": "512x512", "type": "image/png"},
+            "icons": [{"src": "og/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+                      {"src": "og/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
                       {"src": "og/icon-maskable-512.png", "sizes": "512x512", "type": "image/png",
                        "purpose": "maskable"}]},
             ensure_ascii=False), encoding="utf-8")
         (DIST / "favicon.svg").write_text(FAVICON, encoding="utf-8")
         (DIST / ".nojekyll").write_text("")
-        build_id = hashlib.sha1((css + js + gl).encode()).hexdigest()[:10]
+        # the cache-buster must also change when page data changes, not only css/js/gl
+        build_id = hashlib.sha1((css + js + gl + json.dumps([assets, regions, analysis], sort_keys=True,
+                                                             ensure_ascii=False)).encode()).hexdigest()[:10]
 
         env = Environment(loader=FileSystemLoader(TEMPLATES), autoescape=True,
                           undefined=StrictUndefined, trim_blocks=True, lstrip_blocks=True)
@@ -188,7 +190,7 @@ class SiteBuilder(Agent):
               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
         sm += [f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls]
         sm.append("</urlset>")
-        (DIST / "sitemap.xml").write_text("\n".join(sm), encoding="utf-8")
+        (DIST / "sitemap.xml").write_text("\n".join(sm) + "\n", encoding="utf-8")
         (DIST / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base}sitemap.xml\n")
 
         report.stats = {"pages": pages, "build_id": build_id, "css_kb": round(len(css) / 1024, 1),

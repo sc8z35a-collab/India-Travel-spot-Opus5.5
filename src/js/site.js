@@ -403,7 +403,7 @@
     const base = DATA.regions.map((r) => r.id);
     const score = (w) => {
       const tw = Object.values(w).reduce((a, b) => a + b, 0);
-      return Object.fromEntries(DATA.regions.map((r) => [r.id, tw ? Math.round(DATA.axes.reduce((s, a) => s + r.scores[a.id] * (w[a.id] || 0), 0) / tw * 100) / 10 : 0]));
+      return Object.fromEntries(DATA.regions.map((r) => [r.id, tw ? Math.round(DATA.axes.reduce((s, a) => s + r.scores[a.id] * (w[a.id] || 0), 0) * 100 / tw) / 10 : 0]));
     };
     const paint = (s) => {
       s.style.setProperty("--p", (s.value / s.max) * 100 + "%");
@@ -457,7 +457,7 @@
       setActive(id);
       weightsBox.classList.toggle("is-open", id === "custom");
       desc.classList.remove("is-warn");
-      desc.textContent = id === "custom" ? "8つの軸の重み（0〜4）を自分で調整できます。今の重みから始めます。" : P[id].desc;
+      desc.textContent = id === "custom" ? `${DATA.axes.length}つの軸の重み（0〜4）を自分で調整できます。今の重みから始めます。` : P[id].desc;
       if (id !== "custom") sliders.forEach((s) => { s.value = P[id].weights[s.dataset.axis]; paint(s); });
       render(current());
     };
@@ -471,7 +471,7 @@
       weightsBox.classList.add("is-open");
       setActive("custom");
       desc.classList.remove("is-warn");
-      desc.textContent = "8つの軸の重み（0〜4）を自分で調整できます。";
+      desc.textContent = `${DATA.axes.length}つの軸の重み（0〜4）を自分で調整できます。`;
       render(current());
     }));
     const resetBtn = document.createElement("button");
@@ -480,7 +480,7 @@
       sliders.forEach((s) => { s.value = 1; paint(s); });
       setActive("custom");
       desc.classList.remove("is-warn");
-      desc.textContent = "8つの軸の重みをすべて1（均等）に戻しました。";   // never leave the all-zero warning text behind
+      desc.textContent = `${DATA.axes.length}つの軸の重みをすべて1（均等）に戻しました。`;   // never leave the all-zero warning text behind
       render(current());
     });
     weightsBox.appendChild(resetBtn);
@@ -559,7 +559,7 @@
       const draws = DATA.axes.length - wa - wb;
       $(".vs-na", vs).textContent = ra.name; $(".vs-nb", vs).textContent = rb.name;
       $(".vs-score", vs).innerHTML = `${wa}<em>—</em>${wb}`;
-      const lead = wa === wb ? "引き分け" : `${esc(wa > wb ? ra.short : rb.short)}が${Math.max(wa, wb)}軸で勝利`;
+      const lead = wa === wb ? `${wa}勝${wb}敗で引き分け` : `${esc(wa > wb ? ra.short : rb.short)}が${Math.max(wa, wb)}軸で勝利`;
       $(".vs-verdict", vs).innerHTML = `<b>${lead}${draws ? `（同点${draws}軸）` : ""}。</b>`
         + (winsA.length ? `${esc(ra.short)}は<b>${esc(winsA.join("・"))}</b>で優位。` : "")
         + (winsB.length ? `${esc(rb.short)}は<b>${esc(winsB.join("・"))}</b>で優位。` : "")
@@ -595,7 +595,9 @@
         p.setAttribute("points", cb.checked ? series[cb.value].map((v, i) => pt(i, v / 10).join(",")).join(" ") : zero);
         p.parentNode.style.opacity = cb.checked ? 1 : 0;
       });
-      rc.setAttribute("aria-label", "レーダーチャート比較: " + boxes.filter((b) => b.checked).map((b) => R[b.value].short).join("・"));
+      // role=img: the label is the only way screen-reader users get the numbers
+      rc.setAttribute("aria-label", "レーダーチャート比較: " + boxes.filter((b) => b.checked)
+        .map((b) => `${R[b.value].short}（${labels.map((l, i) => l + series[b.value][i]).join("、")}）`).join("／"));
     };
     boxes.forEach((cb) => cb.addEventListener("change", () => {
       if (!boxes.some((x) => x.checked)) cb.checked = true;   // an empty chart explains nothing
@@ -618,8 +620,10 @@
       if (!months.length) return (ans.innerHTML = initial);
       // label = the button's own text nodes (the <small> month hint is excluded, whatever the node order)
       const label = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() || b.textContent.trim();
-      const avg = DATA.regions.map((r) => [r, months.reduce((s, m) => s + r.months[m - 1], 0) / months.length]).sort((x, y) => y[1] - x[1]);
-      const best = avg.filter(([, v]) => v >= 4).map(([r]) => r).sort((x, y) => x.order - y.order).map((r) => [r]);
+      // compare at the displayed 0.1 precision; equal values keep page order (stable sort)
+      const avg = DATA.regions.map((r) => [r, Math.round(months.reduce((s, m) => s + r.months[m - 1], 0) / months.length * 10) / 10]).sort((x, y) => y[1] - x[1]);
+      // best regions in score order (page-order re-sort contradicted the ranked list right below)
+      const best = avg.filter(([, v]) => v >= 4).map(([r]) => [r]);
       const when = `${esc(label)}（${months.join("・")}月）`;
       const head = best.length
         ? `${when}なら <b>${best.map(([r]) => esc(r.short)).join("・")}</b> がベスト。`
@@ -696,7 +700,8 @@
     }
     // animate the `translate` property, not `transform`: an inline GSAP transform would override the
     // gyro parallax transform that landscape.css puts on .hero-content
-    if ($(".hero")) gsap.to(".hero-content", { translate: "0 -18%", opacity: 0.2, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    // explicit start: the computed `translate` is "none", which GSAP cannot interpolate from
+    if ($(".hero")) gsap.fromTo(".hero-content", { translate: "0px 0%", opacity: 1 }, { translate: "0px -18%", opacity: 0.2, ease: "none", immediateRender: false, scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
     $$(".js-parallax").forEach((el) => {
       const img = $("img", el);
       gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
