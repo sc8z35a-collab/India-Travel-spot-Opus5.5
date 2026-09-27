@@ -327,6 +327,7 @@ class DepthHero {
   async show(i, first = false) {
     if (this.busy) { this.queue = i; return; }
     if (!first && this.ready && i === this.cur) return;   // re-showing the current photo must not replay the dissolve
+    if (!this.ready) first = true;                        // the first photo failed (offline) → the next one is a fresh start
     this.busy = true;
     try {
       const { tex, dep, it } = await this.load(i);
@@ -376,10 +377,11 @@ class DepthHero {
     const r = this.host.getBoundingClientRect();
     this.scroll = clamp(-r.top / Math.max(r.height, 1), 0, 1);
     const H = this.H, s = this.scroll;
-    const breathe = Math.sin(this.t * 0.16) * 0.025;
+    const breathe = reduced ? 0 : Math.sin(this.t * 0.16) * 0.025;
     const cam = this.camera;
-    cam.position.set(Input.tx * H * 0.075 + Math.sin(this.t * 0.11) * H * 0.012,
-                     -Input.ty * H * 0.05 + Math.cos(this.t * 0.09) * H * 0.008 - s * H * 0.12,
+    const drift = reduced ? 0 : 1;                  // prefers-reduced-motion: no idle camera drift
+    cam.position.set(Input.tx * H * 0.075 * drift + Math.sin(this.t * 0.11) * H * 0.012 * drift,
+                     -Input.ty * H * 0.05 * drift + Math.cos(this.t * 0.09) * H * 0.008 * drift - s * H * 0.12,
                      this.D * (1 - breathe - s * 0.22));
     cam.lookAt(0, -s * H * 0.08, this.u.uStr.value * 0.42);
     this.u.uStr.value = H * (0.24 + s * 0.1);
@@ -474,7 +476,12 @@ const ARC_FS = `
 class TerrainMap {
   constructor(host, terr) {
     this.host = host; this.terr = terr; this.visible = false; this.t = 0; this.reveal = 0; this.revealing = false;
-    this.az = 0; this.azT = 0; this.focus = null; this.fly = null;
+    this.az = 0; this.azT = 0; this.focus = null; this.fly = null; this.pending = undefined;
+    // taps that arrive while the terrain is still downloading are remembered and replayed once it is built
+    this.onEarlyFocus = (e) => { if (!this.ready) this.pending = e.detail; };
+    this.onEarlyClose = () => { if (!this.ready) this.pending = undefined; };
+    document.addEventListener("map:focus", this.onEarlyFocus);
+    document.addEventListener("sheet:close", this.onEarlyClose);
     const canvas = document.createElement("canvas");
     canvas.className = "gl-canvas gl-map"; canvas.setAttribute("aria-hidden", "true");
     host.prepend(canvas); this.canvas = canvas;
@@ -590,6 +597,9 @@ class TerrainMap {
     $(".map3d-reset", this.host)?.addEventListener("click", () => this.flyTo(null));
     document.addEventListener("sheet:close", (e) => { if (this.focus && (!e.detail || this.pins[e.detail])) this.flyTo(null); });
     this.fitAll();
+    document.removeEventListener("map:focus", this.onEarlyFocus);
+    document.removeEventListener("sheet:close", this.onEarlyClose);
+    if (this.pending && this.pins[this.pending]) this.flyTo(this.pending);
   }
   // frame all five pins (Ladakh in the north … Kerala in the south) for the current aspect ratio
   fitAll() {
@@ -678,7 +688,7 @@ class TerrainMap {
     const up = (e) => {
       if (!g || (e && e.pointerId !== g.id)) return;
       const tap = !g.moved; g = null;
-      if (tap && e && e.type === "pointerup" && this.ready) {
+      if (tap && e && e.type === "pointerup" && this.ready && e.target === this.canvas) {
         const id = this.pick(e.clientX, e.clientY);
         if (id) document.dispatchEvent(new CustomEvent("map:pick", { detail: id }));
       }
@@ -696,6 +706,7 @@ class TerrainMap {
     this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
     this.w = w; this.h = h;
     if (this.motes) this.motes.material.uniforms.uPR.value = DPR;   // point sprites follow the DPR governor
+    if (this.pins) Object.values(this.pins).forEach((p) => { p.lw = p.lh = 0; });   // re-measure label pills (fonts / rotation)
     this.fitAll();
   }
   frame(dt, now) {
@@ -705,9 +716,9 @@ class TerrainMap {
     const r = this.host.getBoundingClientRect();
     const p = clamp(1 - (r.top + r.height * 0.5) / innerHeight, 0, 1);  // 0 entering → 1 leaving
     const polar = lerp(0.22, 0.7, ease(clamp(p * 1.6, 0, 1))) - (this.focus ? 0.05 : 0);
-    this.az = lerp(this.az, this.azT + Input.tx * 0.12 + Math.sin(this.t * 0.07) * 0.06, 1 - Math.exp(-dt * 4));
+    this.az = lerp(this.az, this.azT + (reduced ? 0 : Input.tx * 0.12 + Math.sin(this.t * 0.07) * 0.06), 1 - Math.exp(-dt * 4));
     this.target.lerp(this.tgt, 1 - Math.exp(-dt * 6));
-    const pol = polar - Input.ty * 0.05;
+    const pol = polar - (reduced ? 0 : Input.ty * 0.05);
     const R = this.radius * (1 + (1 - p) * 0.12);
     this.camera.position.set(this.target.x + R * Math.sin(pol) * Math.sin(this.az),
                              this.target.y + R * Math.cos(pol),
@@ -836,7 +847,8 @@ if (GL_OK) try {
     const a = getComputedStyle(e.target).getPropertyValue("--accent").trim();
     if (a.startsWith("#")) ambient.accT.set(a);
   }), { rootMargin: "-45% 0px -45% 0px" });
-  $$("main section, .card").forEach((s) => secIO.observe(s));
+  // (horizontal deck cards all intersect at once — the last callback won, tinting the page with a random region)
+  $$("main section").forEach((s) => secIO.observe(s));
 } catch (e) {
   console.warn("[gl] init failed", e);
   html.classList.remove("gl-on", "gl-hero-on", "gl-map-on", "gl-amb-on");
@@ -857,7 +869,7 @@ function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   Input.update(dt);
   // publish tilt to CSS for DOM-level 3D (cards, spots, headings)
-  if (now - cssT > 32) { cssT = now; html.style.setProperty("--tx", Input.tx.toFixed(3)); html.style.setProperty("--ty", Input.ty.toFixed(3)); }
+  if (!reduced && now - cssT > 32) { cssT = now; html.style.setProperty("--tx", Input.tx.toFixed(3)); html.style.setProperty("--ty", Input.ty.toFixed(3)); }
   for (const s of scenes) s.frame(dt, now);
   Gov.sample(dt, scenes.some((s) => s.visible && s.ready));
   if (ambient) ambient.frame(dt, now, (hero && hero.visible && hero.scroll < 0.9) || (terrain && terrain.visible));
@@ -867,4 +879,12 @@ rafId = requestAnimationFrame(loop);
 window.__gl = { hero, terrain, ambient, Input, Gov, get dpr() { return DPR; } };
 
 // restore the reading position after a context-restore reload
-try { const y = sessionStorage.getItem("gl-scroll"); if (y !== null) { sessionStorage.removeItem("gl-scroll"); scrollTo(0, +y); } } catch { /* ignore */ }
+try {
+  const y = sessionStorage.getItem("gl-scroll");
+  if (y !== null) {
+    sessionStorage.removeItem("gl-scroll");
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    const go = () => scrollTo(0, +y);
+    document.readyState === "complete" ? go() : addEventListener("load", go, { once: true });
+  }
+} catch { /* ignore */ }
