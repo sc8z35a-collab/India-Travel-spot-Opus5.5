@@ -56,6 +56,14 @@ class _Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+def _shot(pg, path, **kw) -> None:
+    """Screenshots are evidence, not the test: one slow SwiftShader frame (90 s timeout) aborted the whole QA run."""
+    try:
+        pg.screenshot(path=path, type="jpeg", timeout=45000, **kw)
+    except Exception as exc:  # noqa: BLE001
+        print(f"    (screenshot skipped: {path} — {type(exc).__name__})")
+
+
 class MobileQa(Agent):
     name = "a9_mobile_qa"
     role = "横画面Androidフラッグシップ相当(915×412・タッチ・WebGL2)での表示/操作/3D描画監査"
@@ -96,7 +104,7 @@ class MobileQa(Agent):
                         hero: document.documentElement.classList.contains('gl-hero-on'),
                         amb: document.documentElement.classList.contains('gl-amb-on')})""")
                     slug = path.replace("/index.html", "").replace(".html", "")
-                    pg.screenshot(path=str(out / f"{slug}.jpg"), type="jpeg", quality=62)
+                    _shot(pg, str(out / f"{slug}.jpg"), quality=62)
                     # scroll through to trigger lazy content
                     h = pg.evaluate("document.documentElement.scrollHeight")
                     shots = 0
@@ -107,12 +115,12 @@ class MobileQa(Agent):
                         pg.evaluate("document.querySelector('#map').scrollIntoView()")
                         pg.wait_for_timeout(5000)
                         gl["map"] = pg.evaluate("document.documentElement.classList.contains('gl-map-on')")
-                        pg.screenshot(path=str(out / f"{slug}-map.jpg"), type="jpeg", quality=70)
+                        _shot(pg, str(out / f"{slug}-map.jpg"), quality=70)
                     for sec in ("regions", "finder", "compare", "highlights", "evaluation"):
                         if pg.query_selector(f"#{sec}"):
                             pg.evaluate(f"document.querySelector('#{sec}').scrollIntoView()")
                             pg.wait_for_timeout(900)
-                            pg.screenshot(path=str(out / f"{slug}-{sec}.jpg"), type="jpeg", quality=62)
+                            _shot(pg, str(out / f"{slug}-{sec}.jpg"), quality=62)
                     probe = pg.evaluate(PROBE_JS)
                     # interaction smoke test: tap something that opens the sheet
                     sheet_ok = None

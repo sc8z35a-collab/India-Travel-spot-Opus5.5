@@ -101,7 +101,12 @@
   $$(".heat-row").forEach((row, r) => $$(".heat-cell", row).forEach((c, i) => c.style.setProperty("--i", r * 2 + i)));
   $$(".cal-row").forEach((row, r) => $$(".cal-cell", row).forEach((c, i) => c.style.setProperty("--d", r * 4 + i)));
   // anchor jumps must land on content that is already visible (no blank-then-fade)
-  const revealAll = (root) => { if (root.matches?.(REVEAL)) root.classList.add("is-in"); $$(REVEAL, root).forEach((el) => el.classList.add("is-in")); };
+  const revealAll = (root) => {
+    if (root.matches?.(REVEAL)) root.classList.add("is-in"); $$(REVEAL, root).forEach((el) => el.classList.add("is-in"));
+    // the footer "Photo credits" links jumped to a collapsed <details> — open it (and any closed ancestor)
+    if (root.id === "credits") $$("details", root).forEach((d) => (d.open = true));
+    for (let d = root.closest?.("details"); d; d = d.parentElement?.closest("details")) d.open = true;
+  };
 
   /* ---------------- count-up ---------------- */
   const countUp = (el) => {
@@ -150,7 +155,13 @@
   let stRaf = 0;
   addEventListener("scroll", () => { if (!stRaf) stRaf = requestAnimationFrame(() => { stRaf = 0; setCurrent(); }); }, { passive: true });
   setCurrent();
-  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => { vibrate(); const t = byHash(a.hash); if (t) revealAll(t); }));
+  // the landscape rail sits above the open menu (z 125 > 124): a tab tap must close the menu too, otherwise the
+  // page scrolled underneath while the menu and its scroll lock stayed on
+  $$(".tabbar a").forEach((a) => a.addEventListener("click", () => {
+    vibrate();
+    if (document.body.classList.contains("menu-open")) setMenu(false);
+    const t = byHash(a.hash); if (t) revealAll(t);
+  }));
   // a malformed hash (e.g. "#%E0") must not throw and kill every script below
   { const t = byHash(location.hash); if (t) revealAll(t); }
   addEventListener("hashchange", () => { const t = byHash(location.hash); if (t) revealAll(t); });
@@ -158,7 +169,7 @@
   /* ---------------- menu ---------------- */
   const toggle = $(".nav-toggle"), menu = $("#menu");
   let menuT = 0, menuRaf = 0;
-  const setMenu = (open) => {
+  function setMenu(open) {
     toggle.setAttribute("aria-expanded", open);
     toggle.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
     document.body.classList.toggle("menu-open", open);
@@ -167,7 +178,7 @@
     if (open) { menu.hidden = false; menuRaf = requestAnimationFrame(() => { menu.classList.add("is-open"); $("a", menu)?.focus({ preventScroll: true }); }); }
     else { menu.classList.remove("is-open"); menuT = setTimeout(() => (menu.hidden = true), 800); }
     onScroll();
-  };
+  }
   toggle.addEventListener("click", () => {
     const open = toggle.getAttribute("aria-expanded") !== "true";
     if (open && sheetOpen) closeSheet();          // two stacked modal dialogs: the drawer would trap focus behind the menu
@@ -241,8 +252,10 @@
     if (e.touches.length > 1) { g0 = null; sheet.classList.remove("is-dragging"); panel.style.transform = ""; return; }
     const t = e.touches[0], dx = t.clientX - g0.x, dy = t.clientY - g0.y;
     if (!g0.axis && Math.hypot(dx, dy) > 8) g0.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-    if (landscape() && g0.axis === "x" && dx > 0) { g0.d = dx; sheet.classList.add("is-dragging"); panel.style.transform = `translateX(${dx}px)`; }
-    else if (!landscape() && g0.axis === "y" && dy > 0 && g0.top <= 0) { g0.d = dy; sheet.classList.add("is-dragging"); panel.style.transform = `translateY(${dy}px)`; }
+    // follow the finger both ways: dragging back past the start used to keep the last positive offset,
+    // so a swipe the user reversed still closed the drawer on release
+    if (landscape() && g0.axis === "x") { g0.d = Math.max(0, dx); sheet.classList.add("is-dragging"); panel.style.transform = `translateX(${g0.d}px)`; }
+    else if (!landscape() && g0.axis === "y" && g0.top <= 0) { g0.d = Math.max(0, dy); sheet.classList.add("is-dragging"); panel.style.transform = `translateY(${g0.d}px)`; }
   }, { passive: true });
   const gEnd = () => {
     if (!g0) return;
@@ -480,7 +493,11 @@
 
   /* ---------------- heatmap cells → drawer (+ arrow-key grid navigation) ---------------- */
   const cells = $$(".heat-cell");
+  // grid pattern: a single tab stop for the 40 cells (roving tabindex) instead of 40 Tab presses to get past it
+  const rove = (k) => cells.forEach((x, j) => (x.tabIndex = j === k ? 0 : -1));
+  if (cells.length) rove(0);
   cells.forEach((c, i) => {
+    c.addEventListener("focus", () => rove(i));
     c.addEventListener("click", () => {
       $$(".is-sel").forEach((x) => x.classList.remove("is-sel"));
       c.classList.add("is-sel");
@@ -492,11 +509,12 @@
         <p class="sh-b">${esc(c.dataset.why)}</p>`, c.dataset.accent, "heat");
     });
     c.addEventListener("keydown", (e) => {
-      const n = DATA.regions.length, m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n }[e.key];
-      if (!m) return;
-      const col = i % n;
+      const n = DATA.regions.length, col = i % n;
+      const m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n, Home: -col, End: n - 1 - col }[e.key];
+      if (m === undefined) return;
+      e.preventDefault();                          // arrows at the grid edge must not scroll the page
       if ((m === 1 && col === n - 1) || (m === -1 && col === 0)) return;   // left/right stay inside the row
-      if (cells[i + m]) { e.preventDefault(); cells[i + m].focus(); }
+      if (cells[i + m]) cells[i + m].focus();
     });
   });
 
@@ -604,7 +622,7 @@
       const when = `${esc(label)}（${months.join("・")}月）`;
       const head = best.length
         ? `${when}なら <b>${best.map(([r]) => esc(r.short)).join("・")}</b> がベスト。`
-        : `${when}は暑さ・雨の季節。比較的おすすめは <b>${esc(avg[0][0].short)}</b>。`;
+        : `${when}は暑さ・雨の季節。比較的おすすめは <b>${avg.filter(([, v]) => v === avg[0][1]).map(([r]) => esc(r.short)).join("・")}</b>。`;   // ties share the top
       ans.innerHTML = `<p class="ha-t">${head}</p><ol>${avg.map(([r, v]) => `<li style="--c:${r.accent};--v:${v.toFixed(1)}"><a href="${ROOT}${r.url}">${esc(r.name)}</a><span>${v.toFixed(1)}<small>/5</small></span><div class="ha-bar"><i></i></div></li>`).join("")}</ol>`;
     }));
   }
@@ -624,7 +642,7 @@
     };
     const show = (i) => {
       idx = (i + items.length) % items.length;
-      const a = DATA.assets[items[idx].dataset.lightbox], w = pick(a), jw = a.jpg.filter((v) => v <= w).pop() || a.jpg[0];
+      const a = DATA.assets[items[idx].dataset.lightbox], w = pick(a), jw = a.jpg.find((v) => v >= w) || a.jpg[a.jpg.length - 1];   // was: smallest (640px) JPEG for any pick above 1920
       lb.classList.add("is-loading");
       stage.innerHTML = `<picture>${a.avif ? `<source type="image/avif" srcset="${ROOT}${a.path}/${w}.avif">` : ""}<source type="image/webp" srcset="${ROOT}${a.path}/${w}.webp"><img src="${ROOT}${a.path}/${jw}.jpg" alt="${esc(a.alt)}" width="${a.w}" height="${a.h}" style="background:${a.color || "#111"}"></picture>`
         + `<p class="lb-cap">${esc(a.alt)}<span>${idx + 1} / ${items.length} · <a href="${esc(a.link)}" target="_blank" rel="noopener">Photo: ${esc(a.credit)}</a></span></p>`;
@@ -682,7 +700,7 @@
       const img = $("img", el);
       gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
     });
-    if ($(".deck")) gsap.from(".card", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, clearProps: "opacity,transform", scrollTrigger: { trigger: ".deck", start: "top 85%", once: true } });
+    if ($(".deck")) gsap.from(".card", { translate: "0 60px", opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, clearProps: "opacity,translate", scrollTrigger: { trigger: ".deck", start: "top 85%", once: true } });
     addEventListener("load", () => ScrollTrigger.refresh());
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
   };
@@ -696,7 +714,8 @@
   const goFs = async () => {
     try {
       if (!inFs()) await (fsEl.requestFullscreen ? fsEl.requestFullscreen({ navigationUI: "hide" }) : fsEl.webkitRequestFullscreen());
-      await screen.orientation?.lock?.("landscape").catch(() => {});
+      // lock() is missing on some engines → `undefined.catch` threw; wrap it so the result is always a promise
+      await Promise.resolve().then(() => screen.orientation?.lock?.("landscape")).catch(() => {});
     } catch { /* user gesture / browser policy */ }
     syncFs();
   };

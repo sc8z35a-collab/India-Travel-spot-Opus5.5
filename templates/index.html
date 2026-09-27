@@ -70,10 +70,10 @@
       <p class="body reveal">砂漠の宮殿、聖なる川、ヤシの水郷、ヒマラヤの湖。インドは「どこに行くか」で旅の性格がまるで変わる国です。日本の大学生が長期休みに行きやすい5地域を、<strong>文化・自然・コスパ・アクセス・安心・食・体験・写真映え</strong>の8軸で採点。点数にはすべて理由を書き、弱点も隠さず載せています。</p>
     </div>
     <dl class="stats">
-      <div class="stat"><dt>日本からの直行便</dt><dd><b data-count="9">9</b><small>時間〜</small></dd><p>羽田・成田 → デリー</p></div>
-      <div class="stat"><dt>評価の視点</dt><dd><b data-count="{{ axes|length }}">{{ axes|length }}</b><small>軸 × {{ personas|length }}</small></dd><p>{{ axes|length }}つの軸 × {{ personas|length }}タイプの旅人</p></div>
-      <div class="stat"><dt>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">{{ "{:,}".format(analysis.robust_samples) }}</b><small>通り</small></dd><p>ランダムな価値観で順位を検証</p></div>
-      <div class="stat"><dt>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">{{ "{:,}".format(min_daily_jpy) }}</b><small>円〜</small></dd><p>宿・食・移動込み</p></div>
+      <div class="stat"><dt>日本からの直行便</dt><dd><b data-count="9">9</b><small>時間〜</small></dd><dd class="stat-note">羽田・成田 → デリー</dd></div>
+      <div class="stat"><dt>評価の視点</dt><dd><b data-count="{{ axes|length }}">{{ axes|length }}</b><small>軸 × {{ personas|length }}</small></dd><dd class="stat-note">{{ axes|length }}つの軸 × {{ personas|length }}タイプの旅人</dd></div>
+      <div class="stat"><dt>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">{{ "{:,}".format(analysis.robust_samples) }}</b><small>通り</small></dd><dd class="stat-note">ランダムな価値観で順位を検証</dd></div>
+      <div class="stat"><dt>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">{{ "{:,}".format(min_daily_jpy) }}</b><small>円〜</small></dd><dd class="stat-note">宿・食・移動込み</dd></div>
     </dl>
   </div>
 </section>
@@ -84,7 +84,7 @@
     <div class="sec-head">
       <p class="eyebrow">02 — The map</p>
       <h2 class="h2 reveal-lines">北はヒマラヤ、<br>南はアラビア海。</h2>
-      <p class="body reveal">実際の標高データから立ち上げたインド亜大陸。5つの目的地はデリーを起点に国内線や特急でつながります。<b class="hint-tap">光の柱をタップ</b>するとカメラが飛び、概要が開きます。<span class="gl-only">横にドラッグで回転。</span></p>
+      <p class="body reveal">実際の標高データから立ち上げたインド亜大陸。5つの目的地はデリーを起点に国内線や特急でつながります。<span class="gl-only"><b class="hint-tap">光の柱をタップ</b>するとカメラが飛び、概要が開きます。横にドラッグで回転。</span><span class="gl-no"><b class="hint-tap">ピンをタップ</b>すると概要が開きます。</span></p>
       <ol class="map-list" aria-label="{{ regions|length }}つの目的地">
         {% for r in regions %}
         <li><button type="button" data-pin="{{ r.id }}" aria-haspopup="dialog" style="--accent:{{ r.theme.accent }}"><span>{{ '%02d' % r.order }}</span><b>{{ r.name }}</b><small>{{ r.state }}</small><i aria-hidden="true"></i></button></li>

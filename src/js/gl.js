@@ -4,7 +4,7 @@
                      into true 3D relief; gyro/touch parallax; depth-ordered
                      dissolve between regions; volumetric dust + bokeh; bloom,
                      chromatic aberration, film grain.
-     • TerrainMap  — the Indian subcontinent from real elevation data, 260k-vertex
+     • TerrainMap  — the Indian subcontinent from real elevation data, ~310k-vertex
                      displaced mesh, per-vertex normals, sun lighting, sea glints,
                      glowing border, flowing flight arcs (incl. Tokyo → Delhi),
                      light-beam pins with HTML labels, camera fly-to.
@@ -502,7 +502,11 @@ class TerrainMap {
       this.visible = e.isIntersecting;
       if (e.isIntersecting && !this.revealing && this.ready) this.startReveal();
     }), { threshold: 0.2 }).observe(host);
-    this.build().catch((e) => { console.warn("[gl] terrain failed", e); });
+    this.build().catch((e) => {
+      console.warn("[gl] terrain failed", e);
+      // no terrain (offline / 404) → hand the stage back to the static SVG map instead of an empty black canvas
+      canvas.remove(); this.visible = false; this.host.classList.remove("gl-ready"); html.classList.remove("gl-map-on");
+    });
     this.bindDrag();
   }
   async build() {
