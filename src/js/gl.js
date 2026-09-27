@@ -68,10 +68,12 @@ const Input = {
   init() {
     addEventListener("deviceorientation", (e) => {
       if (e.beta == null || e.gamma == null) return;
-      const a = (screen.orientation && screen.orientation.angle) ?? (window.orientation || 0);
+      // normalise to 0/90/180/270 (legacy window.orientation reports -90 for angle 270)
+      const a = (((screen.orientation?.angle ?? window.orientation ?? 0) % 360) + 360) % 360;
       let x, y;
       if (a === 90) { x = e.beta; y = e.gamma; }
-      else if (a === 270 || a === -90) { x = -e.beta; y = -e.gamma; }
+      else if (a === 270) { x = -e.beta; y = -e.gamma; }
+      else if (a === 180) { x = -e.gamma; y = -e.beta; }
       else { x = e.gamma; y = e.beta; }
       if (this.bx === null || Math.abs(x - this.bx) > 70 || Math.abs(y - this.by) > 70) { this.bx = x; this.by = y; }
       this.bx += (x - this.bx) * 0.012; this.by += (y - this.by) * 0.012;   // slow re-centring → no drift
@@ -137,7 +139,7 @@ function makeRenderer(canvas, { alpha = false } = {}) {
 
 function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88] } = {}) {
   const size = renderer.getSize(new THREE.Vector2());
-  const rt = new THREE.WebGLRenderTarget(size.x * DPR, size.y * DPR, { type: THREE.HalfFloatType, samples: QA ? 0 : (DPR >= 2.5 ? 2 : 4) });
+  const rt = new THREE.WebGLRenderTarget(Math.max(1, size.x * DPR), Math.max(1, size.y * DPR), { type: THREE.HalfFloatType, samples: QA ? 0 : (DPR >= 2.5 ? 2 : 4) });
   const composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, camera));
   const bloomPass = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), ...bloom);
@@ -162,7 +164,7 @@ function loadTex(url, { srgb = true } = {}) {
   return p;
 }
 function photoUrl(id, cssW) {
-  const a = DATA.assets[id]; const target = cssW * DPR_MAX * 1.02;
+  const a = DATA.assets[id]; const target = Math.max(cssW, innerWidth) * DPR_MAX * 1.02;   // 0-wide host before layout fetched the 640 px file
   const w = a.variants.find((v) => v >= target) || a.variants[a.variants.length - 1];
   return `${ROOT}${a.path}/${w}.webp`;
 }
@@ -222,7 +224,7 @@ const DUST_VS = `
     p.x += sin(uTime * .25 + aSeed * 6.283) * .03 * uH;
     p.z += sin(uTime * .19 + aSeed * 11.) * .02 * uH;
     vec4 mv = modelViewMatrix * vec4(p, 1.);
-    gl_PointSize = aSize * uScale / -mv.z;
+    gl_PointSize = clamp(aSize * uScale / max(-mv.z, .05), 0., 256.);   // near/behind camera: no negative or giant sprites
     gl_Position = projectionMatrix * mv;
     vA = (.45 + .55 * sin(uTime * (1.2 + aSeed * 2.) + aSeed * 40.)) ;
     vS = aSeed;
@@ -584,7 +586,7 @@ class TerrainMap {
       uniforms: { uTime: this.u.uTime, uPR: { value: DPR }, uRev: this.u.uReveal },
       vertexShader: `attribute float aSeed; uniform float uTime, uPR; varying float vA;
         void main(){ vec3 p = position; p.y += sin(uTime * .3 + aSeed * 20.) * .12; p.x += sin(uTime * .1 + aSeed * 9.) * .2;
-          vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.5 + aSeed * 3.) * uPR * 6. / -mv.z; gl_Position = projectionMatrix * mv;
+          vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = clamp((1.5 + aSeed * 3.) * uPR * 6. / max(-mv.z, .05), 0., 64.); gl_Position = projectionMatrix * mv;
           vA = .4 + .6 * sin(uTime * 2. + aSeed * 50.); }`,
       fragmentShader: `uniform float uRev; varying float vA; void main(){ float d = length(gl_PointCoord - .5); float a = (1. - smoothstep(0., .5, d));
           gl_FragColor = vec4(vec3(1., .78, .45) * a * vA * .9 * uRev, 1.); }`,
@@ -738,6 +740,8 @@ class TerrainMap {
       if (!pin.lw) { pin.lw = pin.label.offsetWidth || 110; pin.lh = pin.label.offsetHeight || 34; }
       L.push({ pin, id, x: (v.x * 0.5 + 0.5) * this.w, y0: (-v.y * 0.5 + 0.5) * this.h, y: 0, z: v.z });
     });
+    // labels behind the camera are hidden — they must not push visible labels around
+    for (let i = L.length - 1; i >= 0; i--) if (L[i].z >= 1) { L[i].pin.label.style.visibility = "hidden"; L.splice(i, 1); }
     L.sort((a, b) => a.y0 - b.y0);
     L.forEach((l) => (l.y = l.y0));
     for (let it = 0; it < 4; it++) for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
@@ -869,7 +873,10 @@ document.addEventListener("visibilitychange", () => {
 });
 function loop(now) {
   if (!running || !GL_OK || (!scenes.length && !ambient)) return;
-  if (html.classList.contains("gl-lost")) return;
+  if (html.classList.contains("gl-lost")) {
+    html.style.setProperty("--tx", "0"); html.style.setProperty("--ty", "0");   // DOM tilt must not freeze off-centre
+    return;
+  }
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   Input.update(dt);
   // publish tilt to CSS for DOM-level 3D (cards, spots, headings)

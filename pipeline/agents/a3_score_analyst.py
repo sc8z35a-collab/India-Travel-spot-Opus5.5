@@ -71,7 +71,8 @@ class ScoreAnalyst(Agent):
             sc = {a: r["scores"][a]["v"] for a in axes}
             ordered = sorted(sc, key=lambda a: -sc[a])
             strong = ordered[:2]
-            weak = ordered[-1]
+            # the weakest axis must never also be listed as a strength (flat profiles named one axis as both)
+            weak = next((a for a in reversed(ordered) if a not in strong and sc[a] < sc[strong[-1]]), ordered[-1])
             wins = [pid for pid, v in personas.items() if r["id"] in v["winners"]]
             d_lo, d_hi = r["days"]
             b_lo, b_hi = r["budget_inr"]
@@ -85,8 +86,9 @@ class ScoreAnalyst(Agent):
                 "weak": weak,
                 "persona_wins": wins,
                 "verdict": verdict,
-                "trip_jpy": [round(b_lo * d_lo * rate, -3), round(b_hi * d_hi * rate, -3)],
-                "daily_jpy": [round(b_lo * rate, -2), round(b_hi * rate, -2)],
+                # int(): round(x, -3) returns 15000.0 floats that leaked into the JSON payload
+                "trip_jpy": [int(round(b_lo * d_lo * rate, -3)), int(round(b_hi * d_hi * rate, -3))],
+                "daily_jpy": [int(round(b_lo * rate, -2)), int(round(b_hi * rate, -2))],
             }
 
         # ---- robustness: how often does each region win under random weights?
@@ -101,7 +103,8 @@ class ScoreAnalyst(Agent):
         for _ in range(N):
             w = {a: rng.expovariate(1.0) for a in ax_ids}
             tot = {r["id"]: sum(r["scores"][a]["v"] * w[a] for a in ax_ids) for r in regions}
-            order = sorted(tot, key=lambda k: -tot[k])
+            # same tie-break as the finder (score, balanced, page order)
+            order = sorted(tot, key=lambda k: (-tot[k], -balanced[k], page_order.index(k)))
             top = tot[order[0]]
             # exact ties (possible: integer scores) are split, not credited to whoever comes first in page order
             best = [k for k in order if abs(tot[k] - top) < 1e-9]

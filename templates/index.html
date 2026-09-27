@@ -230,7 +230,7 @@
       <div class="heat-row" role="row">
         <span class="heat-name" role="rowheader">{{ a.short }}</span>
         {% for r in regions %}{% set s = r.scores[a.id] %}
-        <span class="heat-td" role="cell"><button type="button" class="heat-cell{% if r.id in analysis.axis_leaders[a.id] %} lead{% endif %}" aria-haspopup="dialog" style="--heat:{{ charts.heat[r.id][a.id] }};--ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点{% if r.id in analysis.axis_leaders[a.id] %}（1位）{% endif %}">{{ s.v }}</button></span>
+        <span class="heat-td" role="cell"><button type="button" class="heat-cell{% if r.id in analysis.axis_leaders[a.id] %} lead{% endif %}" aria-haspopup="dialog" style="--heat:{{ charts.heat[r.id][a.id] }};--cell-ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点{% if r.id in analysis.axis_leaders[a.id] %}（1位）{% endif %}">{{ s.v }}</button></span>
         {% endfor %}
       </div>
       {% endfor %}

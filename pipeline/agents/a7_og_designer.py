@@ -41,7 +41,8 @@ def _cover(img: Image.Image) -> Image.Image:
 
 
 def card(photo_path: str, title: str, sub: str, accent: str, credit: str, cjk_ok: bool) -> Image.Image:
-    base = _cover(Image.open(photo_path).convert("RGB"))
+    with Image.open(photo_path) as src_im:
+        base = _cover(src_im.convert("RGB"))
     grad = Image.new("L", (W, H))
     gd = ImageDraw.Draw(grad)
     for y in range(H):
@@ -50,8 +51,15 @@ def card(photo_path: str, title: str, sub: str, accent: str, credit: str, cjk_ok
     base = Image.composite(dark, base, grad)
     d = ImageDraw.Draw(base)
     d.rectangle([60, H - 250, 60 + 64, H - 246], fill=accent)
-    d.text((60, H - 230), title, font=_font(92), fill=(255, 250, 240))
-    d.text((62, H - 120), sub if cjk_ok else "", font=_font(34), fill=(235, 225, 210))
+    # shrink long titles / subtitles to the card width instead of running off the right edge
+    ts = 92
+    while ts > 48 and d.textlength(title, font=_font(ts)) > W - 120:
+        ts -= 4
+    d.text((60, H - 230), title, font=_font(ts), fill=(255, 250, 240))
+    ss = 34
+    while cjk_ok and ss > 20 and d.textlength(sub, font=_font(ss)) > W - 124:
+        ss -= 2
+    d.text((62, H - 120), sub if cjk_ok else "", font=_font(ss), fill=(235, 225, 210))
     d.text((W - 60, H - 40), credit, font=_font(16), fill=(200, 190, 180), anchor="rs")
     d.text((60, 50), "INDIA — 5 JOURNEYS", font=_font(22), fill=accent)
     return base
@@ -95,7 +103,8 @@ class OgDesigner(Agent):
         assets = load_json(GEN / "assets.json")
         regions = load_json(GEN / "regions.json")
         f = _font(20)
-        cjk_ok = "CJK" in getattr(f, "path", "")
+        fp = getattr(f, "path", "") or ""       # bytes on some Pillow builds; load_default() has none
+        cjk_ok = "CJK" in (fp.decode(errors="ignore") if isinstance(fp, bytes) else str(fp))
         if not cjk_ok:
             report.warn("CJK font not found — Japanese subtitle omitted from OG cards")
         out = DIST / "og"
