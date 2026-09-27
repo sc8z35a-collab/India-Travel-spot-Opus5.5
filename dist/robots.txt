@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sc8z35a-collab.github.io/India-Travel-spot-Opus5.5/sitemap.xml

@@ -1,0 +1,15 @@
+{
+  "agent": "c5_copy_editor",
+  "role": "原稿の編集レビュー（LLM編集長 ＋ ルールベース校正）",
+  "ok": true,
+  "started": 1790414385.816755,
+  "duration_s": 0.01,
+  "stats": {
+    "mode": "rule",
+    "lint_findings": 6
+  },
+  "warnings": [
+    "LLM unavailable → rule mode (RuntimeError: LLM proxy refused: Free-plan credits can't be used with the Genspark API / L)"
+  ],
+  "errors": []
+}

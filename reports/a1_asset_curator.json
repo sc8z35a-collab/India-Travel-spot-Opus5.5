@@ -1,0 +1,49 @@
+{
+  "agent": "a1_asset_curator",
+  "role": "写真の取得・検証・高解像度レスポンシブ最適化 (AVIF/WebP/JPEG, LQIP, 主色抽出, 帰属表示)",
+  "ok": true,
+  "started": 1790413798.361825,
+  "duration_s": 505.97,
+  "stats": {
+    "requested": 50,
+    "processed": 50,
+    "failed": [],
+    "avif": true,
+    "source_px_median": 2304.0,
+    "source_px_min": 728,
+    "xl": [
+      "delhi-taj-dawn",
+      "delhi-taj-sunrise",
+      "jaipur-amber-wide",
+      "jaipur-hawa-street",
+      "kerala-alleppey",
+      "kerala-backwater",
+      "ladakh-pangong",
+      "ladakh-pangong-pano",
+      "varanasi-dawn",
+      "varanasi-sunrise"
+    ],
+    "files": 613
+  },
+  "warnings": [
+    "jaipur-hawa-street: low source resolution 1280px",
+    "jaipur-hawa-street: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "varanasi-birds: low source resolution 728px",
+    "varanasi-birds: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "kerala-houseboats: low source resolution 1024px",
+    "kerala-houseboats: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "kerala-munnar: low source resolution 1280px",
+    "kerala-munnar: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "kerala-munnar2: low source resolution 1024px",
+    "kerala-munnar2: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "kerala-thali: low source resolution 1280px",
+    "kerala-thali: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "ladakh-nubra: low source resolution 1024px",
+    "ladakh-nubra: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "ladakh-khardung: low source resolution 1280px",
+    "ladakh-khardung: primary hi-res source unavailable — used fallback photo (retried next build)",
+    "varanasi-sadhu: low source resolution 853px",
+    "varanasi-sadhu: primary hi-res source unavailable — used fallback photo (retried next build)"
+  ],
+  "errors": []
+}

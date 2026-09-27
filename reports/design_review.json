@@ -1,0 +1,300 @@
+{
+  "mode": "rule",
+  "screens": {
+    "delhi-agra-evaluation": {
+      "mean_lum": 13.6,
+      "crushed": 0.057,
+      "blown": 0.0,
+      "colorfulness": 14.7,
+      "edge_density": 0.035,
+      "dead_space": 0.417,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "delhi-agra-highlights": {
+      "mean_lum": 96.5,
+      "crushed": 0.067,
+      "blown": 0.222,
+      "colorfulness": 24.8,
+      "edge_density": 0.062,
+      "dead_space": 0.367,
+      "notes": [
+        "白飛び — ブルーム強度を下げる"
+      ]
+    },
+    "delhi-agra": {
+      "mean_lum": 79.9,
+      "crushed": 0.0,
+      "blown": 0.0,
+      "colorfulness": 21.1,
+      "edge_density": 0.067,
+      "dead_space": 0.011,
+      "notes": []
+    },
+    "index-compare": {
+      "mean_lum": 255.0,
+      "crushed": 0.0,
+      "blown": 1.0,
+      "colorfulness": 0.0,
+      "edge_density": 0.01,
+      "dead_space": 1.0,
+      "notes": [
+        "余白（無地ブロック）が多い — 背景に奥行き要素を",
+        "白飛び — ブルーム強度を下げる",
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "index-finder": {
+      "mean_lum": 255.0,
+      "crushed": 0.0,
+      "blown": 1.0,
+      "colorfulness": 0.0,
+      "edge_density": 0.01,
+      "dead_space": 1.0,
+      "notes": [
+        "余白（無地ブロック）が多い — 背景に奥行き要素を",
+        "白飛び — ブルーム強度を下げる",
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "index-map": {
+      "mean_lum": 19.9,
+      "crushed": 0.169,
+      "blown": 0.001,
+      "colorfulness": 26.2,
+      "edge_density": 0.058,
+      "dead_space": 0.183,
+      "notes": []
+    },
+    "index-regions": {
+      "mean_lum": 46.3,
+      "crushed": 0.013,
+      "blown": 0.001,
+      "colorfulness": 23.7,
+      "edge_density": 0.04,
+      "dead_space": 0.322,
+      "notes": []
+    },
+    "index": {
+      "mean_lum": 73.8,
+      "crushed": 0.0,
+      "blown": 0.001,
+      "colorfulness": 28.6,
+      "edge_density": 0.068,
+      "dead_space": 0.017,
+      "notes": []
+    },
+    "jaipur-evaluation": {
+      "mean_lum": 12.1,
+      "crushed": 0.049,
+      "blown": 0.0,
+      "colorfulness": 12.5,
+      "edge_density": 0.032,
+      "dead_space": 0.517,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "jaipur-highlights": {
+      "mean_lum": 96.7,
+      "crushed": 0.049,
+      "blown": 0.24,
+      "colorfulness": 23.2,
+      "edge_density": 0.082,
+      "dead_space": 0.422,
+      "notes": [
+        "白飛び — ブルーム強度を下げる"
+      ]
+    },
+    "jaipur": {
+      "mean_lum": 84.8,
+      "crushed": 0.0,
+      "blown": 0.0,
+      "colorfulness": 40.6,
+      "edge_density": 0.118,
+      "dead_space": 0.006,
+      "notes": []
+    },
+    "kerala-evaluation": {
+      "mean_lum": 12.9,
+      "crushed": 0.055,
+      "blown": 0.0,
+      "colorfulness": 12.1,
+      "edge_density": 0.032,
+      "dead_space": 0.528,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "kerala-highlights": {
+      "mean_lum": 126.9,
+      "crushed": 0.062,
+      "blown": 0.354,
+      "colorfulness": 17.3,
+      "edge_density": 0.072,
+      "dead_space": 0.483,
+      "notes": [
+        "白飛び — ブルーム強度を下げる",
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "kerala": {
+      "mean_lum": 91.4,
+      "crushed": 0.0,
+      "blown": 0.0,
+      "colorfulness": 22.2,
+      "edge_density": 0.092,
+      "dead_space": 0.0,
+      "notes": []
+    },
+    "ladakh-evaluation": {
+      "mean_lum": 12.8,
+      "crushed": 0.069,
+      "blown": 0.0,
+      "colorfulness": 12.4,
+      "edge_density": 0.033,
+      "dead_space": 0.472,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "ladakh-highlights": {
+      "mean_lum": 77.2,
+      "crushed": 0.096,
+      "blown": 0.154,
+      "colorfulness": 19.6,
+      "edge_density": 0.1,
+      "dead_space": 0.3,
+      "notes": [
+        "白飛び — ブルーム強度を下げる"
+      ]
+    },
+    "ladakh": {
+      "mean_lum": 78.0,
+      "crushed": 0.002,
+      "blown": 0.0,
+      "colorfulness": 52.5,
+      "edge_density": 0.068,
+      "dead_space": 0.0,
+      "notes": []
+    },
+    "q-index-compare": {
+      "mean_lum": 63.5,
+      "crushed": 0.062,
+      "blown": 0.001,
+      "colorfulness": 81.6,
+      "edge_density": 0.089,
+      "dead_space": 0.122,
+      "notes": []
+    },
+    "q-index-finder": {
+      "mean_lum": 20.6,
+      "crushed": 0.067,
+      "blown": 0.001,
+      "colorfulness": 17.1,
+      "edge_density": 0.09,
+      "dead_space": 0.106,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "q-index-map": {
+      "mean_lum": 20.9,
+      "crushed": 0.187,
+      "blown": 0.0,
+      "colorfulness": 25.0,
+      "edge_density": 0.071,
+      "dead_space": 0.189,
+      "notes": []
+    },
+    "q-index-regions": {
+      "mean_lum": 46.2,
+      "crushed": 0.019,
+      "blown": 0.0,
+      "colorfulness": 23.2,
+      "edge_density": 0.043,
+      "dead_space": 0.289,
+      "notes": []
+    },
+    "q-index-top": {
+      "mean_lum": 86.7,
+      "crushed": 0.0,
+      "blown": 0.0,
+      "colorfulness": 43.7,
+      "edge_density": 0.129,
+      "dead_space": 0.006,
+      "notes": []
+    },
+    "q-index-vs": {
+      "mean_lum": 19.6,
+      "crushed": 0.07,
+      "blown": 0.0,
+      "colorfulness": 27.7,
+      "edge_density": 0.06,
+      "dead_space": 0.222,
+      "notes": []
+    },
+    "q-ladakh-evaluation": {
+      "mean_lum": 12.6,
+      "crushed": 0.047,
+      "blown": 0.0,
+      "colorfulness": 11.1,
+      "edge_density": 0.036,
+      "dead_space": 0.444,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "q-ladakh-highlights": {
+      "mean_lum": 34.3,
+      "crushed": 0.057,
+      "blown": 0.001,
+      "colorfulness": 18.2,
+      "edge_density": 0.083,
+      "dead_space": 0.378,
+      "notes": []
+    },
+    "q-ladakh-top": {
+      "mean_lum": 79.5,
+      "crushed": 0.003,
+      "blown": 0.0,
+      "colorfulness": 52.6,
+      "edge_density": 0.082,
+      "dead_space": 0.0,
+      "notes": []
+    },
+    "varanasi-evaluation": {
+      "mean_lum": 12.5,
+      "crushed": 0.058,
+      "blown": 0.0,
+      "colorfulness": 17.9,
+      "edge_density": 0.032,
+      "dead_space": 0.533,
+      "notes": [
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "varanasi-highlights": {
+      "mean_lum": 90.0,
+      "crushed": 0.065,
+      "blown": 0.21,
+      "colorfulness": 13.2,
+      "edge_density": 0.077,
+      "dead_space": 0.344,
+      "notes": [
+        "白飛び — ブルーム強度を下げる",
+        "色が単調 — 地域アクセント色を強める"
+      ]
+    },
+    "varanasi": {
+      "mean_lum": 82.6,
+      "crushed": 0.0,
+      "blown": 0.0,
+      "colorfulness": 40.2,
+      "edge_density": 0.118,
+      "dead_space": 0.006,
+      "notes": []
+    }
+  }
+}

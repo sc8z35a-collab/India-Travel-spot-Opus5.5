@@ -1,0 +1,14 @@
+{
+  "agent": "a7_og_designer",
+  "role": "実写真から1200×630のOGP（SNS共有）画像を自動合成",
+  "ok": true,
+  "started": 1790414385.8010979,
+  "duration_s": 1.9,
+  "stats": {
+    "cards": 6,
+    "cjk_font": true,
+    "icons": 4
+  },
+  "warnings": [],
+  "errors": []
+}

@@ -1,0 +1,252 @@
+{
+  "delhi-taj-sunrise": {
+    "path": "img/delhi-taj-sunrise/depth.webp",
+    "mean": 0.165,
+    "near": 0.569
+  },
+  "jaipur-amber-wide": {
+    "path": "img/jaipur-amber-wide/depth.webp",
+    "mean": 0.233,
+    "near": 0.624
+  },
+  "varanasi-sunrise": {
+    "path": "img/varanasi-sunrise/depth.webp",
+    "mean": 0.335,
+    "near": 0.937
+  },
+  "kerala-backwater": {
+    "path": "img/kerala-backwater/depth.webp",
+    "mean": 0.281,
+    "near": 0.933
+  },
+  "ladakh-pangong": {
+    "path": "img/ladakh-pangong/depth.webp",
+    "mean": 0.344,
+    "near": 0.933
+  },
+  "delhi-taj-garden": {
+    "path": "img/delhi-taj-garden/depth.webp",
+    "mean": 0.163,
+    "near": 0.776
+  },
+  "delhi-humayun": {
+    "path": "img/delhi-humayun/depth.webp",
+    "mean": 0.229,
+    "near": 0.773
+  },
+  "delhi-qutub": {
+    "path": "img/delhi-qutub/depth.webp",
+    "mean": 0.448,
+    "near": 0.945
+  },
+  "delhi-chandni": {
+    "path": "img/delhi-chandni/depth.webp",
+    "mean": 0.332,
+    "near": 0.851
+  },
+  "delhi-yamuna": {
+    "path": "img/delhi-yamuna/depth.webp",
+    "mean": 0.257,
+    "near": 0.843
+  },
+  "jaipur-amber": {
+    "path": "img/jaipur-amber/depth.webp",
+    "mean": 0.276,
+    "near": 0.769
+  },
+  "jaipur-hawa": {
+    "path": "img/jaipur-hawa/depth.webp",
+    "mean": 0.504,
+    "near": 0.875
+  },
+  "jaipur-citypalace": {
+    "path": "img/jaipur-citypalace/depth.webp",
+    "mean": 0.323,
+    "near": 0.898
+  },
+  "jaipur-pink": {
+    "path": "img/jaipur-pink/depth.webp",
+    "mean": 0.255,
+    "near": 0.776
+  },
+  "jaipur-moti": {
+    "path": "img/jaipur-moti/depth.webp",
+    "mean": 0.26,
+    "near": 0.737
+  },
+  "varanasi-boat": {
+    "path": "img/varanasi-boat/depth.webp",
+    "mean": 0.21,
+    "near": 0.635
+  },
+  "varanasi-aarti": {
+    "path": "img/varanasi-aarti/depth.webp",
+    "mean": 0.409,
+    "near": 0.902
+  },
+  "varanasi-ghats": {
+    "path": "img/varanasi-ghats/depth.webp",
+    "mean": 0.291,
+    "near": 0.843
+  },
+  "varanasi-alley": {
+    "path": "img/varanasi-alley/depth.webp",
+    "mean": 0.515,
+    "near": 0.933
+  },
+  "varanasi-birds": {
+    "path": "img/varanasi-birds/depth.webp",
+    "mean": 0.264,
+    "near": 0.808
+  },
+  "kerala-houseboats": {
+    "path": "img/kerala-houseboats/depth.webp",
+    "mean": 0.313,
+    "near": 0.918
+  },
+  "kerala-canoe": {
+    "path": "img/kerala-canoe/depth.webp",
+    "mean": 0.412,
+    "near": 0.937
+  },
+  "kerala-munnar": {
+    "path": "img/kerala-munnar/depth.webp",
+    "mean": 0.309,
+    "near": 0.914
+  },
+  "kerala-nets": {
+    "path": "img/kerala-nets/depth.webp",
+    "mean": 0.281,
+    "near": 0.918
+  },
+  "kerala-kathakali": {
+    "path": "img/kerala-kathakali/depth.webp",
+    "mean": 0.48,
+    "near": 0.969
+  },
+  "ladakh-pangong-clear": {
+    "path": "img/ladakh-pangong-clear/depth.webp",
+    "mean": 0.424,
+    "near": 0.941
+  },
+  "ladakh-leh": {
+    "path": "img/ladakh-leh/depth.webp",
+    "mean": 0.379,
+    "near": 0.922
+  },
+  "ladakh-monastery": {
+    "path": "img/ladakh-monastery/depth.webp",
+    "mean": 0.314,
+    "near": 0.824
+  },
+  "ladakh-camel": {
+    "path": "img/ladakh-camel/depth.webp",
+    "mean": 0.265,
+    "near": 0.827
+  },
+  "ladakh-stupa": {
+    "path": "img/ladakh-stupa/depth.webp",
+    "mean": 0.171,
+    "near": 0.808
+  },
+  "delhi-taj-dawn": {
+    "path": "img/delhi-taj-dawn/depth.webp",
+    "mean": 0.182,
+    "near": 0.886
+  },
+  "delhi-chai": {
+    "path": "img/delhi-chai/depth.webp",
+    "mean": 0.413,
+    "near": 0.953
+  },
+  "jaipur-hawa-street": {
+    "path": "img/jaipur-hawa-street/depth.webp",
+    "mean": 0.594,
+    "near": 0.922
+  },
+  "varanasi-aarti2": {
+    "path": "img/varanasi-aarti2/depth.webp",
+    "mean": 0.369,
+    "near": 0.898
+  },
+  "kerala-alleppey": {
+    "path": "img/kerala-alleppey/depth.webp",
+    "mean": 0.187,
+    "near": 0.404
+  },
+  "kerala-munnar2": {
+    "path": "img/kerala-munnar2/depth.webp",
+    "mean": 0.368,
+    "near": 0.839
+  },
+  "kerala-thali": {
+    "path": "img/kerala-thali/depth.webp",
+    "mean": 0.544,
+    "near": 0.906
+  },
+  "ladakh-pangong-pano": {
+    "path": "img/ladakh-pangong-pano/depth.webp",
+    "mean": 0.233,
+    "near": 0.886
+  },
+  "ladakh-nubra": {
+    "path": "img/ladakh-nubra/depth.webp",
+    "mean": 0.303,
+    "near": 0.925
+  },
+  "ladakh-khardung": {
+    "path": "img/ladakh-khardung/depth.webp",
+    "mean": 0.22,
+    "near": 0.816
+  },
+  "ladakh-enfield": {
+    "path": "img/ladakh-enfield/depth.webp",
+    "mean": 0.337,
+    "near": 0.925
+  },
+  "delhi-jama": {
+    "path": "img/delhi-jama/depth.webp",
+    "mean": 0.205,
+    "near": 0.871
+  },
+  "delhi-indiagate": {
+    "path": "img/delhi-indiagate/depth.webp",
+    "mean": 0.247,
+    "near": 0.878
+  },
+  "jaipur-jalmahal": {
+    "path": "img/jaipur-jalmahal/depth.webp",
+    "mean": 0.312,
+    "near": 0.918
+  },
+  "jaipur-jantar": {
+    "path": "img/jaipur-jantar/depth.webp",
+    "mean": 0.516,
+    "near": 0.969
+  },
+  "jaipur-ganesh": {
+    "path": "img/jaipur-ganesh/depth.webp",
+    "mean": 0.26,
+    "near": 0.71
+  },
+  "varanasi-sarnath": {
+    "path": "img/varanasi-sarnath/depth.webp",
+    "mean": 0.624,
+    "near": 0.8
+  },
+  "varanasi-sadhu": {
+    "path": "img/varanasi-sadhu/depth.webp",
+    "mean": 0.35,
+    "near": 0.906
+  },
+  "varanasi-dawn": {
+    "path": "img/varanasi-dawn/depth.webp",
+    "mean": 0.32,
+    "near": 0.898
+  },
+  "kerala-sunset": {
+    "path": "img/kerala-sunset/depth.webp",
+    "mean": 0.155,
+    "near": 0.835
+  }
+}

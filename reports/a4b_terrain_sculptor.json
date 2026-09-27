@@ -1,0 +1,16 @@
+{
+  "agent": "a4b_terrain_sculptor",
+  "role": "実標高データ(SRTM系)からインド亜大陸の3D地形(高さ・陰影・マスク)を生成",
+  "ok": true,
+  "started": 1790414386.9788835,
+  "duration_s": 3.39,
+  "stats": {
+    "height_px": 1024,
+    "color_px": 2048,
+    "max_elev_m": 6907,
+    "pins": 5,
+    "tiles": 16
+  },
+  "warnings": [],
+  "errors": []
+}

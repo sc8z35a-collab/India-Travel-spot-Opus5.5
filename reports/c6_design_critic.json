@@ -1,0 +1,35 @@
+{
+  "agent": "c6_design_critic",
+  "role": "横画面スクリーンショットの画質・構図講評（LLMアートディレクター＋画像計測）",
+  "ok": true,
+  "started": 1790332156.8929322,
+  "duration_s": 0.88,
+  "stats": {
+    "mode": "rule",
+    "screens": 29,
+    "avg_colorfulness": 24.9
+  },
+  "warnings": [
+    "delhi-agra-evaluation: 色が単調 — 地域アクセント色を強める",
+    "delhi-agra-highlights: 白飛び — ブルーム強度を下げる",
+    "index-compare: 余白（無地ブロック）が多い — 背景に奥行き要素を",
+    "index-compare: 白飛び — ブルーム強度を下げる",
+    "index-compare: 色が単調 — 地域アクセント色を強める",
+    "index-finder: 余白（無地ブロック）が多い — 背景に奥行き要素を",
+    "index-finder: 白飛び — ブルーム強度を下げる",
+    "index-finder: 色が単調 — 地域アクセント色を強める",
+    "jaipur-evaluation: 色が単調 — 地域アクセント色を強める",
+    "jaipur-highlights: 白飛び — ブルーム強度を下げる",
+    "kerala-evaluation: 色が単調 — 地域アクセント色を強める",
+    "kerala-highlights: 白飛び — ブルーム強度を下げる",
+    "kerala-highlights: 色が単調 — 地域アクセント色を強める",
+    "ladakh-evaluation: 色が単調 — 地域アクセント色を強める",
+    "ladakh-highlights: 白飛び — ブルーム強度を下げる",
+    "q-index-finder: 色が単調 — 地域アクセント色を強める",
+    "q-ladakh-evaluation: 色が単調 — 地域アクセント色を強める",
+    "varanasi-evaluation: 色が単調 — 地域アクセント色を強める",
+    "varanasi-highlights: 白飛び — ブルーム強度を下げる",
+    "varanasi-highlights: 色が単調 — 地域アクセント色を強める"
+  ],
+  "errors": []
+}

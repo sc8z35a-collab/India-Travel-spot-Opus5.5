@@ -1,0 +1,29 @@
+{
+  "mode": "rule",
+  "regions": {
+    "delhi-agra": {
+      "lint": [
+        "scores.budget: 半角記号と全角句読点が混在"
+      ]
+    },
+    "jaipur": {
+      "lint": []
+    },
+    "varanasi": {
+      "lint": []
+    },
+    "kerala": {
+      "lint": [
+        "highlights.ムンナールの茶畑: 半角記号と全角句読点が混在",
+        "scores.budget: 半角記号と全角句読点が混在"
+      ]
+    },
+    "ladakh": {
+      "lint": [
+        "catch: 半角記号と全角句読点が混在",
+        "highlights.パンゴン湖: 半角記号と全角句読点が混在",
+        "scores.nature: 半角記号と全角句読点が混在"
+      ]
+    }
+  }
+}
