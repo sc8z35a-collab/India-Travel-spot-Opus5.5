@@ -87,7 +87,8 @@ ol, ul { list-style: none; }
 .pic { position: relative; overflow: hidden; background: var(--c) var(--ph) center / cover no-repeat; }
 .pic picture, .pic img { width: 100%; height: 100%; }
 .pic img { object-fit: cover; opacity: 0; transition: opacity 1s var(--ease), transform 1.4s var(--ease); }
-.pic img.is-loaded, .no-js .pic img { opacity: 1; }
+/* the fade-in only applies while JS runs (html.js) — without JS every photo is visible */
+html:not(.js) .pic img, .pic img.is-loaded { opacity: 1; }
 .credit {
   position: absolute; right: 12px; bottom: 10px; z-index: 3; font-size: 10.5px; letter-spacing: .04em;
   color: rgba(255,255,255,.72); background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
@@ -154,7 +155,7 @@ ol, ul { list-style: none; }
 
 /* ---------- Loader ------------------------------------------------------- */
 .loader { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: grid; place-items: center; }
-.no-js .loader, .loader.is-done { display: none; }
+html:not(.js) .loader, .loader.is-done { display: none; }
 .loader-inner { display: grid; place-items: center; gap: 18px; }
 .loader-mandala { width: 120px; height: 120px; fill: none; stroke: var(--saffron); stroke-width: 1.1; animation: spin 14s linear infinite; }
 .loader-mandala ellipse, .loader-mandala circle { stroke-dasharray: 300; stroke-dashoffset: 300; animation: draw 1.6s var(--ease) forwards; }
@@ -257,6 +258,7 @@ ol, ul { list-style: none; }
 .map.is-drawn .route { opacity: 1; animation: dash 30s linear infinite; }
 @keyframes dash { to { stroke-dashoffset: -400; } }
 .pin { cursor: pointer; outline: none; }
+.pin:focus-visible .pin-dot { stroke: var(--ink); stroke-width: 3; }
 .pin-dot { fill: var(--accent); stroke: #0d0b0a; stroke-width: 2; transition: r .3s; }
 .pin-pulse { fill: var(--accent); opacity: .25; transform-box: fill-box; transform-origin: center; animation: pulse 2.4s var(--ease) infinite; }
 @keyframes pulse { 0% { transform: scale(.4); opacity: .6; } 100% { transform: scale(2.2); opacity: 0; } }
