@@ -40,7 +40,7 @@ def lint(r: dict) -> list[str]:
                 issues.append(f"{field}: 1文が{len(s)}字（横画面2カラムでは70字前後が読みやすい）")
             if len(s) > 4:
                 endings[s[-3:]] = endings.get(s[-3:], 0) + 1
-        if re.search(r"[,!?]", t) and re.search(r"[、。]", t):
+        if re.search(r"(?<!\d),|,(?!\d{3})|[!?]", t) and re.search(r"[、。]", t):   # "₹1,100" is not a punctuation mix
             issues.append(f"{field}: 半角記号と全角句読点が混在")
         for w in ABSOLUTE:
             if w in t:

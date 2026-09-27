@@ -173,6 +173,13 @@ class SiteBuilder(Agent):
             (out / "index.html").write_text(html, encoding="utf-8")
             pages += 1
 
+        # a region removed from data/ left its old page online (still linked from nowhere, still indexed)
+        keep = {r["id"] for r in regions} | {"assets", "img", "og"}
+        for d in DIST.iterdir():
+            if d.is_dir() and d.name not in keep and (d / "index.html").exists():
+                shutil.rmtree(d)
+                report.warn(f"removed stale page dist/{d.name}/")
+
         # ---- sitemap / robots ---------------------------------------------
         base = cfg["site"]["base_url"]
         urls = [base] + [f"{base}{r['id']}/" for r in regions]

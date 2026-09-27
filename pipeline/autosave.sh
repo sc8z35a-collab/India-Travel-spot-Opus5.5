@@ -12,6 +12,9 @@ echo "[$(date '+%F %T')] autosave started (every ${INTERVAL}s)" >> "$LOG"
 while true; do
   sleep "$INTERVAL"
   BR="$(git rev-parse --abbrev-ref HEAD)"
+  [ "$BR" = "HEAD" ] && { echo "[$(date '+%F %T')] detached HEAD — skipped" >> "$LOG"; continue; }
+  # never snapshot in the middle of a merge / rebase (would commit conflict markers)
+  if [ -e .git/MERGE_HEAD ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; then continue; fi
   if [ -n "$(git status --porcelain)" ]; then
     git add -A >/dev/null 2>&1
     git commit -qm "wip(autosave): snapshot $(date '+%F %T')" >/dev/null 2>&1 \

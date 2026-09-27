@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 0.8,
+  "duration_s": 1.2,
   "llm": {
     "ok": false,
     "model": null,
@@ -36,34 +36,84 @@
   },
   "timeline": [
     {
+      "task": "a3",
+      "agent": "③",
+      "start": 0.0,
+      "end": 0.41,
+      "ok": true
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "start": 0.41,
+      "end": 0.41,
+      "ok": true
+    },
+    {
       "task": "a6",
       "agent": "⑤",
-      "start": 0.0,
-      "end": 0.24,
+      "start": 0.41,
+      "end": 0.6,
       "ok": true
     },
     {
       "task": "a8",
       "agent": "⑥",
-      "start": 0.24,
-      "end": 0.76,
+      "start": 0.6,
+      "end": 1.16,
       "ok": true
     }
   ],
+  "failed": [],
+  "skipped": [],
   "agents": [
+    {
+      "task": "a3",
+      "agent": "③",
+      "name": "a3_score_analyst",
+      "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
+      "ok": true,
+      "duration_s": 0.41,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "personas": 7,
+        "distinct_winners": [
+          "delhi-agra",
+          "kerala",
+          "ladakh",
+          "varanasi"
+        ]
+      }
+    },
+    {
+      "task": "a5",
+      "agent": "④",
+      "name": "a5_chart_designer",
+      "role": "レーダーチャート・ヒートマップのSVG/配色を事前生成",
+      "ok": true,
+      "duration_s": 0.0,
+      "warnings": 0,
+      "errors": 0,
+      "stats": {
+        "radars": 5,
+        "heat_cells": 40,
+        "season_cells": 60
+      }
+    },
     {
       "task": "a6",
       "agent": "⑤",
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.24,
+      "duration_s": 0.19,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "90c1ba1902",
-        "css_kb": 115.6,
+        "build_id": "cadfc49db4",
+        "css_kb": 115.9,
         "js_kb": 45.0,
         "gl_kb": 48.9,
         "depth_maps": 50,
@@ -76,49 +126,49 @@
       "name": "a8_qa_auditor",
       "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
       "ok": true,
-      "duration_s": 0.52,
+      "duration_s": 0.55,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "checks": 1965,
+        "checks": 2017,
         "issues": 0,
         "per_page": {
           "delhi-agra/index.html": {
-            "checks": 304,
+            "checks": 311,
             "issues": [],
             "score": 100.0,
-            "html_kb": 84.6
+            "html_kb": 84.7
           },
           "index.html": {
-            "checks": 485,
+            "checks": 502,
             "issues": [],
             "score": 100.0,
             "html_kb": 172.1
           },
           "jaipur/index.html": {
-            "checks": 301,
+            "checks": 308,
+            "issues": [],
+            "score": 100.0,
+            "html_kb": 83.7
+          },
+          "kerala/index.html": {
+            "checks": 293,
             "issues": [],
             "score": 100.0,
             "html_kb": 83.6
           },
-          "kerala/index.html": {
-            "checks": 286,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 83.5
-          },
           "ladakh/index.html": {
-            "checks": 295,
+            "checks": 302,
             "issues": [],
             "score": 100.0,
-            "html_kb": 84.3
+            "html_kb": 84.4
           },
           "varanasi/index.html": {
-            "checks": 294,
+            "checks": 301,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.8
+            "html_kb": 83.9
           }
         }
       }

@@ -23,7 +23,7 @@ from .base import DIST, REPORTS, Agent, Report
 
 # Flagship Android held sideways (e.g. Galaxy S25 Ultra / Pixel 9 Pro: 915×412 CSS px @ DPR 3.5)
 VIEW = {"width": 915, "height": 412}
-DPR = 2  # screenshots at 2x keep QA fast; runtime uses the device's full DPR (capped 2.5 in gl.js)
+DPR = 2  # screenshots at 2x keep QA fast; runtime uses the device's full DPR (capped at 3 in gl.js)
 UA = ("Mozilla/5.0 (Linux; Android 15; SM-S938B) AppleWebKit/537.36 (KHTML, like Gecko) "
       "Chrome/140.0.0.0 Mobile Safari/537.36")
 
@@ -122,7 +122,8 @@ class MobileQa(Agent):
                         trigger.tap()
                         pg.wait_for_timeout(700)
                         opened = pg.evaluate("!document.querySelector('.sheet').hidden")
-                        pg.tap(".sheet-close")
+                        if opened:
+                            pg.tap(".sheet-close")
                         pg.wait_for_timeout(700)
                         closed = pg.evaluate("document.querySelector('.sheet').hidden")
                         sheet_ok = bool(opened and closed)
