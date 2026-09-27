@@ -113,6 +113,7 @@
     const to = parseFloat(el.dataset.count), dec = +(el.dataset.decimals || 0), grp = el.dataset.format === "yen";
     const fmt = (v) => grp ? Math.round(v).toLocaleString("ja-JP") : v.toFixed(dec);
     if (reduced || !isFinite(to)) return;         // the server-rendered text already holds the final value
+    if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", fmt(to));   // AT never hears the transient 0…n
     el.textContent = fmt(0);
     const t0 = performance.now(), dur = 1500;
     const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = fmt(to * (1 - Math.pow(1 - k, 4))); if (k < 1) requestAnimationFrame(step); };
@@ -274,7 +275,7 @@
     const w = a ? (a.variants.find((v) => v >= need) || a.variants[a.variants.length - 1]) : 1280;
     const facts = r.facts.map((f) => `<div><dt>${esc(f.k)}</dt><dd>${esc(f.v)}</dd></div>`).join("");
     openSheet(`
-      <div class="sh-img" role="img" aria-label="${esc(a ? a.alt : r.name)}" style="background-image:url('${ROOT}${r.hero}/${w}.webp');background-color:${a?.color || "#1d1814"}"></div>
+      <div class="sh-img" style="background-color:${a?.color || "#1d1814"}"><picture>${a?.avif ? `<source type="image/avif" srcset="${ROOT}${r.hero}/${w}.avif">` : ""}<source type="image/webp" srcset="${ROOT}${r.hero}/${w}.webp"><img src="${ROOT}${r.hero}/${a ? (a.jpg.filter((v) => v <= w).pop() || a.jpg[0]) : w}.jpg" alt="${esc(a ? a.alt : r.name)}" decoding="async"></picture></div>
       <p class="sh-en">${String(r.order).padStart(2, "0")} — ${esc(r.en)}</p>
       <h3 class="sh-t" id="sheet-t">${esc(r.name)}</h3>
       <p class="sh-c">${esc(r.catch)}</p>

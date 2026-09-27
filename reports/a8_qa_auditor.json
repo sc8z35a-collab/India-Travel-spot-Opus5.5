@@ -2,8 +2,8 @@
   "agent": "a8_qa_auditor",
   "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
   "ok": true,
-  "started": 1790506872.3130522,
-  "duration_s": 0.47,
+  "started": 1790514396.219085,
+  "duration_s": 0.53,
   "stats": {
     "pages": 6,
     "checks": 2017,
