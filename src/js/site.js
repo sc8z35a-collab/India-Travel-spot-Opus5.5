@@ -23,6 +23,11 @@
   // "/site/" and "/site/index.html" are the same page (GitHub Pages serves both)
   const samePage = (a) => a.pathname.replace(/index\.html$/, "") === location.pathname.replace(/index\.html$/, "");
   const byHash = (hash) => { try { return hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; } catch { return null; } };
+  // storage throws when cookies/storage are blocked — an event handler must never die on it
+  const store = {
+    get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* unavailable */ } },
+  };
 
   // one scroll-lock registry for every overlay: closing one never unlocks the page while another is open
   const locks = new Set();
@@ -152,21 +157,25 @@
 
   /* ---------------- menu ---------------- */
   const toggle = $(".nav-toggle"), menu = $("#menu");
-  let menuT = 0;
+  let menuT = 0, menuRaf = 0;
   const setMenu = (open) => {
     toggle.setAttribute("aria-expanded", open);
     toggle.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
     document.body.classList.toggle("menu-open", open);
     lock("menu", open);
-    clearTimeout(menuT);
-    if (open) { menu.hidden = false; requestAnimationFrame(() => { menu.classList.add("is-open"); $("a", menu)?.focus({ preventScroll: true }); }); }
+    clearTimeout(menuT); cancelAnimationFrame(menuRaf);
+    if (open) { menu.hidden = false; menuRaf = requestAnimationFrame(() => { menu.classList.add("is-open"); $("a", menu)?.focus({ preventScroll: true }); }); }
     else { menu.classList.remove("is-open"); menuT = setTimeout(() => (menu.hidden = true), 800); }
     onScroll();
   };
-  toggle.addEventListener("click", () => setMenu(toggle.getAttribute("aria-expanded") !== "true"));
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    if (open && sheetOpen) closeSheet();          // two stacked modal dialogs: the drawer would trap focus behind the menu
+    setMenu(open);
+  });
   // the close (toggle) button lives outside the menu — keep it reachable from the keyboard
   menu.addEventListener("keydown", (e) => trap(menu, e, [toggle]));
-  toggle.addEventListener("keydown", (e) => { if (menu.classList.contains("is-open")) trap(menu, e, [toggle]); });
+  toggle.addEventListener("keydown", (e) => { if (document.body.classList.contains("menu-open")) trap(menu, e, [toggle]); });
   menu.addEventListener("click", (e) => { if (e.target === menu) setMenu(false); });
   $$("a", menu).forEach((a) => a.addEventListener("click", () => {
     setMenu(false);
@@ -176,12 +185,14 @@
 
   /* ---------------- side drawer / bottom sheet ---------------- */
   const sheet = $(".sheet"), sheetBody = $(".sheet-body", sheet), panel = $(".sheet-panel", sheet);
-  let lastFocus = null, sheetT = 0, sheetKey = null;
+  // explicit state: `is-open` is only added two frames after opening, so it can't be the source of truth
+  let lastFocus = null, sheetT = 0, sheetKey = null, sheetOpen = false, sheetRaf = 0;
   const openSheet = (html, accent, key = null) => {
-    if (!sheet.classList.contains("is-open")) lastFocus = document.activeElement;
+    if (!sheetOpen) lastFocus = document.activeElement;
     clearTimeout(sheetT);                        // re-opening during the close animation must not blank the new content
     // replacing a region drawer with a non-region one (e.g. a heatmap cell) must still return the 3D camera
-    if (sheetKey && sheetKey !== key && !R[key] && sheet.classList.contains("is-open")) emit("sheet:close", sheetKey);
+    if (sheetKey && sheetKey !== key && !R[key] && sheetOpen) emit("sheet:close", sheetKey);
+    sheetOpen = true;
     sheetKey = key;
     sheetBody.innerHTML = html;
     panel.scrollTop = 0;
@@ -189,12 +200,14 @@
     panel.style.setProperty("--accent", accent || "");
     sheet.hidden = false;
     lock("sheet", true);
-    requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add("is-open")));
+    cancelAnimationFrame(sheetRaf);
+    sheetRaf = requestAnimationFrame(() => (sheetRaf = requestAnimationFrame(() => { if (sheetOpen) sheet.classList.add("is-open"); })));
     $(".sheet-close", sheet).focus({ preventScroll: true });
     vibrate();
   };
   const closeSheet = () => {
-    if (sheet.hidden || !sheet.classList.contains("is-open")) return;
+    if (!sheetOpen) return;
+    sheetOpen = false; cancelAnimationFrame(sheetRaf);
     sheet.classList.remove("is-open", "is-dragging");
     panel.style.transform = "";                  // an inline drag offset would override the CSS slide-out
     lock("sheet", false);
@@ -204,23 +217,28 @@
     $$(".map-list button.is-hot, .pin.is-hot").forEach((x) => x.classList.remove("is-hot"));
     emit("sheet:close", sheetKey);
     sheetKey = null;
-    lastFocus?.focus?.({ preventScroll: true });
+    // the opener may be gone or hidden by now (3D label culled, pin re-rendered) → fall back to <main>
+    if (lastFocus && lastFocus.isConnected && lastFocus.getClientRects().length) lastFocus.focus({ preventScroll: true });
+    else if (sheet.contains(document.activeElement)) document.activeElement.blur();
+    lastFocus = null;
   };
   $$("[data-close]", sheet).forEach((b) => b.addEventListener("click", closeSheet));
   sheet.addEventListener("keydown", (e) => trap(sheet, e));
   addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if (!sheet.hidden) closeSheet();
+    if (sheetOpen) closeSheet();
     else if (document.body.classList.contains("menu-open")) { setMenu(false); toggle.focus({ preventScroll: true }); }
   });
   // swipe to dismiss: rightwards for the landscape drawer, downwards for the portrait sheet
   let g0 = null;
   panel.addEventListener("touchstart", (e) => {
+    if (e.touches.length > 1) { g0 = null; return; }
     const t = e.touches[0];
-    g0 = { x: t.clientX, y: t.clientY, top: panel.scrollTop, axis: null, d: 0 };
+    g0 = { x: t.clientX, y: t.clientY, top: panel.scrollTop, left: 0, axis: null, d: 0 };
   }, { passive: true });
   panel.addEventListener("touchmove", (e) => {
     if (!g0) return;
+    if (e.touches.length > 1) { g0 = null; sheet.classList.remove("is-dragging"); panel.style.transform = ""; return; }
     const t = e.touches[0], dx = t.clientX - g0.x, dy = t.clientY - g0.y;
     if (!g0.axis && Math.hypot(dx, dy) > 8) g0.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
     if (landscape() && g0.axis === "x" && dx > 0) { g0.d = dx; sheet.classList.add("is-dragging"); panel.style.transform = `translateX(${dx}px)`; }
@@ -267,7 +285,7 @@
     credits.forEach((c, k) => (c.hidden = k !== cur));
     const img = $("img", slides[cur]); if (img && img.loading === "lazy") img.loading = "eager";
     clearTimeout(timer);
-    timer = reduced || !heroVisible || document.hidden ? 0 : setTimeout(() => go(cur + 1), DUR);
+    timer = reduced || !heroVisible || document.hidden ? 0 : setTimeout(() => (locks.size ? go(cur) : go(cur + 1)), DUR);
     emit("hero:go", cur);
   };
   if (slides.length > 1) {
@@ -337,8 +355,11 @@
       raf = 0;
       const i = current(), max = track.scrollWidth - track.clientWidth;
       dotEls.forEach((d, k) => d.classList.toggle("on", k === i));
+      const focused = document.activeElement;
       if (prev) prev.disabled = track.scrollLeft <= 4;
       if (next) next.disabled = track.scrollLeft >= max - 4;
+      // a button that just became disabled drops keyboard focus to <body> → hand it to the sibling
+      if (focused && focused.disabled && (focused === prev || focused === next)) (focused === prev ? next : prev)?.focus({ preventScroll: true });
     };
     track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
     addEventListener("resize", sync);
@@ -349,6 +370,8 @@
       if (e.target !== track) return;
       if (e.key === "ArrowRight") { e.preventDefault(); to(current() + 1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); to(current() - 1); }
+      if (e.key === "Home") { e.preventDefault(); to(0); }
+      if (e.key === "End") { e.preventDefault(); to(items.length - 1); }
     });
     sync();
   };
@@ -370,7 +393,7 @@
     };
     const paint = (s) => {
       s.style.setProperty("--p", (s.value / s.max) * 100 + "%");
-      s.nextElementSibling.textContent = s.value;
+      const o = s.parentElement.querySelector("output"); if (o) o.textContent = s.value;
       s.setAttribute("aria-valuetext", `重み${s.value}`);
     };
     const shown = {}, anim = {};                 // displayed value per row → interrupted animations resume smoothly
@@ -407,10 +430,12 @@
       });
       if (!reduced) order.forEach((id) => {
         const li = rows[id], dy = first[id] - li.getBoundingClientRect().top;
+        li.getAnimations?.().forEach((a) => a.cancel());
         if (dy) li.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 650, easing: "cubic-bezier(.22,1,.36,1)" });
       });
       desc.classList.toggle("is-warn", allZero);
       if (allZero) desc.textContent = "すべての重みが0です。少なくとも1つの軸を1以上にしてください。";
+      ranking.setAttribute("aria-label", allZero ? "タイプ別ランキング" : `タイプ別ランキング（1位: ${order.filter((id) => totals[id] === totals[order[0]]).map((id) => R[id].name).join("・")}）`);
     };
     const current = () => Object.fromEntries(sliders.map((s) => [s.dataset.axis, +s.value]));
     const setActive = (id) => $$(".persona").forEach((b) => { const on = b.dataset.persona === id; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
@@ -447,8 +472,9 @@
     weightsBox.appendChild(resetBtn);
     sliders.forEach(paint);
     // first paint when visible — unless the user already interacted with the finder
+    // keyboard and slider input count too — a keyboard user's choice was overwritten by the deferred first paint
     let touched = false;
-    $(".finder").addEventListener("pointerdown", () => (touched = true), { once: true, capture: true });
+    ["pointerdown", "keydown", "input"].forEach((t) => $(".finder").addEventListener(t, () => (touched = true), { once: true, capture: true }));
     new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { if (!touched) setPersona("balanced"); o.disconnect(); } }), { threshold: 0.2 }).observe(ranking);
   }
 
@@ -587,6 +613,8 @@
   const lb = $(".lightbox");
   if (lb) {
     const stage = $(".lb-stage", lb), items = $$("[data-lightbox]");
+    const live = document.createElement("p");
+    live.className = "sr-only"; live.setAttribute("aria-live", "polite"); lb.appendChild(live);
     let idx = 0, last = null;
     // the browser already negotiated AVIF for the page's own <picture>s — reuse that answer for preloads
     const AVIF = () => $$(".pic img").some((im) => /\.avif(\?|$)/.test(im.currentSrc || ""));
@@ -599,9 +627,10 @@
       const a = DATA.assets[items[idx].dataset.lightbox], w = pick(a), jw = a.jpg.filter((v) => v <= w).pop() || a.jpg[0];
       lb.classList.add("is-loading");
       stage.innerHTML = `<picture>${a.avif ? `<source type="image/avif" srcset="${ROOT}${a.path}/${w}.avif">` : ""}<source type="image/webp" srcset="${ROOT}${a.path}/${w}.webp"><img src="${ROOT}${a.path}/${jw}.jpg" alt="${esc(a.alt)}" width="${a.w}" height="${a.h}" style="background:${a.color || "#111"}"></picture>`
-        + `<p class="lb-cap" aria-live="polite">${esc(a.alt)}<span>${idx + 1} / ${items.length} · <a href="${esc(a.link)}" target="_blank" rel="noopener">Photo: ${esc(a.credit)}</a></span></p>`;
+        + `<p class="lb-cap">${esc(a.alt)}<span>${idx + 1} / ${items.length} · <a href="${esc(a.link)}" target="_blank" rel="noopener">Photo: ${esc(a.credit)}</a></span></p>`;
+      if (live) live.textContent = `${idx + 1} / ${items.length}: ${a.alt}`;
       const img = $("img", stage);
-      const done = () => lb.classList.remove("is-loading");
+      const done = () => { if ($("img", stage) === img) lb.classList.remove("is-loading"); };
       if (img.complete && img.naturalWidth) done(); else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
       const multi = items.length > 1;
       $$(".lb-nav", lb).forEach((b) => (b.hidden = !multi));
@@ -610,7 +639,7 @@
       if (items.length > 1) [idx + 1, idx - 1].forEach((k) => { const n = DATA.assets[items[(k + items.length) % items.length].dataset.lightbox]; const im = new Image(); im.src = `${ROOT}${n.path}/${pick(n)}.${n.avif && AVIF() ? "avif" : "webp"}`; });
     };
     const open = (i, btn) => { if (!lb.hidden) return; last = btn; show(i); lb.hidden = false; lock("lightbox", true); $(".lb-close", lb).focus({ preventScroll: true }); };
-    const close = () => { if (lb.hidden) return; lb.hidden = true; stage.innerHTML = ""; lock("lightbox", false); last?.focus({ preventScroll: true }); };
+    const close = () => { if (lb.hidden) return; lb.hidden = true; stage.innerHTML = ""; live.textContent = ""; lb.classList.remove("is-loading"); lock("lightbox", false); last?.focus({ preventScroll: true }); };
     items.forEach((b, i) => b.addEventListener("click", () => open(i, b)));
     $(".lb-close", lb).addEventListener("click", close);
     $(".lb-prev", lb)?.addEventListener("click", () => show(idx - 1));
@@ -628,6 +657,7 @@
     lb.addEventListener("touchend", (e) => {
       if (lx === null) return;
       const dx = e.changedTouches[0].clientX - lx, dy = e.changedTouches[0].clientY - ly; lx = null;
+      if ((window.visualViewport?.scale || 1) > 1.05) return;       // pinch-zoomed: the finger is panning the photo
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(idx + (dx < 0 ? 1 : -1));
       else if (dy > 100 && Math.abs(dy) > Math.abs(dx)) close();
     });
@@ -679,12 +709,12 @@
   const firstTap = (e) => {
     if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
     removeEventListener("pointerup", firstTap);
-    if (canFs && !inFs() && !sessionStorage.getItem("fs-declined")) goFs();
+    if (canFs && !inFs() && !store.get("fs-declined")) goFs();
   };
   addEventListener("pointerup", firstTap, { passive: true });
   document.addEventListener("fullscreenchange", () => {
     if (inFs()) wasFs = true;
-    else if (wasFs) sessionStorage.setItem("fs-declined", "1");   // only a real exit counts as "declined"
+    else if (wasFs) store.set("fs-declined", "1");   // only a real exit counts as "declined"
   });
   syncFs();
 
