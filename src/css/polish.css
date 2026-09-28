@@ -40,6 +40,8 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .heat-cell { color: var(--cell-ink, #fff); text-shadow: none; }   /* --ink is the global text token — a per-cell --ink leaked into the sheet/tooltips */
 .heat-td { display: grid; min-width: 0; }
 .heat-td > .heat-cell { width: 100%; }
+.heat-cell.lead::after { color: var(--cell-ink, #fff); }
+.heat.is-in .heat-cell.is-sel { transform: scale(1.12); z-index: 2; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
 
 /* ---- VS swap button ---- */

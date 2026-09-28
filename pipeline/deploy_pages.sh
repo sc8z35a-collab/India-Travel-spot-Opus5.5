@@ -11,7 +11,8 @@ trap 'rm -rf "$TMP"' EXIT                         # the temp copy (≈120 MB) wa
 cp -r dist/. "$TMP/"
 find "$TMP/img" -name meta.json -delete 2>/dev/null || true
 cd "$TMP"
-git init -q -b gh-pages
+git init -q && git checkout -q -b gh-pages
+touch .nojekyll
 # a fresh repo has no identity in CI / clean sandboxes → "Please tell me who you are" aborted the deploy
 NAME="$(git -C "$OLDPWD" config user.name || echo deploy-bot)"
 MAIL="$(git -C "$OLDPWD" config user.email || echo deploy@localhost)"

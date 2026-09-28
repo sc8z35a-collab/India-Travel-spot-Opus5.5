@@ -2,8 +2,8 @@
   "agent": "a3_score_analyst",
   "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
   "ok": true,
-  "started": 1790514536.507849,
-  "duration_s": 0.36,
+  "started": 1790595373.5583246,
+  "duration_s": 0.43,
   "stats": {
     "personas": 7,
     "distinct_winners": [

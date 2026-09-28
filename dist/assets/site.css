@@ -694,7 +694,7 @@ button, a, summary { touch-action: manipulation; }
   transform: translateY(0); transition: transform .5s var(--ease), opacity .4s;
 }
 .tabbar.is-away { transform: translateY(calc(100% + 30px)); opacity: 0; }
-.tabbar a { display: grid; place-items: center; align-content: center; gap: 3px; font-size: 10.5px; letter-spacing: .06em; color: var(--ink3); position: relative; transition: color .3s; }
+.tabbar a { isolation: isolate; display: grid; place-items: center; align-content: center; gap: 3px; font-size: 10.5px; letter-spacing: .06em; color: var(--ink3); position: relative; transition: color .3s; }
 .tabbar svg { width: 22px; height: 22px; }
 .tabbar a.is-current { color: var(--accent); }
 .tabbar a.is-current::before { content: ""; position: absolute; top: 6px; width: 34px; height: 30px; border-radius: 12px; background: color-mix(in srgb, var(--accent) 16%, transparent); z-index: -1; }
@@ -708,7 +708,7 @@ body { padding-bottom: 0; }
 .sheet-back { position: absolute; inset: 0; background: rgba(5,4,3,.6); backdrop-filter: blur(4px); opacity: 0; transition: opacity .4s; }
 .sheet.is-open .sheet-back { opacity: 1; }
 .sheet-panel {
-  position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; overflow: auto; overscroll-behavior: contain;
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; max-height: 86dvh; overflow: auto; overscroll-behavior: contain;
   background: var(--bg2); border-radius: 26px 26px 0 0; border-top: 1px solid var(--line2);
   padding: 26px var(--pad) calc(28px + var(--safe-b)); transform: translateY(100%); transition: transform .55s var(--ease);
 }
@@ -933,8 +933,8 @@ input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top:
 .cal-head span { font-size: 10px; color: var(--ink3); text-align: center; transition: color .3s; }
 .cal-name { font-family: var(--serif-ja); font-weight: 700; font-size: 12px; border-left: 2px solid var(--accent); padding-left: 6px; line-height: 1.3; }
 .cal-cell { aspect-ratio: .78; border-radius: 5px; background: var(--heat); position: relative; transition: opacity .4s, filter .4s, transform .4s var(--ease); }
-.cal-cell[data-v="5"]::after { content: "◎"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: #fff; }
-.cal-cell[data-v="4"]::after { content: "○"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: rgba(255,255,255,.85); }
+.cal-cell[data-v="5"]::after { content: "◎"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: #1a1109; }
+.cal-cell[data-v="4"]::after { content: "○"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: rgba(26,17,9,.78); }
 .cal.is-filtered .cal-cell:not(.on) { opacity: .14; filter: grayscale(1); }
 .cal.is-filtered .cal-head .on { color: var(--saffron); font-weight: 700; }
 .js .cal .cal-cell { clip-path: inset(0 0 100% 0); }
@@ -1420,6 +1420,8 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 .heat-cell { color: var(--cell-ink, #fff); text-shadow: none; }   /* --ink is the global text token — a per-cell --ink leaked into the sheet/tooltips */
 .heat-td { display: grid; min-width: 0; }
 .heat-td > .heat-cell { width: 100%; }
+.heat-cell.lead::after { color: var(--cell-ink, #fff); }
+.heat.is-in .heat-cell.is-sel { transform: scale(1.12); z-index: 2; }
 .axis-chips { flex-wrap: wrap; overflow: visible; }
 
 /* ---- VS swap button ---- */

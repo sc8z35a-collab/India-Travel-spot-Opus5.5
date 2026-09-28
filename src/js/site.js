@@ -67,6 +67,7 @@
     if (!heroImg || (heroImg.complete && heroImg.naturalWidth)) ready();
     else { heroImg.addEventListener("load", ready, { once: true }); heroImg.addEventListener("error", ready, { once: true }); setTimeout(ready, 1800); }
     if (reduced) return loader.classList.add("is-done");
+    const hardStop = setTimeout(() => loader.classList.add("is-done"), 6000);   // never block the page if rAF stalls
     const tick = () => {
       p += done ? (100 - p) * 0.3 + 1.5 : Math.max(0.6, (86 - p) * 0.06);
       p = Math.min(p, done ? 100 : 86);
@@ -74,7 +75,7 @@
       if (p >= 100) {
         loader.style.transition = "clip-path .8s cubic-bezier(.76,0,.24,1)";
         loader.style.clipPath = "inset(0 0 100% 0)";
-        setTimeout(() => loader.classList.add("is-done"), 800);
+        setTimeout(() => { clearTimeout(hardStop); loader.classList.add("is-done"); }, 800);
         return;
       }
       requestAnimationFrame(tick);
@@ -116,8 +117,10 @@
     if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", fmt(to));   // AT never hears the transient 0…n
     el.textContent = fmt(0);
     const t0 = performance.now(), dur = 1500;
-    const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = fmt(to * (1 - Math.pow(1 - k, 4))); if (k < 1) requestAnimationFrame(step); };
+    const final = el.dataset.final ?? (el.dataset.final = fmt(to));
+    const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = k < 1 ? fmt(to * (1 - Math.pow(1 - k, 4))) : final; if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
+    setTimeout(() => (el.textContent = final), dur + 400);   // background tabs pause rAF — never leave a half-counted number
   };
   const cio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); } }), { threshold: 0.4 });
   $$("[data-count]").forEach((el) => cio.observe(el));
@@ -125,19 +128,19 @@
   /* ---------------- scroll progress, nav, tab bar ---------------- */
   const bar = $(".progress i"), nav = $("[data-nav]"), tabbar = $(".tabbar");
   const hero = $(".hero, .rp-hero");
-  let ticking = false;
+  let ticking = false, heroH = hero ? hero.offsetHeight : 0;
   const onScroll = () => {
     ticking = false;
     const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
     if (bar) bar.style.transform = `scaleX(${h > 0 ? Math.min(1, y / h) : 0})`;
     nav.classList.toggle("is-scrolled", y > 30);
     if (tabbar) {
-      const away = !landscape() && (y > h - 40 || (hero && y < hero.offsetHeight * 0.35));   // side rail stays put
+      const away = !landscape() && (y > h - 40 || (hero && y < heroH * 0.35));   // side rail stays put
       tabbar.classList.toggle("is-away", !!away || document.body.classList.contains("menu-open"));
     }
   };
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
-  addEventListener("resize", onScroll);
+  addEventListener("resize", () => { heroH = hero ? hero.offsetHeight : 0; onScroll(); });
   onScroll();
 
   // current section → one highlighted rail item (none while still inside the hero)
@@ -188,7 +191,7 @@
   // the close (toggle) button lives outside the menu — keep it reachable from the keyboard
   menu.addEventListener("keydown", (e) => trap(menu, e, [toggle]));
   toggle.addEventListener("keydown", (e) => { if (document.body.classList.contains("menu-open")) trap(menu, e, [toggle]); });
-  menu.addEventListener("click", (e) => { if (e.target === menu) setMenu(false); });
+  menu.addEventListener("click", (e) => { if (e.target === menu || e.target.classList.contains("menu-inner")) setMenu(false); });
   $$("a", menu).forEach((a) => a.addEventListener("click", () => {
     setMenu(false);
     const t = a.hash && samePage(a) && byHash(a.hash);
@@ -209,7 +212,7 @@
     sheetBody.innerHTML = html;
     panel.scrollTop = 0;
     panel.style.transform = "";
-    panel.style.setProperty("--accent", accent || "");
+    if (accent) panel.style.setProperty("--accent", accent); else panel.style.removeProperty("--accent");
     sheet.hidden = false;
     lock("sheet", true);
     cancelAnimationFrame(sheetRaf);
@@ -265,10 +268,11 @@
     if (d > 90) closeSheet(); else panel.style.transform = "";
   };
   panel.addEventListener("touchend", gEnd);
-  panel.addEventListener("touchcancel", gEnd);
+  panel.addEventListener("touchcancel", () => { if (!g0) return; g0 = null; sheet.classList.remove("is-dragging"); panel.style.transform = ""; });
 
   const regionSheet = (id) => {
-    const r = R[id], a = DATA.assets[r.heroId];
+    const r = R[id]; if (!r) return;
+    const a = DATA.assets[r.heroId];
     // drawer is min(460px, 56vw) wide in landscape, full width in portrait — pick for the real device density
     const cssW = landscape() ? Math.min(460, innerWidth * 0.56) : innerWidth;
     const need = cssW * Math.min(devicePixelRatio || 1, 3);
@@ -307,8 +311,9 @@
       d.style.setProperty("--dur", DUR + "ms");
       d.addEventListener("click", () => go(+d.dataset.go));
       d.addEventListener("keydown", (e) => {
-        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-        e.preventDefault(); go(cur + (e.key === "ArrowRight" ? 1 : -1)); dots[cur].focus();
+        const k = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: slides.length - 1 }[e.key];
+        if (k === undefined) return;
+        e.preventDefault(); go(k); dots[cur].focus();
       });
     });
     const heroEl = $(".hero");
@@ -317,6 +322,7 @@
       if (e.target.closest("a, button") || e.touches.length > 1) { hx = null; return; }
       hx = e.touches[0].clientX; hy = e.touches[0].clientY;
     }, { passive: true });
+    heroEl.addEventListener("touchmove", (e) => { if (e.touches.length > 1) hx = null; }, { passive: true });
     heroEl.addEventListener("touchend", (e) => {
       if (hx === null) return;
       const dx = e.changedTouches[0].clientX - hx, dy = e.changedTouches[0].clientY - hy; hx = null;
@@ -339,6 +345,7 @@
     new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { map.classList.add("is-drawn"); o.disconnect(); } }), { threshold: 0.25 }).observe(map);
   }
   const openPin = (id) => {
+    if (!R[id]) return;
     $$(".pin, .map-list button").forEach((p) => p.classList.toggle("is-hot", p.dataset.pin === id));
     emit("map:focus", id);
     regionSheet(id);
@@ -364,7 +371,12 @@
       const tr = track.getBoundingClientRect(), r = el.getBoundingClientRect();
       track.scrollBy({ left: r.left + r.width / 2 - (tr.left + tr.width / 2), behavior: reduced ? "auto" : "smooth" });
     };
-    let raf = 0;
+    let raf = 0, target = null, tT = 0;
+    const step = (d) => {
+      const i = Math.max(0, Math.min(items.length - 1, (target ?? current()) + d));
+      target = i; clearTimeout(tT); tT = setTimeout(() => (target = null), 700);
+      to(i);
+    };
     const sync = () => {
       raf = 0;
       const i = current(), max = track.scrollWidth - track.clientWidth;
@@ -376,14 +388,15 @@
       if (focused && focused.disabled && (focused === prev || focused === next)) (focused === prev ? next : prev)?.focus({ preventScroll: true });
     };
     track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
+    track.addEventListener("pointerdown", () => (target = null), { passive: true });   // a manual swipe resets the queued target
     addEventListener("resize", sync);
-    prev?.addEventListener("click", () => { vibrate(); to(current() - 1); });
-    next?.addEventListener("click", () => { vibrate(); to(current() + 1); });
-    dotEls.forEach((d, k) => d.addEventListener("click", () => to(k)));
+    prev?.addEventListener("click", () => { vibrate(); step(-1); });
+    next?.addEventListener("click", () => { vibrate(); step(1); });
+    dotEls.forEach((d, k) => d.addEventListener("click", () => { target = null; to(k); }));
     track.addEventListener("keydown", (e) => {
       if (e.target !== track) return;
-      if (e.key === "ArrowRight") { e.preventDefault(); to(current() + 1); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); to(current() - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); step(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
       if (e.key === "Home") { e.preventDefault(); to(0); }
       if (e.key === "End") { e.preventDefault(); to(items.length - 1); }
     });
@@ -400,10 +413,10 @@
     const sliders = $$(".weights input"), weightsBox = $(".weights"), desc = $(".persona-desc");
     const rows = Object.fromEntries($$(".rank", ranking).map((li) => [li.dataset.region, li]));
     const P = Object.fromEntries(DATA.personas.map((p) => [p.id, p]));
-    const base = DATA.regions.map((r) => r.id);
+    const base = DATA.regions.map((r) => r.id).filter((id) => rows[id]);
     const score = (w) => {
       const tw = Object.values(w).reduce((a, b) => a + b, 0);
-      return Object.fromEntries(DATA.regions.map((r) => [r.id, tw ? Math.round(DATA.axes.reduce((s, a) => s + r.scores[a.id] * (w[a.id] || 0), 0) * 100 / tw) / 10 : 0]));
+      return Object.fromEntries(DATA.regions.filter((r) => rows[r.id]).map((r) => [r.id, tw ? Math.round(DATA.axes.reduce((s, a) => s + r.scores[a.id] * (w[a.id] || 0), 0) * 100 / tw) / 10 : 0]));
     };
     const paint = (s) => {
       s.style.setProperty("--p", (s.value / s.max) * 100 + "%");
@@ -453,13 +466,17 @@
     };
     const current = () => Object.fromEntries(sliders.map((s) => [s.dataset.axis, +s.value]));
     const setActive = (id) => $$(".persona").forEach((b) => { const on = b.dataset.persona === id; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
+    let lastKey = "";
     const setPersona = (id) => {
+      if (id !== "custom" && !P[id]) id = "custom";
       setActive(id);
       weightsBox.classList.toggle("is-open", id === "custom");
       desc.classList.remove("is-warn");
       desc.textContent = id === "custom" ? `${DATA.axes.length}つの軸の重み（0〜4）を自分で調整できます。今の重みから始めます。` : P[id].desc;
-      if (id !== "custom") sliders.forEach((s) => { s.value = P[id].weights[s.dataset.axis]; paint(s); });
-      render(current());
+      if (id !== "custom") sliders.forEach((s) => { s.value = P[id].weights[s.dataset.axis] ?? 0; paint(s); });
+      const w = current(), key = JSON.stringify(w);
+      if (key === lastKey) return;                 // re-tapping the active persona replayed the whole FLIP shuffle
+      lastKey = key; render(w);
     };
     $$(".persona").forEach((b) => b.addEventListener("click", () => {
       vibrate(); setPersona(b.dataset.persona);
@@ -472,7 +489,7 @@
       setActive("custom");
       desc.classList.remove("is-warn");
       desc.textContent = `${DATA.axes.length}つの軸の重み（0〜4）を自分で調整できます。`;
-      render(current());
+      const w = current(); lastKey = JSON.stringify(w); render(w);
     }));
     const resetBtn = document.createElement("button");
     resetBtn.type = "button"; resetBtn.className = "weights-reset"; resetBtn.textContent = "均等（すべて1）に戻す";
@@ -481,7 +498,7 @@
       setActive("custom");
       desc.classList.remove("is-warn");
       desc.textContent = `${DATA.axes.length}つの軸の重みをすべて1（均等）に戻しました。`;   // never leave the all-zero warning text behind
-      render(current());
+      const w = current(); lastKey = JSON.stringify(w); render(w);
     });
     weightsBox.appendChild(resetBtn);
     sliders.forEach(paint);
@@ -510,7 +527,7 @@
         <p class="sh-b">${esc(c.dataset.why)}</p>`, c.dataset.accent, "heat");
     });
     c.addEventListener("keydown", (e) => {
-      const n = DATA.regions.length, col = i % n;
+      const n = $$(".heat-cell", c.closest(".heat-row")).length || DATA.regions.length, col = i % n;
       const m = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n, Home: -col, End: n - 1 - col }[e.key];
       if (m === undefined) return;
       e.preventDefault();                          // arrows at the grid edge must not scroll the page
@@ -527,8 +544,10 @@
       $$(".axis-chips .chip").forEach((b) => { const on = b.dataset.axis === ax; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
       descEl.textContent = AX[ax].label + " — " + AX[ax].desc;
       const list = [...DATA.regions].sort((a, b) => b.scores[ax] - a.scores[ax] || b.balanced - a.balanced);
-      axBars.innerHTML = list.map((r) => `<li style="--c:${r.accent};--v:0" data-v="${r.scores[ax]}"><span class="ab-n">${esc(r.short)}</span><span class="ab-t"><i></i></span><span class="ab-v">${r.scores[ax]}</span></li>`).join("");
-      requestAnimationFrame(() => requestAnimationFrame(() => $$("li", axBars).forEach((li) => li.style.setProperty("--v", li.dataset.v))));
+      axBars.setAttribute("aria-label", `${AX[ax].label}の地域別スコア`);
+      axBars.innerHTML = list.map((r) => `<li style="--c:${r.accent};--v:0" data-v="${r.scores[ax]}" aria-label="${esc(r.short)} ${r.scores[ax]}点"><span class="ab-n">${esc(r.short)}</span><span class="ab-t"><i></i></span><span class="ab-v">${r.scores[ax]}</span></li>`).join("");
+      const grow = () => $$("li", axBars).forEach((li) => li.style.setProperty("--v", li.dataset.v));
+      if (document.hidden || reduced) grow(); else requestAnimationFrame(() => requestAnimationFrame(grow));
     };
     $$(".axis-chips .chip").forEach((b) => b.addEventListener("click", () => { vibrate(); show(b.dataset.axis); }));
     show(DATA.axes[0].id);
@@ -536,10 +555,11 @@
 
   /* ---------------- VS board ---------------- */
   const vs = $(".vs-board");
-  if (vs) {
-    let A = $(".vs-a .is-active").dataset.id, B = $(".vs-b .is-active").dataset.id;
+  if (vs && DATA.regions.length > 1) {
+    let A = $(".vs-a .is-active")?.dataset.id || DATA.regions[0].id, B = $(".vs-b .is-active")?.dataset.id || DATA.regions[1].id;
     const draw = () => {
-      if (A === B) B = DATA.regions.find((r) => r.id !== A).id;
+      if (!R[A]) A = DATA.regions[0].id;
+      if (A === B || !R[B]) B = DATA.regions.find((r) => r.id !== A).id;
       // the region picked on the other side is disabled instead of being silently swapped away
       $$(".vs-a .chip").forEach((c) => { const on = c.dataset.id === A; c.classList.toggle("is-active", on); c.setAttribute("aria-pressed", on); c.disabled = c.dataset.id === B; });
       $$(".vs-b .chip").forEach((c) => { const on = c.dataset.id === B; c.classList.toggle("is-active", on); c.setAttribute("aria-pressed", on); c.disabled = c.dataset.id === A; });
@@ -558,15 +578,15 @@
       });
       const draws = DATA.axes.length - wa - wb;
       $(".vs-na", vs).textContent = ra.name; $(".vs-nb", vs).textContent = rb.name;
-      $(".vs-score", vs).innerHTML = `${wa}<em>—</em>${wb}`;
+      $(".vs-score", vs).innerHTML = `${wa}<em aria-hidden="true">—</em><span class="sr-only">対</span>${wb}`;
       const lead = wa === wb ? `${wa}勝${wb}敗で引き分け` : `${esc(wa > wb ? ra.short : rb.short)}が${Math.max(wa, wb)}軸で勝利`;
       $(".vs-verdict", vs).innerHTML = `<b>${lead}${draws ? `（同点${draws}軸）` : ""}。</b>`
         + (winsA.length ? `${esc(ra.short)}は<b>${esc(winsA.join("・"))}</b>で優位。` : "")
         + (winsB.length ? `${esc(rb.short)}は<b>${esc(winsB.join("・"))}</b>で優位。` : "")
         + `総合点は ${ra.balanced.toFixed(1)} 対 ${rb.balanced.toFixed(1)}。`;
     };
-    $$(".vs-a .chip").forEach((c) => c.addEventListener("click", () => { A = c.dataset.id; vibrate(); draw(); }));
-    $$(".vs-b .chip").forEach((c) => c.addEventListener("click", () => { B = c.dataset.id; vibrate(); draw(); }));
+    $$(".vs-a .chip").forEach((c) => c.addEventListener("click", () => { if (A === c.dataset.id) return; A = c.dataset.id; vibrate(); draw(); }));
+    $$(".vs-b .chip").forEach((c) => c.addEventListener("click", () => { if (B === c.dataset.id) return; B = c.dataset.id; vibrate(); draw(); }));
     $(".vs-mark")?.addEventListener("click", () => { [A, B] = [B, A]; vibrate(); draw(); });
     draw();
   }
@@ -599,12 +619,14 @@
       rc.setAttribute("aria-label", "レーダーチャート比較: " + boxes.filter((b) => b.checked)
         .map((b) => `${R[b.value].short}（${labels.map((l, i) => l + series[b.value][i]).join("、")}）`).join("／"));
     };
+    let seen = false;
     boxes.forEach((cb) => cb.addEventListener("change", () => {
+      seen = true;
       if (!boxes.some((x) => x.checked)) cb.checked = true;   // an empty chart explains nothing
       if (cb.checked) rc.appendChild(polys[cb.value].parentNode);   // the series just enabled is drawn on top
       vibrate(); update();
     }));
-    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { update(); o.disconnect(); } }), { threshold: 0.3 }).observe(rc);
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { if (!seen) update(); seen = true; o.disconnect(); } }), { threshold: 0.3 }).observe(rc);
   }
 
   /* ---------------- season / holiday filter ---------------- */
@@ -621,7 +643,7 @@
       // label = the button's own text nodes (the <small> month hint is excluded, whatever the node order)
       const label = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() || b.textContent.trim();
       // compare at the displayed 0.1 precision; equal values keep page order (stable sort)
-      const avg = DATA.regions.map((r) => [r, Math.round(months.reduce((s, m) => s + r.months[m - 1], 0) / months.length * 10) / 10]).sort((x, y) => y[1] - x[1]);
+      const avg = DATA.regions.map((r) => [r, Math.round(months.reduce((s, m) => s + (r.months[m - 1] ?? 0), 0) / months.length * 10) / 10]).sort((x, y) => y[1] - x[1] || y[0].balanced - x[0].balanced);
       // best regions in score order (page-order re-sort contradicted the ranked list right below)
       const best = avg.filter(([, v]) => v >= 4).map(([r]) => [r]);
       const when = `${esc(label)}（${months.join("・")}月）`;
@@ -635,12 +657,13 @@
   /* ---------------- lightbox (+ swipe / arrows between photos) ---------------- */
   const lb = $(".lightbox");
   if (lb) {
-    const stage = $(".lb-stage", lb), items = $$("[data-lightbox]");
+    const stage = $(".lb-stage", lb), items = $$("[data-lightbox]").filter((b) => DATA.assets[b.dataset.lightbox]);
     const live = document.createElement("p");
     live.className = "sr-only"; live.setAttribute("aria-live", "polite"); lb.appendChild(live);
     let idx = 0, last = null;
     // the browser already negotiated AVIF for the page's own <picture>s — reuse that answer for preloads
-    const AVIF = () => $$(".pic img").some((im) => /\.avif(\?|$)/.test(im.currentSrc || ""));
+    let avifMemo = false;
+    const AVIF = () => avifMemo || (avifMemo = $$(".pic img").some((im) => /\.avif(\?|$)/.test(im.currentSrc || "")));
     const pick = (a) => {
       const need = Math.min(innerWidth, innerHeight * (a.w / a.h)) * Math.min(devicePixelRatio || 1, 3);
       return a.variants.find((v) => v >= need) || a.variants[a.variants.length - 1];
@@ -661,27 +684,29 @@
       // preload the exact file the <picture> will choose (AVIF when available), not a WebP that is never used
       if (items.length > 1) [idx + 1, idx - 1].forEach((k) => { const n = DATA.assets[items[(k + items.length) % items.length].dataset.lightbox]; const im = new Image(); im.src = `${ROOT}${n.path}/${pick(n)}.${n.avif && AVIF() ? "avif" : "webp"}`; });
     };
-    const open = (i, btn) => { if (!lb.hidden) return; last = btn; show(i); lb.hidden = false; lock("lightbox", true); $(".lb-close", lb).focus({ preventScroll: true }); };
+    const open = (i, btn) => { if (!lb.hidden || !items.length) return; last = btn; show(i); lb.hidden = false; lock("lightbox", true); $(".lb-close", lb).focus({ preventScroll: true }); };
     const close = () => { if (lb.hidden) return; lb.hidden = true; stage.innerHTML = ""; live.textContent = ""; lb.classList.remove("is-loading"); lock("lightbox", false); last?.focus({ preventScroll: true }); };
     items.forEach((b, i) => b.addEventListener("click", () => open(i, b)));
     $(".lb-close", lb).addEventListener("click", close);
-    $(".lb-prev", lb)?.addEventListener("click", () => show(idx - 1));
-    $(".lb-next", lb)?.addEventListener("click", () => show(idx + 1));
+    const nav = (d) => { if (items.length > 1) show(idx + d); };
+    $(".lb-prev", lb)?.addEventListener("click", () => nav(-1));
+    $(".lb-next", lb)?.addEventListener("click", () => nav(1));
     lb.addEventListener("click", (e) => { if (e.target === lb || e.target === stage) close(); });
     lb.addEventListener("keydown", (e) => trap(lb, e));
     addEventListener("keydown", (e) => {
       if (lb.hidden) return;
       if (e.key === "Escape") { e.stopImmediatePropagation(); close(); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); show(idx + 1); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); nav(1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); nav(-1); }
     }, true);
     let lx = null, ly = null;
     lb.addEventListener("touchstart", (e) => { if (e.touches.length > 1 || e.target.closest("button, a")) { lx = null; return; } lx = e.touches[0].clientX; ly = e.touches[0].clientY; }, { passive: true });
+    lb.addEventListener("touchmove", (e) => { if (e.touches.length > 1) lx = null; }, { passive: true });   // pinch-zoom is not a swipe
     lb.addEventListener("touchend", (e) => {
       if (lx === null) return;
       const dx = e.changedTouches[0].clientX - lx, dy = e.changedTouches[0].clientY - ly; lx = null;
       if ((window.visualViewport?.scale || 1) > 1.05) return;       // pinch-zoomed: the finger is panning the photo
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(idx + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) nav(dx < 0 ? 1 : -1);
       else if (dy > 100 && Math.abs(dy) > Math.abs(dx)) close();
     });
   }
@@ -704,6 +729,7 @@
     if ($(".hero")) gsap.fromTo(".hero-content", { translate: "0px 0%", opacity: 1 }, { translate: "0px -18%", opacity: 0.2, ease: "none", immediateRender: false, scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
     $$(".js-parallax").forEach((el) => {
       const img = $("img", el);
+      if (!img || el.closest(".spots")) return;
       gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
     });
     if ($(".deck")) gsap.from(".card", { translate: "0 60px", opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, clearProps: "opacity,translate", scrollTrigger: { trigger: ".deck", start: "top 85%", once: true } });
@@ -732,15 +758,17 @@
   // alone: entering full-screen resizes the viewport under the finger and would mis-target the tap.
   let wasFs = false;
   const firstTap = (e) => {
-    if (e.pointerType === "mouse" || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
+    if (e.pointerType === "mouse" || !e.isPrimary || String(getSelection?.() || "").trim() || e.target.closest("a[href], button, input, label, summary, [role=button], [role=tab], .sheet, .lightbox, .menu, .deck, .spots, .map3d, .personas, .chips")) return;
     removeEventListener("pointerup", firstTap);
     if (canFs && !inFs() && !store.get("fs-declined")) goFs();
   };
   addEventListener("pointerup", firstTap, { passive: true });
-  document.addEventListener("fullscreenchange", () => {
+  const onFs = () => {
     if (inFs()) wasFs = true;
     else if (wasFs) store.set("fs-declined", "1");   // only a real exit counts as "declined"
-  });
+  };
+  document.addEventListener("fullscreenchange", onFs);
+  document.addEventListener("webkitfullscreenchange", onFs);
   syncFs();
 
   /* ---------------- 3D coverflow for horizontal decks ---------------- */
@@ -762,6 +790,7 @@
     track.addEventListener("scroll", q, { passive: true });
     addEventListener("resize", q);
     screen.orientation?.addEventListener?.("change", q);
+    addEventListener("load", q, { once: true });
     upd();
   };
   if (!reduced) {
@@ -769,6 +798,10 @@
     const sp = $(".spots"); if (sp) flow(sp, $$(".spot", sp));
   }
 
-  const boot = () => { finishLoader(); initMotion(); if (slides.length > 1) go(0); };
+  const boot = () => {
+    finishLoader();
+    try { initMotion(); } catch (e) { console.warn("[motion] disabled", e); }
+    if (slides.length > 1) go(0);
+  };
   document.readyState !== "loading" ? boot() : addEventListener("DOMContentLoaded", boot);
 })();

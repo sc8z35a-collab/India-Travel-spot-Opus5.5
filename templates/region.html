@@ -194,7 +194,7 @@
 
 <nav class="next-region" aria-label="次の地域へ">
   {% set nx = next_region %}
-  <a href="{{ root }}{{ nx.id }}/index.html" style="--accent:{{ nx.theme.accent }}">
+  <a href="{{ root }}{{ nx.id }}/index.html" style="--accent:{{ nx.theme.accent }}" aria-label="次の旅先: {{ nx.name }}（{{ nx.name_en }}）">
     {{ pic(nx.hero, "100vw", "nr-bg") }}
     <div class="nr-shade"></div>
     <div class="nr-in wrap"><p class="eyebrow">Next journey — {{ '%02d' % nx.order }}</p><p class="nr-t">{{ nx.name_en }}</p><p class="nr-ja">{{ nx.name }} — {{ nx.catch }}</p></div>
