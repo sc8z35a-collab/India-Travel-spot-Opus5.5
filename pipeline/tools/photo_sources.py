@@ -52,10 +52,12 @@ def commons(files: list[str]) -> dict:
             "iiprop": "url|size|extmetadata", "iiurlwidth": 3840, "format": "json"}).json()
         back = {n["to"]: n["from"] for n in r["query"].get("normalized", [])}
         for p in r["query"]["pages"].values():
-            ii = p["imageinfo"][0]; m = ii["extmetadata"]
+            if not p.get("imageinfo"):
+                continue                                   # missing / deleted file — skip instead of KeyError
+            ii = p["imageinfo"][0]; m = ii.get("extmetadata", {})
             key = back.get(p["title"], p["title"])[5:].replace("_", " ")
             lic = m.get("LicenseShortName", {}).get("value", "")
-            out[key] = {"hires": ii["thumburl"].split("?")[0] if ii["width"] > 3840 else ii["url"],
+            out[key] = {"hires": ii["thumburl"].split("?")[0] if ii["width"] > 3840 and ii.get("thumburl") else ii["url"],
                         "link": ii["descriptionurl"], "license": lic, "license_url": CC.get(lic, m.get("LicenseUrl", {}).get("value", "")),
                         "author": re.sub(r"\s+", " ", re.sub("<[^>]+>", "", m.get("Artist", {}).get("value", ""))).strip()[:60],
                         "width": ii["width"]}

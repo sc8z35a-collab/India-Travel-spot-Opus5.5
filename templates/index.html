@@ -26,7 +26,7 @@
 <section class="hero" id="top" aria-label="イントロダクション">
   <div class="hero-slides">
     {% for r in regions %}
-    <div class="hero-slide{% if loop.first %} is-active{% endif %}" data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
+    <div class="hero-slide{% if loop.first %} is-active{% endif %}"{% if not loop.first %} aria-hidden="true"{% endif %} data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
       {{ pic(r.hero, "100vw", "hero-pic", loop.first) }}
     </div>
     {% endfor %}

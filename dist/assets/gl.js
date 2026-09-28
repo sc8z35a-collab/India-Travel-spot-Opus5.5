@@ -28,12 +28,14 @@ const QA = /[?&]qa=1/.test(location.search);
 // governor step it down (3 → 2.5 → 2 → 1.6) only if a device genuinely can't hold ~50 fps.
 const DPR_MAX = QA ? 1 : Math.min(window.devicePixelRatio || 1, 3);
 let DPR = DPR_MAX;
+const html = document.documentElement;
 const Gov = {
   steps: [3, 2.5, 2, 1.6].filter((v) => v <= DPR_MAX + 0.01), i: 0, acc: 0, n: 0, cool: 0, listeners: new Set(),
   init() { if (!this.steps.length || this.steps[0] < DPR_MAX - 0.01) this.steps.unshift(DPR_MAX); DPR = this.steps[0]; },
   sample(dt, active) {
     if (QA || !active) { this.acc = this.n = 0; return; }
     if (this.cool > 0) { this.cool -= dt; return; }
+    if (dt >= 0.05) return;                                   // hitches (GC, tab switch) are not sustained load
     this.acc += dt; this.n++;
     if (this.n < 90) return;
     const avg = this.acc / this.n; this.acc = this.n = 0;
@@ -42,7 +44,6 @@ const Gov = {
   },
   set(i) { this.i = i; DPR = this.steps[i]; this.cool = 2.5; this.listeners.forEach((f) => f(DPR)); html.dataset.dpr = DPR; },
 };
-const html = document.documentElement;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => 1 - Math.pow(1 - t, 3);
@@ -131,6 +132,7 @@ function makeRenderer(canvas, { alpha = false } = {}) {
   });
   onRestore(canvas);
   r.setPixelRatio(DPR);
+  try { GPU.aniso = r.capabilities.getMaxAnisotropy() || 1; GPU.maxTex = r.capabilities.maxTextureSize || GPU.maxTex; } catch { /* keep defaults */ }
   r.outputColorSpace = THREE.SRGBColorSpace;
   r.toneMapping = THREE.NeutralToneMapping;
   r.toneMappingExposure = 1.0;
@@ -141,6 +143,7 @@ function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88] } = {}
   const size = renderer.getSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(Math.max(1, size.x * DPR), Math.max(1, size.y * DPR), { type: THREE.HalfFloatType, samples: QA ? 0 : (DPR >= 2.5 ? 2 : 4) });
   const composer = new EffectComposer(renderer, rt);
+  if (!QA) Gov.listeners.add((d) => { const s = d >= 2.5 ? 2 : 4; [composer.renderTarget1, composer.renderTarget2].forEach((t) => { if (t && t.samples !== s) { t.samples = s; t.dispose(); } }); });
   composer.addPass(new RenderPass(scene, camera));
   const bloomPass = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), ...bloom);
   composer.addPass(bloomPass);
@@ -150,6 +153,7 @@ function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88] } = {}
   return { composer, bloomPass, final };
 }
 
+const GPU = { aniso: 8, maxTex: 16384 };
 const loader = new THREE.TextureLoader();
 const texCache = new Map();
 function loadTex(url, { srgb = true } = {}) {
@@ -157,7 +161,7 @@ function loadTex(url, { srgb = true } = {}) {
   const p = loader.loadAsync(url).then((t) => {
     t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
     t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
-    t.generateMipmaps = true; t.anisotropy = 8; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+    t.generateMipmaps = true; t.anisotropy = Math.min(8, GPU.aniso); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     return t;
   }, (e) => { texCache.delete(url); throw e; });   // a failed (offline) load must be retryable, not cached forever
   texCache.set(url, p);
@@ -165,7 +169,9 @@ function loadTex(url, { srgb = true } = {}) {
 }
 function photoUrl(id, cssW) {
   const a = DATA.assets[id]; const target = Math.max(cssW, innerWidth) * DPR_MAX * 1.02;   // 0-wide host before layout fetched the 640 px file
-  const w = a.variants.find((v) => v >= target) || a.variants[a.variants.length - 1];
+  const ok = a.variants.filter((v) => v <= GPU.maxTex);
+  const vs = ok.length ? ok : a.variants;
+  const w = vs.find((v) => v >= target) || vs[vs.length - 1];
   return `${ROOT}${a.path}/${w}.webp`;
 }
 
@@ -626,7 +632,7 @@ class TerrainMap {
     let best = null, bd = 0.09;                                            // NDC radius ≈ 40 px on a phone
     Object.entries(this.pins).forEach(([id, p]) => {
       for (const q of [p.pos, p.pos.clone().lerp(p.top, 0.5), p.top]) {
-        const v = q.clone().project(this.camera); if (v.z > 1) continue;
+        const v = q.clone().project(this.camera); if (v.z > 1 || v.z < -1) continue;
         const d = Math.hypot((v.x - ndc.x) * (r.width / r.height), v.y - ndc.y);
         if (d < bd) { bd = d; best = id; }
       }
@@ -751,7 +757,7 @@ class TerrainMap {
       if (ox > -6 && oy > -4) { const push = (oy + 4) / 2; a.y -= push; b.y += push; }
     }
     L.forEach(({ pin, id, x, y, y0, z }) => {
-      const cy = clamp(y, 24, this.h - 24), cx = clamp(x, 8, this.w - pin.lw - 8);
+      const cy = clamp(y, 24, Math.max(24, this.h - 24)), cx = clamp(x, 8, Math.max(8, this.w - pin.lw - 8));
       pin.label.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
       pin.label.style.setProperty("--lead", Math.max(0, y0 - cy).toFixed(0) + "px");
       pin.label.style.visibility = z < 1 ? "" : "hidden";
@@ -776,6 +782,7 @@ class Ambient {
     canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); html.classList.add("gl-lost"); });
     onRestore(canvas);
     this.renderer.setPixelRatio(Math.min(DPR, 1) * 0.6);
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.scene = new THREE.Scene(); this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     this.u = { uTime: { value: 0 }, uScroll: { value: 0 }, uAcc: { value: col(accent) }, uRes: { value: new THREE.Vector2() },
                uTilt: { value: new THREE.Vector2() } };
@@ -805,6 +812,7 @@ class Ambient {
           gl_FragColor = vec4(c, 1.);
         }` })));
     this.resize(); addEventListener("resize", () => this.resize());
+    window.visualViewport?.addEventListener("resize", () => this.resize());
     screen.orientation?.addEventListener?.("change", () => setTimeout(() => this.resize(), 120));
     this.acc = col(accent); this.accT = col(accent); this.last = 0;
     html.classList.add("gl-amb-on");

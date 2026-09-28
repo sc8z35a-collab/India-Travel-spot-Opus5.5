@@ -2,8 +2,8 @@
   "agent": "a8_qa_auditor",
   "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
   "ok": true,
-  "started": 1790514537.0710385,
-  "duration_s": 0.47,
+  "started": 1790595374.2223377,
+  "duration_s": 0.55,
   "stats": {
     "pages": 6,
     "checks": 2017,
@@ -37,13 +37,13 @@
         "checks": 302,
         "issues": [],
         "score": 100.0,
-        "html_kb": 84.4
+        "html_kb": 84.5
       },
       "varanasi/index.html": {
         "checks": 301,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.8
+        "html_kb": 83.9
       }
     }
   },

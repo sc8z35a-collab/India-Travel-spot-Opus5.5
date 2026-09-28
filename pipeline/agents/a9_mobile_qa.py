@@ -98,7 +98,7 @@ class MobileQa(Agent):
                     pg.on("console", lambda m, e=errors: m.type == "error" and e.append(m.text))
                     pg.on("pageerror", lambda exc, e=errors: e.append(str(exc)))
                     pg.set_default_timeout(90000)
-                    pg.goto(f"http://127.0.0.1:{port}/{path}?qa=1", wait_until="networkidle")
+                    pg.goto(f"http://127.0.0.1:{port}/{path}?qa=1", wait_until="load")
                     pg.wait_for_timeout(4500)
                     gl = pg.evaluate("""() => ({on: document.documentElement.classList.contains('gl-on'),
                         hero: document.documentElement.classList.contains('gl-hero-on'),

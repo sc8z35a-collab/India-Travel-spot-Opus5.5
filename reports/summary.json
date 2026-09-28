@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 1.0,
+  "duration_s": 1.2,
   "llm": {
     "ok": false,
     "model": null,
@@ -39,28 +39,28 @@
       "task": "a3",
       "agent": "③",
       "start": 0.0,
-      "end": 0.36,
+      "end": 0.43,
       "ok": true
     },
     {
       "task": "a5",
       "agent": "④",
-      "start": 0.36,
-      "end": 0.37,
+      "start": 0.43,
+      "end": 0.43,
       "ok": true
     },
     {
       "task": "a6",
       "agent": "⑤",
-      "start": 0.37,
-      "end": 0.56,
+      "start": 0.43,
+      "end": 0.67,
       "ok": true
     },
     {
       "task": "a8",
       "agent": "⑥",
-      "start": 0.56,
-      "end": 1.03,
+      "start": 0.67,
+      "end": 1.22,
       "ok": true
     }
   ],
@@ -73,7 +73,7 @@
       "name": "a3_score_analyst",
       "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
       "ok": true,
-      "duration_s": 0.36,
+      "duration_s": 0.43,
       "warnings": 0,
       "errors": 0,
       "stats": {
@@ -107,15 +107,15 @@
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.2,
+      "duration_s": 0.23,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "4409f7ff7a",
-        "css_kb": 117.9,
-        "js_kb": 47.3,
-        "gl_kb": 49.8,
+        "build_id": "761cc5a0f8",
+        "css_kb": 118.1,
+        "js_kb": 49.9,
+        "gl_kb": 50.6,
         "depth_maps": 50,
         "photos_credited": 50
       }
@@ -126,7 +126,7 @@
       "name": "a8_qa_auditor",
       "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
       "ok": true,
-      "duration_s": 0.47,
+      "duration_s": 0.55,
       "warnings": 0,
       "errors": 0,
       "stats": {
@@ -162,13 +162,13 @@
             "checks": 302,
             "issues": [],
             "score": 100.0,
-            "html_kb": 84.4
+            "html_kb": 84.5
           },
           "varanasi/index.html": {
             "checks": 301,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.8
+            "html_kb": 83.9
           }
         }
       }

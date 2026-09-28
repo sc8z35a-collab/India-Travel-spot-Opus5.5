@@ -188,7 +188,8 @@ class SiteBuilder(Agent):
         today = cfg["site"].get("checked") or dt.date.today().isoformat()
         sm = ['<?xml version="1.0" encoding="UTF-8"?>',
               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-        sm += [f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls]
+        from xml.sax.saxutils import escape as _xml
+        sm += [f"<url><loc>{_xml(u)}</loc><lastmod>{_xml(str(today))}</lastmod></url>" for u in urls]
         sm.append("</urlset>")
         (DIST / "sitemap.xml").write_text("\n".join(sm) + "\n", encoding="utf-8")
         (DIST / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base}sitemap.xml\n")

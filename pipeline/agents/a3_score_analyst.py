@@ -27,6 +27,11 @@ def weighted(scores: dict, weights: dict) -> float:
     return (s * 200 + total_w) // (2 * total_w) / 10
 
 
+def _half_up(x: float, step: int) -> int:
+    """Round to the nearest multiple of `step`, halves away from zero (Python's round() is banker's)."""
+    return int((x / step + 0.5) // 1 * step) if x >= 0 else -_half_up(-x, step)
+
+
 def competition_rank(order: list, totals: dict) -> dict:
     """1224-style ranks: equal totals share a rank (same rule as the finder in site.js)."""
     ranks, prev, rank = {}, None, 0
@@ -87,8 +92,8 @@ class ScoreAnalyst(Agent):
                 "persona_wins": wins,
                 "verdict": verdict,
                 # int(): round(x, -3) returns 15000.0 floats that leaked into the JSON payload
-                "trip_jpy": [int(round(b_lo * d_lo * rate, -3)), int(round(b_hi * d_hi * rate, -3))],
-                "daily_jpy": [int(round(b_lo * rate, -2)), int(round(b_hi * rate, -2))],
+                "trip_jpy": [_half_up(b_lo * d_lo * rate, 1000), _half_up(b_hi * d_hi * rate, 1000)],
+                "daily_jpy": [_half_up(b_lo * rate, 100), _half_up(b_hi * rate, 100)],
             }
 
         # ---- robustness: how often does each region win under random weights?
