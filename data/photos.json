@@ -709,6 +709,61 @@
       "alt": "夕暮れのコーチンの漁網と水平線",
       "license": "CC0 1.0",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "id": "delhi-curry",
+      "region": "delhi-agra",
+      "url": "https://sspark.genspark.ai/i/NwfPxBx8N0ewenSm?width=2560",
+      "source": "FreeFoodPhotos.com",
+      "link": "https://freefoodphotos.com/imagelibrary/meals/slides/indian_chicken_dish.html",
+      "title": "Indian chicken curry with rice and papadums",
+      "alt": "銅鍋のチキンカレーとバスマティライス、パパド",
+      "license": "CC BY 3.0",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/"
+    },
+    {
+      "id": "jaipur-spices",
+      "region": "jaipur",
+      "url": "https://sspark.genspark.ai/i/vR2IGoVtOMTceLkH?width=2560",
+      "source": "PxHere",
+      "link": "https://pxhere.com/en/photo/1093499",
+      "title": "Spices in a bazaar",
+      "alt": "バザールに山と積まれた色とりどりのスパイス",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "id": "varanasi-naan",
+      "region": "varanasi",
+      "url": "https://sspark.genspark.ai/i/tmSspa0QlYmpVNRt?width=2560",
+      "source": "PxHere",
+      "link": "https://pxhere.com/en/photo/731748",
+      "title": "Naan with masala curries",
+      "alt": "焼きたてのナンと2種のマサラカレー",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "id": "ladakh-momo",
+      "region": "ladakh",
+      "url": "https://sspark.genspark.ai/i/YGzcSUX8V471TjKl?width=2560",
+      "source": "PxHere",
+      "link": "https://pxhere.com/en/photo/1116039",
+      "title": "Pleated dumplings (momo)",
+      "alt": "ひだを寄せて包んだ大ぶりのモモ（蒸し餃子）",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "id": "india-spice-jars",
+      "region": "delhi-agra",
+      "url": "https://sspark.genspark.ai/i/iVz4nc4jM3OHHF7u?width=2560",
+      "source": "PxHere",
+      "link": "https://pxhere.com/en/photo/592850",
+      "title": "Indian spices in jars (haldi, star anise)",
+      "alt": "ハルディ（ターメリック）や八角が並ぶスパイス店の瓶",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     }
   ]
 }

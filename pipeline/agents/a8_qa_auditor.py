@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 
 from .base import DIST, GEN, Agent, Report, load_json
 
-HTML_BUDGET_KB = 220
+HTML_BUDGET_KB = 240   # +marquee photo medallions / skyline SVG (graphics layer)
 
 
 class QaAuditor(Agent):

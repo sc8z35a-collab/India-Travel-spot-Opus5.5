@@ -32,6 +32,9 @@ RNAV = [
     {"id": "access", "label": "注意"},
 ]
 
+# photos used purely as decoration on the home page (section backdrops)
+DECOR_PHOTOS = ["india-spice-jars"]
+
 FAVICON = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
     '<rect width="64" height="64" rx="14" fill="#0d0b0a"/>'
@@ -67,7 +70,8 @@ class SiteBuilder(Agent):
         css = (SRC / "css" / "site.css").read_text(encoding="utf-8") + "\n" + \
             (SRC / "css" / "mobile.css").read_text(encoding="utf-8") + "\n" + \
             (SRC / "css" / "landscape.css").read_text(encoding="utf-8") + "\n" + \
-            (SRC / "css" / "polish.css").read_text(encoding="utf-8")
+            (SRC / "css" / "polish.css").read_text(encoding="utf-8") + "\n" + \
+            (SRC / "css" / "graphics.css").read_text(encoding="utf-8")
         js = (SRC / "js" / "site.js").read_text(encoding="utf-8")
         (DIST / "assets" / "site.css").write_text(css, encoding="utf-8")
         (DIST / "assets" / "site.js").write_text(js, encoding="utf-8")
@@ -102,7 +106,9 @@ class SiteBuilder(Agent):
         min_daily = int(min(v["daily_jpy"][0] for v in analysis["regions"].values()))
         used_ids = sorted({r["hero"] for r in regions}
                           | {g for r in regions for g in r["gallery"]}
-                          | {h["photo"] for r in regions for h in r["highlights"]})
+                          | {h["photo"] for r in regions for h in r["highlights"]}
+                          | {r["food_photo"] for r in regions if r.get("food_photo")}
+                          | {k for k in DECOR_PHOTOS if k in assets})
         credit_list = [assets[i] for i in used_ids]
 
         front = {

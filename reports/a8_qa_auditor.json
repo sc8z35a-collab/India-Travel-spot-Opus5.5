@@ -2,48 +2,48 @@
   "agent": "a8_qa_auditor",
   "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
   "ok": true,
-  "started": 1790595374.2223377,
+  "started": 1790677661.283145,
   "duration_s": 0.55,
   "stats": {
     "pages": 6,
-    "checks": 2017,
+    "checks": 2315,
     "issues": 0,
     "per_page": {
       "delhi-agra/index.html": {
-        "checks": 311,
+        "checks": 330,
         "issues": [],
         "score": 100.0,
-        "html_kb": 84.7
+        "html_kb": 100.8
       },
       "index.html": {
-        "checks": 502,
+        "checks": 710,
         "issues": [],
         "score": 100.0,
-        "html_kb": 172.5
+        "html_kb": 221.6
       },
       "jaipur/index.html": {
-        "checks": 308,
+        "checks": 327,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.7
+        "html_kb": 99.7
       },
       "kerala/index.html": {
-        "checks": 293,
+        "checks": 307,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.6
+        "html_kb": 99.4
       },
       "ladakh/index.html": {
-        "checks": 302,
+        "checks": 321,
         "issues": [],
         "score": 100.0,
-        "html_kb": 84.5
+        "html_kb": 100.3
       },
       "varanasi/index.html": {
-        "checks": 301,
+        "checks": 320,
         "issues": [],
         "score": 100.0,
-        "html_kb": 83.9
+        "html_kb": 99.9
       }
     }
   },

@@ -51,7 +51,7 @@ class ContentValidator(Agent):
                     report.warn(f"{rid}: weak justification for '{ax}'")
             if any(k not in r for k in ("hero", "gallery", "highlights", "months", "budget_inr", "sources")):
                 continue                              # already reported as missing — don't crash on the checks below
-            photo_refs = [r["hero"], *r["gallery"], *[h["photo"] for h in r["highlights"]]]
+            photo_refs = [r["hero"], *r["gallery"], *[h["photo"] for h in r["highlights"]], *([r["food_photo"]] if r.get("food_photo") else [])]
             for pid in photo_refs:
                 checks += 1
                 if pid not in assets:

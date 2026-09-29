@@ -70,7 +70,7 @@
     <div class="why-grid">
       {% for a in axes %}{% set s = r.scores[a.id] %}
       <article class="why-card reveal" style="--v:{{ s.v }}">
-        <header><h3>{{ a.label }}</h3><p class="why-v"><b>{{ s.v }}</b>/10</p></header>
+        <header><h3><svg class="ax-i" aria-hidden="true"><use href="#ax-{{ a.id }}"/></svg>{{ a.label }}</h3><p class="why-v"><b>{{ s.v }}</b>/10</p></header>
         <div class="why-meter"><i></i></div>
         <p>{{ s.why }}</p>
       </article>
@@ -130,6 +130,7 @@
   <div class="wrap">
     <p class="eyebrow">Eat</p>
     <h2 class="h2 reveal-lines">この土地で、<br>食べるべきもの。</h2>
+    {% if r.food_photo is defined and r.food_photo %}<div class="food-hero">{{ pic(r.food_photo, "(orientation: landscape) 60vw, 100vw", "", false, true) }}{{ credit(r.food_photo) }}</div>{% endif %}
     <ul class="food-list">
       {% for f in r.foods %}<li class="reveal"><span class="fl-n">{{ '%02d' % loop.index }}</span><h3>{{ f.name }}</h3><p>{{ f.desc }}</p></li>{% endfor %}
     </ul>
@@ -142,7 +143,7 @@
     <h2 class="h2 reveal-lines">季節ごとの<br>おすすめ度。</h2>
     <div class="season-bars" role="list" aria-label="月別のおすすめ度（5段階）">
       {% for v in r.months %}{% set m = loop.index %}
-      <div class="sb{% if m in holiday_months %} hol{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--m:{{ loop.index0 }};--heat:{{ charts.season[r.id][loop.index0] }}">
+      <div class="sb{% if m in holiday_months %} hol{% endif %}{% if v == 5 %} top{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--m:{{ loop.index0 }};--heat:{{ charts.season[r.id][loop.index0] }}">
         <b>{{ v }}</b><i></i><span>{{ m }}月</span>
       </div>
       {% endfor %}

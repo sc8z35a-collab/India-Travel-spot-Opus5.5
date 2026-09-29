@@ -161,6 +161,7 @@
         "desc": "路上で1杯₹10〜20前後。旅の燃料。"
       }
     ],
+    "food_photo": "delhi-curry",
     "itinerary": [
       {
         "day": "DAY 1",
@@ -414,6 +415,7 @@
         "desc": "蜂の巣状の揚げ菓子。祭りの季節の甘味。"
       }
     ],
+    "food_photo": "jaipur-spices",
     "itinerary": [
       {
         "day": "DAY 1",
@@ -657,6 +659,7 @@
         "desc": "キンマの葉で包む食後の口直し。"
       }
     ],
+    "food_photo": "varanasi-naan",
     "itinerary": [
       {
         "day": "DAY 1",
@@ -902,6 +905,7 @@
         "desc": "南インド式の定食。おかわり自由の店が多い。"
       }
     ],
+    "food_photo": "kerala-thali",
     "itinerary": [
       {
         "day": "DAY 1",
@@ -1155,6 +1159,7 @@
         "desc": "夏に実る名産。ジャムやドライフルーツに。"
       }
     ],
+    "food_photo": "ladakh-momo",
     "itinerary": [
       {
         "day": "DAY 1",
