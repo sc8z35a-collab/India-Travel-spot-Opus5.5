@@ -2,13 +2,15 @@
   "agent": "a2_content_validator",
   "role": "コンテンツの構造・整合性・出典チェック",
   "ok": true,
-  "started": 1790506507.4763973,
-  "duration_s": 0.0,
+  "started": 1790677009.9729843,
+  "duration_s": 0.03,
   "stats": {
     "regions": 5,
-    "checks": 230,
+    "checks": 235,
     "sources": 15
   },
-  "warnings": [],
+  "warnings": [
+    "kerala: some photos repeated within the page"
+  ],
   "errors": []
 }

@@ -23,19 +23,53 @@ def _pt(i: int, n: int, v: float, radius: float = R) -> tuple[float, float]:
     return round(CX + math.cos(ang) * radius * v, 2), round(CY + math.sin(ang) * radius * v, 2)
 
 
-def radar_svg(values: list[float], labels: list[str], accent: str, rid: str) -> str:
+def _shade(hex_: str, k: float) -> str:
+    """Darken (k<0, towards black) or lighten (k>0, towards white) a #rrggbb colour."""
+    r, g, b = (int(hex_[i:i + 2], 16) for i in (1, 3, 5))
+    t = 255 if k > 0 else 0
+    k = abs(k)
+    return "#%02x%02x%02x" % tuple(round(c + (t - c) * k) for c in (r, g, b))
+
+
+EXTRUDE = 7          # layers of the extruded "slab" under the data polygon
+EX_STEP = 2.2        # px per layer (viewBox units)
+
+
+def radar_svg(values: list[float], labels: list[str], accent: str, rid: str, uid: str = "") -> str:
+    """Radar chart drawn as an extruded, glowing glass slab floating over a banded, jali-like disc.
+
+    Pure SVG (no JS needed): a stack of darker copies of the data polygon fakes the slab's side walls,
+    the top face carries a radial gradient + inner specular edge, vertices are little gems.
+    """
     n = len(values)
+    uid = uid or rid
+    rings = (1.0, 0.8, 0.6, 0.4, 0.2)
     grid = []
-    for ring in (0.2, 0.4, 0.6, 0.8, 1.0):
+    for k, ring in enumerate(rings):   # outer → inner so the alternating bands stack correctly
         pts = " ".join(f"{x},{y}" for x, y in (_pt(i, n, ring) for i in range(n)))
-        grid.append(f'<polygon class="rg" points="{pts}"/>')
+        grid.append(f'<polygon class="rg{" rg-b" if k % 2 == 0 else ""}" points="{pts}"/>')
     spokes = "".join(
         f'<line class="rs" x1="{CX}" y1="{CY}" x2="{x}" y2="{y}"/>'
         for x, y in (_pt(i, n, 1) for i in range(n))
     )
+    ticks = "".join(   # tiny diamonds at the rim, like inlay on a marble jali
+        f'<rect class="rt" x="{x - 2.2}" y="{y - 2.2}" width="4.4" height="4.4" transform="rotate(45 {x} {y})"/>'
+        for x, y in (_pt(i, n, 1) for i in range(n))
+    )
     data_pts = [_pt(i, n, v / 10) for i, v in enumerate(values)]
     poly = " ".join(f"{x},{y}" for x, y in data_pts)
-    dots = "".join(f'<circle class="rd" cx="{x}" cy="{y}" r="3.5"/>' for x, y in data_pts)
+    # inner specular edge: the same polygon shrunk 6 % towards the centre
+    inner = " ".join(f"{round(CX + (x - CX) * .94, 2)},{round(CY + (y - CY) * .94, 2)}" for x, y in data_pts)
+    walls = "".join(
+        f'<polygon points="{poly}" transform="translate(0 {round((EXTRUDE - k) * EX_STEP, 2)})" '
+        f'fill="{_shade(accent, -0.35 - 0.45 * (EXTRUDE - k) / EXTRUDE)}"/>'
+        for k in range(EXTRUDE)
+    )
+    dots = "".join(
+        f'<g class="rd"><circle cx="{x}" cy="{y}" r="5.2" fill="{_shade(accent, -0.25)}"/>'
+        f'<circle cx="{x}" cy="{y}" r="3.6" fill="{accent}"/><circle cx="{x - 1}" cy="{y - 1.2}" r="1.5" fill="#fff" opacity=".9"/></g>'
+        for x, y in data_pts
+    )
     lbls = []
     for i, (lab, v) in enumerate(zip(labels, values)):
         x, y = _pt(i, n, 1.0, R + 30)
@@ -44,16 +78,30 @@ def radar_svg(values: list[float], labels: list[str], accent: str, rid: str) -> 
             f'<text class="rl" x="{x}" y="{y}" text-anchor="{anchor}" dominant-baseline="middle">'
             f'{lab}<tspan class="rv" dx="4">{v:g}</tspan></text>'
         )
-    gid = f"rgrad-{rid}"
+    gid, sid, fid, bid = (f"{p}-{uid}" for p in ("rgrad", "rspec", "rglow", "rdisc"))
     return (
-        f'<svg class="radar" viewBox="0 0 {SIZE} {SIZE}" role="img" '
+        f'<svg class="radar radar3d" viewBox="0 0 {SIZE} {SIZE}" role="img" '
         f'aria-label="{"、".join(f"{l}{v:g}" for l, v in zip(labels, values))}">'
-        f'<defs><radialGradient id="{gid}"><stop offset="0%" stop-color="{accent}" stop-opacity=".15"/>'
-        f'<stop offset="100%" stop-color="{accent}" stop-opacity=".55"/></radialGradient></defs>'
-        f'<g class="rgrid">{"".join(grid)}{spokes}</g>'
-        f'<polygon class="rp" points="{poly}" fill="url(#{gid})" stroke="{accent}" '
-        f'style="transform-origin:{CX}px {CY}px"/>'
-        f'<g class="rdots" fill="{accent}">{dots}</g>'
+        f'<defs>'
+        f'<radialGradient id="{gid}" cx="42%" cy="30%" r="80%"><stop offset="0%" stop-color="{_shade(accent, .55)}" stop-opacity=".95"/>'
+        f'<stop offset="45%" stop-color="{accent}" stop-opacity=".78"/>'
+        f'<stop offset="100%" stop-color="{_shade(accent, -0.35)}" stop-opacity=".62"/></radialGradient>'
+        f'<linearGradient id="{sid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/>'
+        f'<stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+        f'<radialGradient id="{bid}"><stop offset="0" stop-color="{accent}" stop-opacity=".16"/>'
+        f'<stop offset=".7" stop-color="{accent}" stop-opacity=".05"/><stop offset="1" stop-color="{accent}" stop-opacity="0"/></radialGradient>'
+        f'<filter id="{fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="b"/>'
+        f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+        f'</defs>'
+        f'<circle class="rdisc" cx="{CX}" cy="{CY}" r="{R + 16}" fill="url(#{bid})"/>'
+        f'<g class="rgrid">{"".join(grid)}{spokes}{ticks}</g>'
+        f'<ellipse class="rshadow" cx="{CX}" cy="{CY + EXTRUDE * EX_STEP + 4}" rx="{R * .7}" ry="{R * .5}"/>'
+        f'<g class="rp" style="transform-origin:{CX}px {CY}px">'
+        f'<g class="rwall">{walls}</g>'
+        f'<polygon class="rtop" points="{poly}" fill="url(#{gid})" stroke="{_shade(accent, .25)}" filter="url(#{fid})"/>'
+        f'<polygon class="rspec" points="{inner}" fill="none" stroke="url(#{sid})"/>'
+        f'</g>'
+        f'<g class="rdots">{dots}</g>'
         f'<g class="rlabels">{"".join(lbls)}</g></svg>'
     )
 

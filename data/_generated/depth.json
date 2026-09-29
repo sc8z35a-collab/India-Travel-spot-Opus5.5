@@ -248,5 +248,30 @@
     "path": "img/kerala-sunset/depth.webp",
     "mean": 0.155,
     "near": 0.835
+  },
+  "delhi-curry": {
+    "path": "img/delhi-curry/depth.webp",
+    "mean": 0.464,
+    "near": 0.863
+  },
+  "jaipur-spices": {
+    "path": "img/jaipur-spices/depth.webp",
+    "mean": 0.587,
+    "near": 0.953
+  },
+  "varanasi-naan": {
+    "path": "img/varanasi-naan/depth.webp",
+    "mean": 0.583,
+    "near": 0.941
+  },
+  "ladakh-momo": {
+    "path": "img/ladakh-momo/depth.webp",
+    "mean": 0.599,
+    "near": 0.922
+  },
+  "india-spice-jars": {
+    "path": "img/india-spice-jars/depth.webp",
+    "mean": 0.576,
+    "near": 0.953
   }
 }

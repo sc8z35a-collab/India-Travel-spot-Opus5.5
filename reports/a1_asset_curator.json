@@ -2,14 +2,14 @@
   "agent": "a1_asset_curator",
   "role": "写真の取得・検証・高解像度レスポンシブ最適化 (AVIF/WebP/JPEG, LQIP, 主色抽出, 帰属表示)",
   "ok": true,
-  "started": 1790413798.361825,
-  "duration_s": 505.97,
+  "started": 1790672656.3063314,
+  "duration_s": 352.21,
   "stats": {
-    "requested": 50,
-    "processed": 50,
+    "requested": 55,
+    "processed": 55,
     "failed": [],
     "avif": true,
-    "source_px_median": 2304.0,
+    "source_px_median": 2560,
     "source_px_min": 728,
     "xl": [
       "delhi-taj-dawn",
@@ -23,7 +23,7 @@
       "varanasi-dawn",
       "varanasi-sunrise"
     ],
-    "files": 613
+    "files": 683
   },
   "warnings": [
     "jaipur-hawa-street: low source resolution 1280px",

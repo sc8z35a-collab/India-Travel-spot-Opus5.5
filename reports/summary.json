@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 1.2,
+  "duration_s": 0.8,
   "llm": {
     "ok": false,
     "model": null,
@@ -36,31 +36,17 @@
   },
   "timeline": [
     {
-      "task": "a3",
-      "agent": "③",
-      "start": 0.0,
-      "end": 0.43,
-      "ok": true
-    },
-    {
-      "task": "a5",
-      "agent": "④",
-      "start": 0.43,
-      "end": 0.43,
-      "ok": true
-    },
-    {
       "task": "a6",
       "agent": "⑤",
-      "start": 0.43,
-      "end": 0.67,
+      "start": 0.0,
+      "end": 0.2,
       "ok": true
     },
     {
       "task": "a8",
       "agent": "⑥",
-      "start": 0.67,
-      "end": 1.22,
+      "start": 0.2,
+      "end": 0.75,
       "ok": true
     }
   ],
@@ -68,56 +54,22 @@
   "skipped": [],
   "agents": [
     {
-      "task": "a3",
-      "agent": "③",
-      "name": "a3_score_analyst",
-      "role": "8軸スコアの多元的分析（ペルソナ別加重・ランキング・講評生成）",
-      "ok": true,
-      "duration_s": 0.43,
-      "warnings": 0,
-      "errors": 0,
-      "stats": {
-        "personas": 7,
-        "distinct_winners": [
-          "delhi-agra",
-          "kerala",
-          "ladakh",
-          "varanasi"
-        ]
-      }
-    },
-    {
-      "task": "a5",
-      "agent": "④",
-      "name": "a5_chart_designer",
-      "role": "レーダーチャート・ヒートマップのSVG/配色を事前生成",
-      "ok": true,
-      "duration_s": 0.0,
-      "warnings": 0,
-      "errors": 0,
-      "stats": {
-        "radars": 5,
-        "heat_cells": 40,
-        "season_cells": 60
-      }
-    },
-    {
       "task": "a6",
       "agent": "⑤",
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.23,
+      "duration_s": 0.2,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "761cc5a0f8",
-        "css_kb": 118.1,
-        "js_kb": 49.9,
-        "gl_kb": 50.6,
-        "depth_maps": 50,
-        "photos_credited": 50
+        "build_id": "9f690f207a",
+        "css_kb": 153.0,
+        "js_kb": 50.0,
+        "gl_kb": 61.3,
+        "depth_maps": 55,
+        "photos_credited": 55
       }
     },
     {
@@ -131,44 +83,44 @@
       "errors": 0,
       "stats": {
         "pages": 6,
-        "checks": 2017,
+        "checks": 2315,
         "issues": 0,
         "per_page": {
           "delhi-agra/index.html": {
-            "checks": 311,
+            "checks": 330,
             "issues": [],
             "score": 100.0,
-            "html_kb": 84.7
+            "html_kb": 100.8
           },
           "index.html": {
-            "checks": 502,
+            "checks": 710,
             "issues": [],
             "score": 100.0,
-            "html_kb": 172.5
+            "html_kb": 221.6
           },
           "jaipur/index.html": {
-            "checks": 308,
+            "checks": 327,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.7
+            "html_kb": 99.7
           },
           "kerala/index.html": {
-            "checks": 293,
+            "checks": 307,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.6
+            "html_kb": 99.4
           },
           "ladakh/index.html": {
-            "checks": 302,
+            "checks": 321,
             "issues": [],
             "score": 100.0,
-            "html_kb": 84.5
+            "html_kb": 100.3
           },
           "varanasi/index.html": {
-            "checks": 301,
+            "checks": 320,
             "issues": [],
             "score": 100.0,
-            "html_kb": 83.9
+            "html_kb": 99.9
           }
         }
       }

@@ -587,6 +587,7 @@
     "title": "Varanasi ghats with boats and birds",
     "alt": "ボートと鳥が舞うバラナシの川辺",
     "license": "PickPik Free License",
+    "license_url": "https://www.pickpik.com/about",
     "width": 728,
     "height": 546,
     "source_width": 728,
@@ -601,8 +602,7 @@
     "avif": true,
     "lqip": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQBACdASoYABIAPu1gqE2ppaOiMAgBMB2JZwDI1CHW8J2yw7LkI3nzoAD+7XzYosefKsB033S8lpDBH8rnSjCsVCIRw5Xh+Dn7c9ZToF4NagDHei5hxbwdgAAAAA==",
     "color": "#959087",
-    "path": "img/varanasi-birds",
-    "license_url": "https://www.pickpik.com/about"
+    "path": "img/varanasi-birds"
   },
   "varanasi-aarti": {
     "id": "varanasi-aarti",
@@ -1578,5 +1578,165 @@
     "lqip": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAwBACdASoYABAAPu1iqk4ppaQiMAgBMB2JYwCdMoADK+6dGFN/lzm/52AA/tzz8gJHo+1GqoWbl5x0He+b9qdRC/JM2jv+GNYY8DOwbAA=",
     "color": "#a08b86",
     "path": "img/kerala-sunset"
+  },
+  "delhi-curry": {
+    "id": "delhi-curry",
+    "region": "delhi-agra",
+    "source": "FreeFoodPhotos.com",
+    "link": "https://freefoodphotos.com/imagelibrary/meals/slides/indian_chicken_dish.html",
+    "title": "Indian chicken curry with rice and papadums",
+    "alt": "銅鍋のチキンカレーとバスマティライス、パパド",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/",
+    "width": 2560,
+    "height": 1703,
+    "source_width": 2560,
+    "source_height": 1703,
+    "ratio": 1.5032,
+    "variants": [
+      640,
+      960,
+      1280,
+      1920,
+      2560
+    ],
+    "jpg": [
+      640,
+      960,
+      1280,
+      1920
+    ],
+    "avif": true,
+    "lqip": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAACwAwCdASoYABAAPu1iqk2ppaQiMAgBMB2JQBYdhBmc91d197SXIADgEvAzggjy2hcsMpmh20dU5hj028ae/PRinfx4in04FmbQSQRx5Ru7Rb8tk9OpewAA",
+    "color": "#806e5e",
+    "path": "img/delhi-curry"
+  },
+  "jaipur-spices": {
+    "id": "jaipur-spices",
+    "region": "jaipur",
+    "source": "PxHere",
+    "link": "https://pxhere.com/en/photo/1093499",
+    "title": "Spices in a bazaar",
+    "alt": "バザールに山と積まれた色とりどりのスパイス",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "width": 2560,
+    "height": 1920,
+    "source_width": 2560,
+    "source_height": 1920,
+    "ratio": 1.3333,
+    "variants": [
+      640,
+      960,
+      1280,
+      1920,
+      2560
+    ],
+    "jpg": [
+      640,
+      960,
+      1280,
+      1920
+    ],
+    "avif": true,
+    "lqip": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAwBQCdASoYABIAPu1srFEppaQiqAqpMB2JYgCsMuiBl9TYKp3LE62DPVtDBjvSQWPQAAD+b4Y0c1mXgCIda0KiFbrdAQZ2upkdxF8m8OWCVMw+LXDrR1zbk4bFkTIox1ZXGAGCPvLDu/y+XmBvPBAAAAA=",
+    "color": "#725331",
+    "path": "img/jaipur-spices"
+  },
+  "varanasi-naan": {
+    "id": "varanasi-naan",
+    "region": "varanasi",
+    "source": "PxHere",
+    "link": "https://pxhere.com/en/photo/731748",
+    "title": "Naan with masala curries",
+    "alt": "焼きたてのナンと2種のマサラカレー",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "width": 2560,
+    "height": 1920,
+    "source_width": 2560,
+    "source_height": 1920,
+    "ratio": 1.3333,
+    "variants": [
+      640,
+      960,
+      1280,
+      1920,
+      2560
+    ],
+    "jpg": [
+      640,
+      960,
+      1280,
+      1920
+    ],
+    "avif": true,
+    "lqip": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAADQBACdASoYABIAPu1krE4ppaSjKA1RMB2JYgCdMxL/+BRv/9zagKH6kmv/QIr3oAD+w6B7eCyzkVk+c7obUYI7oYDrjvbLcfr/CDacvC33yVhOLYTLOwzkuLjczkUx233him/cZjZX5esZkvw2PkP1olh3BtLMgWAAAA==",
+    "color": "#b39e89",
+    "path": "img/varanasi-naan"
+  },
+  "ladakh-momo": {
+    "id": "ladakh-momo",
+    "region": "ladakh",
+    "source": "PxHere",
+    "link": "https://pxhere.com/en/photo/1116039",
+    "title": "Pleated dumplings (momo)",
+    "alt": "ひだを寄せて包んだ大ぶりのモモ（蒸し餃子）",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "width": 2560,
+    "height": 1713,
+    "source_width": 2560,
+    "source_height": 1713,
+    "ratio": 1.4945,
+    "variants": [
+      640,
+      960,
+      1280,
+      1920,
+      2560
+    ],
+    "jpg": [
+      640,
+      960,
+      1280,
+      1920
+    ],
+    "avif": true,
+    "lqip": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAACwBACdASoYABAAPu1kqk4ppaQiMAgBMB2JZgCdMoMrZEJGh3FgdFNNqyzIu1wAAP67zuPIC9RClMeHBOmyg+LRvdMzch8CFW6JUnLO+Z2xjnCEMgq7KaA6QAA=",
+    "color": "#b59686",
+    "path": "img/ladakh-momo"
+  },
+  "india-spice-jars": {
+    "id": "india-spice-jars",
+    "region": "delhi-agra",
+    "source": "PxHere",
+    "link": "https://pxhere.com/en/photo/592850",
+    "title": "Indian spices in jars (haldi, star anise)",
+    "alt": "ハルディ（ターメリック）や八角が並ぶスパイス店の瓶",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "width": 2560,
+    "height": 1706,
+    "source_width": 2560,
+    "source_height": 1706,
+    "ratio": 1.5006,
+    "variants": [
+      640,
+      960,
+      1280,
+      1920,
+      2560
+    ],
+    "jpg": [
+      640,
+      960,
+      1280,
+      1920
+    ],
+    "avif": true,
+    "lqip": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAAAwBACdASoYABAAPu1kq04ppaQiMAgBMB2JaACdL1ABzwotd5OcASr5VAAA/U5cAGhLrOh/jUxRxkg+76uXipH/nntm4O9gM1BGnOmCm04scSdABKhV1SI8aNzfFSIhTW26MPAAAAA=",
+    "color": "#8e7154",
+    "path": "img/india-spice-jars"
   }
 }

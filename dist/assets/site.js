@@ -438,6 +438,7 @@
         prevV = totals[id];
         const tie = !allZero && order.some((o) => o !== id && totals[o] === totals[id]);
         $(".rank-pos", li).textContent = allZero ? "–" : rank;
+        li.dataset.rank = allZero ? "" : rank;
         li.classList.toggle("is-top", rank === 1 && !allZero);
         const nm = $(".rank-name", li);
         let tg = $(".rank-tie", nm);
@@ -543,6 +544,7 @@
     const show = (ax) => {
       $$(".axis-chips .chip").forEach((b) => { const on = b.dataset.axis === ax; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", on); });
       descEl.textContent = AX[ax].label + " — " + AX[ax].desc;
+      emit("axis:select", ax);
       const list = [...DATA.regions].sort((a, b) => b.scores[ax] - a.scores[ax] || b.balanced - a.balanced);
       axBars.setAttribute("aria-label", `${AX[ax].label}の地域別スコア`);
       axBars.innerHTML = list.map((r) => `<li style="--c:${r.accent};--v:0" data-v="${r.scores[ax]}" aria-label="${esc(r.short)} ${r.scores[ax]}点"><span class="ab-n">${esc(r.short)}</span><span class="ab-t"><i></i></span><span class="ab-v">${r.scores[ax]}</span></li>`).join("");
