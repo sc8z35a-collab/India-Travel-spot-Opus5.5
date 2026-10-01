@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 27.4,
+  "duration_s": 32.6,
   "llm": {
     "ok": false,
     "model": null,
@@ -36,17 +36,10 @@
   },
   "timeline": [
     {
-      "task": "a4",
-      "agent": "②",
-      "start": 0.0,
-      "end": 0.33,
-      "ok": true
-    },
-    {
       "task": "a4b",
       "agent": "②",
-      "start": 0.33,
-      "end": 27.4,
+      "start": 0.0,
+      "end": 32.58,
       "ok": true
     }
   ],
@@ -54,28 +47,12 @@
   "skipped": [],
   "agents": [
     {
-      "task": "a4",
-      "agent": "②",
-      "name": "a4_cartographer",
-      "role": "実測国境データからインド地図SVGを生成し5地域をプロット",
-      "ok": true,
-      "duration_s": 0.33,
-      "warnings": 0,
-      "errors": 0,
-      "stats": {
-        "rings": 4,
-        "points_raw": 1518,
-        "points_kept": 579,
-        "reduction": "62%"
-      }
-    },
-    {
       "task": "a4b",
       "agent": "②",
       "name": "a4b_terrain_sculptor",
       "role": "実標高(SRTM系)+NASA衛星画像からインド亜大陸の3D地形(高さ・色・夜景・水深・川)を生成",
       "ok": true,
-      "duration_s": 26.66,
+      "duration_s": 31.38,
       "warnings": 0,
       "errors": 0,
       "stats": {

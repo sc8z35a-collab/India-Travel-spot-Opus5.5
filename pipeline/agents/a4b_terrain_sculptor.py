@@ -270,6 +270,26 @@ class TerrainSculptor(Agent):
             tint = np.where(water[..., None], np.array([10, 22, 34], np.float32), tint)
             Image.fromarray(tint.astype(np.uint8)).resize((CN, CN), Image.BICUBIC).save(out / "color.jpg", quality=90)
         gc.collect()
+        # light variant for the software-GPU QA run (SwiftShader keeps textures in the shared 1 GB RAM)
+        Image.open(out / "color.jpg").resize((2048, 2048), Image.LANCZOS).save(out / "color-2k.jpg", quality=88, optimize=True)
+
+        # ---- whole-Earth textures: the patch sits on a real globe (horizon, night side, Tokyo) ----
+        def world_img(layer, W, name):
+            url = GIBS.format(layer=layer, s=-90, w=-180, n=90, e=180, W=W, H=W // 2)
+            return Image.open(io.BytesIO(_get(url, CACHE / "gibs" / f"{name}_{W}.jpg", timeout=300))).convert("RGB")
+        try:
+            gw = world_img("BlueMarble_NextGeneration", 4096, "world_bmng")
+            gw.save(out / "globe.jpg", quality=88, optimize=True, progressive=True)
+            gw.resize((2048, 1024), Image.LANCZOS).save(out / "globe-2k.jpg", quality=85, optimize=True)
+            del gw
+            gn = world_img("VIIRS_Black_Marble", 4096, "world_night").convert("L")
+            gn = Image.fromarray(np.clip((np.asarray(gn, np.float32) - 40) * 1.9, 0, 255).astype(np.uint8))
+            gn.save(out / "globe-night.jpg", quality=85, optimize=True)
+            gn.resize((2048, 1024), Image.LANCZOS).save(out / "globe-night-2k.jpg", quality=82, optimize=True)
+            del gn
+        except Exception as ex:
+            report.warn(f"globe textures skipped: {ex}")
+        gc.collect()
 
         # ---- rivers (downstream-oriented polylines in UV) ---------------------
         rivers = []
