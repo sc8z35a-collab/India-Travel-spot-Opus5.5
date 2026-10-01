@@ -17,11 +17,11 @@
      gl/terrain.js  TerrainMap                                                 (C)
      gl/city.js     ScoreCity                                                  (D)
      gl.js          boot + render loop                                         (A) */
-import { $, $$, DATA, reduced, DPR, html, Gov, GL_OK, Input } from "./gl/core.js?v=047c1bb6c8";
-import { DepthHero } from "./gl/hero.js?v=047c1bb6c8";
-import { TerrainMap } from "./gl/terrain.js?v=047c1bb6c8";
-import { ScoreCity } from "./gl/city.js?v=047c1bb6c8";
-import { Ambient } from "./gl/ambient.js?v=047c1bb6c8";
+import { $, $$, DATA, reduced, DPR, html, Gov, GL_OK, Input } from "./gl/core.js?v=23d2c13dfe";
+import { DepthHero } from "./gl/hero.js?v=23d2c13dfe";
+import { TerrainMap } from "./gl/terrain.js?v=23d2c13dfe";
+import { ScoreCity } from "./gl/city.js?v=23d2c13dfe";
+import { Ambient } from "./gl/ambient.js?v=23d2c13dfe";
 
 /* ============================ boot ============================ */
 const scenes = [];
