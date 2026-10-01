@@ -10,3 +10,7 @@
 - 再発防止:
 ```
 
+
+### 2026-10-01 10:47 UTC  quick_shot が 200 秒でタイムアウト（スクショ 0 枚）
+- 状況: 4エージェントが同一サンドボックス（RAM 985MB）。他エージェントの Chromium（console_dump）が同時に走っており空き RAM 81MB → SwiftShader 描画が極端に遅延。
+- 解決: C の提案どおり全重処理を `flock -w 900 /tmp/webapp-heavy.lock <cmd>` で直列化。撮影セクション数を 1 回 2〜3 個に減らす。
