@@ -1,0 +1,18 @@
+# Generated build outputs: on a merge conflict keep the current branch's copy, then REBUILD
+# (python3 -m pipeline.run --only a6). The "ours" driver is registered per clone by
+# pipeline/agent_bootstrap.sh / autosave_ensure.sh:  git config merge.ours.driver true
+dist/index.html          merge=ours
+dist/*/index.html        merge=ours
+dist/assets/site.css     merge=ours
+dist/assets/site.js      merge=ours
+dist/assets/gl.js        merge=ours
+dist/assets/gl/*.js      merge=ours
+dist/sitemap.xml         merge=ours
+reports/**               merge=ours
+*.avif binary
+*.webp binary
+*.jpg  binary
+*.png  binary
+*.hdr  binary
+*.exr  binary
+*.ktx2 binary

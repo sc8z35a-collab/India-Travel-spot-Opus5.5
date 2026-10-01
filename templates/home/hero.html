@@ -1,0 +1,52 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= LOADER ================= #}
+<div class="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <svg class="loader-mandala" viewBox="0 0 200 200">
+      {% for i in range(16) %}<ellipse cx="100" cy="52" rx="10" ry="40" transform="rotate({{ i * 22.5 }} 100 100)"/>{% endfor %}
+      <circle cx="100" cy="100" r="20"/><circle cx="100" cy="100" r="88"/>
+    </svg>
+    <p class="loader-word"><span>नमस्ते</span></p>
+    <p class="loader-count"><b>0</b>%</p>
+  </div>
+</div>
+
+{# ================= HERO ================= #}
+<section class="hero" id="top" aria-label="イントロダクション">
+  <div class="hero-slides">
+    {% for r in regions %}
+    <div class="hero-slide{% if loop.first %} is-active{% endif %}"{% if not loop.first %} aria-hidden="true"{% endif %} data-region="{{ r.id }}" style="--accent:{{ r.theme.accent }}">
+      {{ pic(r.hero, "100vw", "hero-pic", loop.first) }}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="hero-shade"></div>
+  <div class="hero-content wrap">
+    <p class="eyebrow hero-eyebrow"><span class="dot"></span>For university students in Japan</p>
+    <h1 class="hero-title">
+      <span class="line">{{ split("INDIA,") }}</span>
+      <span class="line line-it">{{ split("five journeys.") }}</span>
+    </h1>
+    <p class="hero-ja">大学生のためのインド、5つの旅。<br><span>{{ axes|length }}つの視点 × {{ personas|length }}タイプの旅人で評価した、本当に行くべき場所。</span></p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#finder">30秒でタイプ診断</a>
+      <a class="btn btn-ghost" href="#regions">5つの地域を見る</a>
+    </div>
+  </div>
+  <div class="hero-index wrap" role="group" aria-label="ヒーロー写真の切り替え">
+    {% for r in regions %}
+    <button type="button" class="hi{% if loop.first %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.first else 'false' }}" data-go="{{ loop.index0 }}" style="--accent:{{ r.theme.accent }}" aria-label="{{ r.name }}">
+      <span class="hi-n">{{ '%02d' % r.order }}</span><span class="hi-t">{{ r.short }}</span><i class="hi-bar"><b></b></i>
+    </button>
+    {% endfor %}
+  </div>
+  <div class="hero-credit">{% for r in regions %}<span data-credit="{{ loop.index0 }}"{% if not loop.first %} hidden{% endif %}>{{ credit(r.hero) }}</span>{% endfor %}</div>
+</section>
+
+{# ================= MARQUEE ================= #}
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {% for _ in range(2) %}{% for r in regions %}<span>{{ r.name_en }}</span><i class="mq-pic" style="--accent:{{ r.theme.accent }}">{{ pic(r.hero, "64px") }}</i><span class="mq-ja">{{ r.name }}</span><em>✦</em>{% endfor %}{% endfor %}
+  </div>
+</div>

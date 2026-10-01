@@ -1,0 +1,22 @@
+{# OWNER: Agent C (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-access" id="access">
+  <div class="wrap access-grid">
+    <div>
+      <p class="eyebrow">Getting there</p>
+      <h2 class="h2 reveal-lines">アクセス。</h2>
+      <ul class="access-list">
+        {% for a in r.access %}
+        <li class="reveal"><span class="al-from">{{ a.from }}</span><span class="al-arrow"><i></i></span><span class="al-to">{{ a.to }}</span><span class="al-how">{{ a.how }}</span><span class="al-time">{{ a.time }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <p class="eyebrow">Tips &amp; cautions</p>
+      <h2 class="h2 reveal-lines">知っておきたいこと。</h2>
+      <ul class="tips">
+        {% for t in r.tips %}<li class="tip tip-{{ t.type }} reveal"><span class="tip-i">{{ {'warn': '!', 'info': 'i', 'good': '✓'}[t.type] }}</span><p>{{ t.text }}</p></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>

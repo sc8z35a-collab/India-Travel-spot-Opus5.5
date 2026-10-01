@@ -1,0 +1,40 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= REGIONS (swipe deck) ================= #}
+<section class="regions section" id="regions" aria-labelledby="regions-h">
+  <div class="wrap">
+    <p class="eyebrow">03 — Five journeys</p>
+    <div class="spots-head">
+      <h2 class="h2 reveal-lines" id="regions-h">{{ regions|length }}つの旅先を、<br><em>スワイプ</em>で。</h2>
+      <div class="deck-nav" role="group" aria-label="地域カードの移動">
+        <button type="button" class="deck-prev" aria-label="前の地域" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="deck-next" aria-label="次の地域"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="deck" tabindex="0" role="region" aria-label="{{ regions|length }}つの地域カード（横にスワイプ・左右キーで移動）">
+    {% for r in regions %}{% set an = analysis.regions[r.id] %}
+    <article class="card" id="region-{{ r.id }}" aria-label="{{ '%02d' % r.order }} {{ r.name }}" style="--accent:{{ r.theme.accent }};--deep:{{ r.theme.deep }}">
+      <a class="card-link" href="{{ root }}{{ r.id }}/index.html" aria-label="{{ r.name }}の詳しいガイドへ"></a>
+      <div class="card-img">{{ pic(r.hero, "(orientation: landscape) %dvw, 88vw" % (34 * [1, assets[r.hero].ratio / 0.85]|max)) }}<span class="card-num">{{ '%02d' % r.order }}<small>/{{ '%02d' % regions|length }}</small></span></div>
+      <div class="card-body">
+        <p class="card-en">{{ r.name_en }}</p>
+        <h3 class="card-ja">{{ r.name }}</h3>
+        <p class="card-catch">{{ r.catch }}</p>
+        <div class="card-score">
+          <p><b>{{ an.balanced }}</b><small>/100</small></p>
+          <div class="card-radar">{{ charts.radar[r.id]|safe }}</div>
+        </div>
+        <ul class="card-chips">
+          {% for s in an.strong %}<li class="up">▲ {{ axes_map[s].short }} {{ r.scores[s].v }}</li>{% endfor %}
+          <li class="down">▼ {{ axes_map[an.weak].short }} {{ r.scores[an.weak].v }}</li>
+        </ul>
+        <p class="card-for"><span>こんな人に</span>{{ r.good_for[0] }}</p>
+        <p class="card-meta"><span>{{ (r.keyfacts|selectattr('k', 'equalto', 'ベストシーズン')|map(attribute='v')|first) or r.keyfacts[1].v }}</span><span>{{ r.days[0] }}〜{{ r.days[1] }}日</span><span>{{ yen(an.daily_jpy[0]) }}〜/日</span></p>
+        <span class="card-cta">詳しいガイドを読む <i>→</i></span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="deck-dots wrap" aria-hidden="true">{% for r in regions %}<i data-i="{{ loop.index0 }}" style="--accent:{{ r.theme.accent }}"{% if loop.first %} class="on"{% endif %}></i>{% endfor %}</div>
+</section>

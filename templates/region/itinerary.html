@@ -1,0 +1,22 @@
+{# OWNER: Agent C (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{% set an = analysis.regions[r.id] %}
+<section class="section rp-itin" id="itinerary">
+  <div class="wrap itin-grid">
+    <div class="itin-head">
+      <p class="eyebrow">Model itinerary</p>
+      <h2 class="h2 reveal-lines">{{ r.itinerary|length }}日間の<br>モデルプラン。</h2>
+      <p class="body reveal">大学生の個人旅行を想定した、無理のない日程です。</p>
+      <div class="budget-box reveal">
+        <p class="bb-l">現地費用の目安</p>
+        <p class="bb-v">{{ yen(an.trip_jpy[0]) }}<span>〜</span>{{ yen(an.trip_jpy[1]) }}</p>
+        <p class="bb-s">{{ r.days[0] }}〜{{ r.days[1] }}日・宿／食事／移動／入場料（航空券除く）<br>1日 ₹{{ "{:,}".format(r.budget_inr[0]) }}〜{{ "{:,}".format(r.budget_inr[1]) }}（{{ yen(an.daily_jpy[0]) }}〜{{ yen(an.daily_jpy[1]) }}）</p>
+      </div>
+    </div>
+    <ol class="timeline">
+      {% for d in r.itinerary %}
+      <li class="tl reveal"><span class="tl-day">{{ d.day }}</span><h3>{{ d.title }}</h3><p>{{ d.text }}</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>

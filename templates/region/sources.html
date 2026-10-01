@@ -1,0 +1,9 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-sources">
+  <div class="wrap">
+    <p class="eyebrow">Sources</p>
+    <ul class="sources">{% for s in r.sources %}<li><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.label }} ↗</a></li>{% endfor %}</ul>
+    <p class="checked">情報確認日: {{ site.checked }}。最新情報は必ず公式サイトで確認してください。</p>
+  </div>
+</section>

@@ -1,3 +1,4 @@
+/* ==== site.css ==== */
 /* ==========================================================================
    INDIA — 5 JOURNEYS
    Editorial dark theme · warm saffron accents · cinematic photography
@@ -648,6 +649,7 @@ a.src:hover { color: var(--saffron); }
   .marquee-track { animation: none !important; }   /* a 1-iteration marquee just jumped once and froze mid-way */
 }
 
+/* ==== mobile.css ==== */
 /* ==========================================================================
    MOBILE-FIRST LAYER  (target: smartphones only, 360–430px)
    Loaded after site.css and overrides desktop-oriented rules.
@@ -1113,6 +1115,7 @@ input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top:
 .vs-pick .chips { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; gap: 6px; }
 .vs-pick .chip { padding: 8px 13px; font-size: 13px; min-height: 40px; }
 
+/* ==== landscape.css ==== */
 /* ==========================================================================
    LANDSCAPE FULL-SCREEN PHONE LAYER  (the ONLY target device)
    Flagship Android held sideways: ~800–1000 × 360–450 CSS px, DPR 3+.
@@ -1378,6 +1381,7 @@ input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top:
   .heat-head span { font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
 }
 
+/* ==== polish.css ==== */
 /* =====================================================================
    POLISH LAYER — QA round L2 (landscape flagship Android, 915×412 CSS px)
    Loaded last. Fixes layout / clipping / overlap bugs found in the
@@ -1626,6 +1630,7 @@ input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; }
 /* context lost: controls that only steer the 3D camera are meaningless */
 .gl-lost .gl-only, .gl-lost .map3d-reset { display: none !important; }
 
+/* ==== graphics.css ==== */
 /* =====================================================================
    GRAPHICS LAYER — "Mughal night" visual upgrade
    Loaded LAST. Pure presentation: depth (layered shadows), glass &
@@ -2040,3 +2045,15 @@ input[type=range]::-webkit-slider-thumb { background: radial-gradient(circle at 
 
 /* ambient canvas not painted yet → never flash the UA white behind a transparent body */
 html { background: #0d0b0a; }
+
+/* ==== fx-a-core.css ==== */
+/* fx-a-core.css — OWNER: Agent A. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-b-photo.css ==== */
+/* fx-b-photo.css — OWNER: Agent B. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-c-world.css ==== */
+/* fx-c-world.css — OWNER: Agent C. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-d-data.css ==== */
+/* fx-d-data.css — OWNER: Agent D. Loaded after graphics.css (last layer). Only this agent edits this file. */

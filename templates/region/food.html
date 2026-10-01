@@ -1,0 +1,12 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-food" id="food">
+  <div class="wrap">
+    <p class="eyebrow">Eat</p>
+    <h2 class="h2 reveal-lines">この土地で、<br>食べるべきもの。</h2>
+    {% if r.food_photo is defined and r.food_photo %}<div class="food-hero">{{ pic(r.food_photo, "(orientation: landscape) 60vw, 100vw", "", false, true) }}{{ credit(r.food_photo) }}</div>{% endif %}
+    <ul class="food-list">
+      {% for f in r.foods %}<li class="reveal"><span class="fl-n">{{ '%02d' % loop.index }}</span><h3>{{ f.name }}</h3><p>{{ f.desc }}</p></li>{% endfor %}
+    </ul>
+  </div>
+</section>

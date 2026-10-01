@@ -1,0 +1,13 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-gallery" id="gallery">
+  <div class="wrap">
+    <p class="eyebrow">Gallery</p>
+    <div class="gallery">
+      {% for g in r.gallery %}
+      <button type="button" class="g-item" data-lightbox="{{ g }}" aria-haspopup="dialog" aria-label="写真を拡大: {{ assets[g].alt }}">{{ pic(g, "(orientation: landscape) 46vw, 100vw" if loop.index <= 2 else "(orientation: landscape) %dvw, 50vw" % (24 * [1, assets[g].ratio / 1.3]|max)) }}<span class="g-zoom" aria-hidden="true"></span></button>
+      {% endfor %}
+    </div>
+    <p class="gallery-credits">{% for g in r.gallery %}{{ credit(g) }}{% endfor %}</p>
+  </div>
+</section>

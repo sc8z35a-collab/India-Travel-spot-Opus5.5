@@ -1,0 +1,13 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="rp-hero">
+  {{ pic(r.hero, "100vw", "rp-bg", true, true) }}
+  <div class="ch-hero-shade"></div>
+  <div class="rp-hero-in wrap">
+    <nav class="crumbs" aria-label="パンくず"><a href="{{ root }}index.html">TOP</a><span>/</span><a href="{{ root }}index.html#regions">5 JOURNEYS</a><span>/</span><span aria-current="page">{{ r.name }}</span></nav>
+    <p class="ch-num"><span>{{ '%02d' % r.order }}</span> / {{ '%02d' % regions|length }} — {{ r.state }}</p>
+    <h1 class="ch-title rp-title"><span class="ch-en">{{ split(r.name_en) }}</span><span class="ch-ja">{{ r.name }}</span></h1>
+    <p class="ch-catch">{{ r.catch }}</p>
+  </div>
+  {{ credit(r.hero) }}
+  </section>

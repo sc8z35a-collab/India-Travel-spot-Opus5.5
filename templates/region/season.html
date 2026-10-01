@@ -1,0 +1,16 @@
+{# OWNER: Agent C (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-season" id="season">
+  <div class="wrap">
+    <p class="eyebrow">When to go</p>
+    <h2 class="h2 reveal-lines">季節ごとの<br>おすすめ度。</h2>
+    <div class="season-bars" role="list" aria-label="月別のおすすめ度（5段階）">
+      {% for v in r.months %}{% set m = loop.index %}
+      <div class="sb{% if m in holiday_months %} hol{% endif %}{% if v == 5 %} top{% endif %}" role="listitem" aria-label="{{ m }}月 おすすめ度{{ v }}" style="--v:{{ v }};--m:{{ loop.index0 }};--heat:{{ charts.season[r.id][loop.index0] }}">
+        <b>{{ v }}</b><i></i><span>{{ m }}月</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="sb-legend"><i></i>大学の長期休み（春休み・GW・夏休み・冬休み）の目安</p>
+  </div>
+</section>

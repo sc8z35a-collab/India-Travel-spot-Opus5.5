@@ -1,0 +1,12 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-fit" id="fit">
+  <div class="wrap">
+    <p class="eyebrow">Is it for you?</p>
+    <h2 class="h2 reveal-lines">向いている人、<br><em>向いていない人</em>。</h2>
+    <div class="fit-grid">
+      <div class="fit fit-yes reveal"><h3><i>◎</i>こんな人におすすめ</h3><ul>{% for t in r.good_for %}<li>{{ t }}</li>{% endfor %}</ul></div>
+      <div class="fit fit-no reveal"><h3><i>△</i>こんな人は要注意</h3><ul>{% for t in r.not_for %}<li>{{ t }}</li>{% endfor %}</ul></div>
+    </div>
+  </div>
+</section>

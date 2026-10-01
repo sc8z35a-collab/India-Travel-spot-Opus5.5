@@ -1,0 +1,57 @@
+{# OWNER: Agent C (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= MAP ================= #}
+<section class="mapsec section" id="map">
+  <div class="wrap mapsec-grid">
+    <div class="sec-head">
+      <p class="eyebrow">02 — The map</p>
+      <h2 class="h2 reveal-lines">北はヒマラヤ、<br>南はアラビア海。</h2>
+      <p class="body reveal">実際の標高データから立ち上げたインド亜大陸。5つの目的地はデリーを起点に国内線や特急でつながります。<span class="gl-only"><b class="hint-tap">光の柱をタップ</b>するとカメラが飛び、概要が開きます。横にドラッグで回転。</span><span class="gl-no"><b class="hint-tap">ピンをタップ</b>すると概要が開きます。</span></p>
+      <ol class="map-list" aria-label="{{ regions|length }}つの目的地">
+        {% for r in regions %}
+        <li><button type="button" data-pin="{{ r.id }}" aria-haspopup="dialog" style="--accent:{{ r.theme.accent }}"><span>{{ '%02d' % r.order }}</span><b>{{ r.name }}</b><small>{{ r.state }}</small><i aria-hidden="true"></i></button></li>
+        {% endfor %}
+      </ol>
+    </div>
+    <div class="map3d" role="region" aria-label="インドの3D地形図と{{ regions|length }}つの目的地">
+      <div class="map-wrap">
+      <svg class="map" viewBox="0 0 {{ map.w }} {{ map.h }}" role="group" aria-label="インドの地図と{{ regions|length }}つの目的地">
+        <defs>
+          <linearGradient id="mapfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a221c"/><stop offset="1" stop-color="#1a1512"/></linearGradient>
+        </defs>
+        <g class="map-land">{% for d in map.paths %}<path d="{{ d }}"/>{% endfor %}</g>
+        <g class="map-routes">
+          {% for p in map.pins %}{% if p.id != 'delhi-agra' %}
+          <path class="route" d="M{{ map.delhi[0] }},{{ map.delhi[1] }} Q{{ (map.delhi[0] + p.x) / 2 + (p.y - map.delhi[1]) * 0.25 }},{{ (map.delhi[1] + p.y) / 2 - (p.x - map.delhi[0]) * 0.25 }} {{ p.x }},{{ p.y }}"/>
+          {% endif %}{% endfor %}
+        </g>
+        <g class="map-pins">
+          {% for p in map.pins %}{% set r = region_map[p.id] %}
+          <g class="pin" data-pin="{{ p.id }}" transform="translate({{ p.x }},{{ p.y }})" style="--accent:{{ r.theme.accent }}" tabindex="0" role="button" aria-label="{{ p.label }}の概要を開く">
+            <circle class="pin-hit" r="34"/>
+            <circle class="pin-pulse" r="16"/><circle class="pin-dot" r="8"/>
+            {% set left = (p.x < map.delhi[0] - 8 and p.y < map.delhi[1] + 90) %}<text class="pin-label" x="{{ -18 if left else 18 }}" y="8" text-anchor="{{ 'end' if left else 'start' }}">{{ r.short }}</text>
+          </g>
+          {% endfor %}
+        </g>
+      </svg>
+      </div>
+      <div class="map3d-labels">
+        {% for r in regions %}
+        <button type="button" class="map3d-label" data-pin="{{ r.id }}" aria-haspopup="dialog" style="--accent:{{ r.theme.accent }}" aria-label="{{ r.name }}の概要を開く"><i></i><span class="ml-n">{{ '%02d' % r.order }}</span><b>{{ r.short }}</b></button>
+        {% endfor %}
+        <p class="map3d-tokyo" aria-hidden="true"><span>TOKYO</span>直行便 約9〜10時間</p>
+      </div>
+      <svg class="compass" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="44" class="cp-ring"/><circle cx="50" cy="50" r="36" class="cp-ring2"/>
+        {% for i in range(16) %}<line x1="50" y1="{{ 8 if i % 4 == 0 else 11 }}" x2="50" y2="14" transform="rotate({{ i * 22.5 }} 50 50)" class="cp-tick"/>{% endfor %}
+        <path d="M50 12 56 50 50 56 44 50Z" class="cp-n"/><path d="M50 88 56 50 50 44 44 50Z" class="cp-s"/>
+        <path d="M12 50 50 45 55 50 50 55Z" class="cp-s" opacity=".6"/><path d="M88 50 50 45 45 50 50 55Z" class="cp-s" opacity=".6"/>
+        <circle cx="50" cy="50" r="3.2" class="cp-c"/><text x="50" y="7" text-anchor="middle" class="cp-t">N</text>
+      </svg>
+      <button type="button" class="map3d-reset" aria-label="全体表示に戻す">全体</button>
+      <p class="map3d-hint" aria-hidden="true"><i></i>ドラッグで回転 · ピンをタップ</p>
+      <p class="map3d-src">Relief: SRTM/GMTED via AWS Terrain Tiles · Natural Earth</p>
+    </div>
+  </div>
+</section>
