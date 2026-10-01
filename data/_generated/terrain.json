@@ -1,37 +1,37 @@
 {
   "side_deg": 33.0,
-  "max_elev": 6907.025598993399,
+  "max_elev": 8137.02880859375,
   "height_scale_m": 9000,
   "pins": [
     {
       "id": "delhi-agra",
       "u": 0.3514,
       "v": 0.2845,
-      "elev": 216.8
+      "elev": 217.7
     },
     {
       "id": "jaipur",
       "u": 0.3115,
       "v": 0.3361,
-      "elev": 460.2
+      "elev": 434.5
     },
     {
       "id": "varanasi",
       "u": 0.5143,
       "v": 0.3842,
-      "elev": 74.8
+      "elev": 81.0
     },
     {
       "id": "kerala",
       "u": 0.3247,
       "v": 0.8506,
-      "elev": 2.6
+      "elev": 8.3
     },
     {
       "id": "ladakh",
       "u": 0.3618,
       "v": 0.1164,
-      "elev": 3656.1
+      "elev": 3443.0
     }
   ],
   "delhi": [
@@ -42,5 +42,5 @@
     1,
     -0.35
   ],
-  "source": "AWS Terrain Tiles (SRTM/GMTED/ETOPO, open data) + Natural Earth"
+  "source": "AWS Terrain Tiles (SRTM/GMTED/ETOPO, open data) + NASA Blue Marble / Black Marble (GIBS, public domain) + Natural Earth"
 }
