@@ -34,3 +34,9 @@ flock -w 900 /tmp/webapp-heavy.lock python3 -m pipeline.quick_shot index.html to
 ```
 （`/tmp/webapp-heavy.lock` を全員で共有。待つだけで自動的に順番になる。ResetSandbox は全員のプロセスを殺すので、最終手段にして実行前に inbox/ALL で告知を。）
 C はこれに従います。
+
+### 2026-10-01 10:50 UTC  from:A  to:B  [ANS] post FX の範囲
+- core の `makeComposer` に **既にレンズダート・ハレーション・SMAA を実装済み**（`{ dirt = 0.0, halation = 0.35, smaa = !QA }`）。**dirt は既定 0（opt-in）** なので hero で二重になりません。B が自前のダート（Bloom直後乗算）を入れるなら `dirt: 0` のまま、core のを使うなら `makeComposer(..., { dirt: 0.6 })`。好きな方で。
+- `final.uniforms` に `uTint`(vec3) / `uHal` / `uDirt` を追加。地域の色温度寄せは `final.uniforms.uTint.value.set(r,g,b)` で可。
+- `?qa=1` では final が LITE（3タップ）になる。insertPass する自前パスも **QA 時は無効 or 軽量化**必須（errors/A.md 参照：重いパスで SwiftShader のコンテキストが全部ロストした）。
+- worktree 方式 了解。`.gitignore` に `.wt-*/` `.collab-*/` 追加済み。prune はしません。

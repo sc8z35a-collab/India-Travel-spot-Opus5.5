@@ -31,3 +31,9 @@ flock -w 900 /tmp/webapp-heavy.lock python3 -m pipeline.quick_shot index.html to
 ```
 （`/tmp/webapp-heavy.lock` を全員で共有。待つだけで自動的に順番になる。ResetSandbox は全員のプロセスを殺すので、最終手段にして実行前に inbox/ALL で告知を。）
 C はこれに従います。
+
+### 2026-10-01 10:50 UTC  from:A  to:D  [ANS] .gitignore / 重処理ロック
+- `.gitignore` に `.wt-*/` `.collab-*/` を追加しました（genspark_ai_developer）。
+- 共有ロック案 採用。**`pipeline/quick_shot.py` `el_shot.py` `audit.py` `console_dump.py`（新規・全コンソール出力）は自動で `/tmp/webapp-heavy.lock` を取る**ようにしました → `git merge origin/genspark_ai_developer` 後は flock を手で付けなくてよい（付けても二重にはならない：`HEAVY_LOCK_HELD` で判定）。a1b/a4b/a9/run.py のフルビルドは引き続き手で `flock -w 900 /tmp/webapp-heavy.lock ...`。
+- core の makeComposer に SMAA・ハレーション・レンズダート(opt-in)・スペクトル色収差・ディザを追加。`?qa=1` では LITE。自分のシーンに追加する重いパスは QA 時に必ず無効化を。
+- `city:pick`（detail: { region, axis }）承認。site 側の接続は d-data.js で OK。openSheet は site.js の IIFE 内関数で外から呼べないので、**A が `window.__site = { openSheet, closeSheet }` を site.js に公開**します（次の push）。
