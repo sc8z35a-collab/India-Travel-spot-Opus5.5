@@ -20,11 +20,11 @@ import { THREE, DATA, ROOT, reduced, QA, DPR, html, Gov, clamp, lerp, ease, ease
 // ap: aperture (max CoC as fraction of frame) · fog/mist: aerial veil strengths · mistY: horizon band
 // shimmer: heat haze on the far plane · fx: particle mode · rays: god-ray gain
 const LOOK = {
-  "delhi-agra": { sun: [0.58, 0.93], haze: "#ffd3a1", fog: 0.34, mist: 0.30, mistY: 0.50, shimmer: 1.0, focus: 0.10, ap: 0.0042, fx: 0, rays: 1.00, grade: [0.06, 0.05, 0.08] },
-  jaipur:       { sun: [0.20, 0.97], haze: "#ffc6b4", fog: 0.14, mist: 0.10, mistY: 0.40, shimmer: 0.6, focus: 0.22, ap: 0.0036, fx: 1, rays: 0.70, grade: [0.05, 0.03, 0.06] },
-  varanasi:     { sun: [0.70, 0.92], haze: "#ffb874", fog: 0.28, mist: 0.36, mistY: 0.56, shimmer: 0.8, focus: 0.35, ap: 0.0040, fx: 2, rays: 1.05, grade: [0.07, 0.04, 0.03] },
-  kerala:       { sun: [0.80, 0.99], haze: "#e2f3dc", fog: 0.22, mist: 0.30, mistY: 0.48, shimmer: 0.3, focus: 0.16, ap: 0.0034, fx: 3, rays: 0.75, grade: [0.03, 0.06, 0.05] },
-  ladakh:       { sun: [0.13, 1.02], haze: "#d4e8ff", fog: 0.06, mist: 0.05, mistY: 0.55, shimmer: 0.0, focus: 0.55, ap: 0.0030, fx: 4, rays: 0.55, grade: [0.03, 0.05, 0.08] },
+  "delhi-agra": { sun: [0.58, 0.93], haze: "#ffd3a1", fog: 0.16, mist: 0.20, mistY: 0.50, shimmer: 1.0, focus: 0.10, ap: 0.0030, fx: 0, rays: 1.00, grade: [0.06, 0.05, 0.08] },
+  jaipur:       { sun: [0.20, 0.97], haze: "#ffc6b4", fog: 0.14, mist: 0.10, mistY: 0.40, shimmer: 0.6, focus: 0.22, ap: 0.0026, fx: 1, rays: 0.70, grade: [0.05, 0.03, 0.06] },
+  varanasi:     { sun: [0.70, 0.92], haze: "#ffb874", fog: 0.18, mist: 0.26, mistY: 0.56, shimmer: 0.8, focus: 0.35, ap: 0.0030, fx: 2, rays: 1.05, grade: [0.07, 0.04, 0.03] },
+  kerala:       { sun: [0.80, 0.99], haze: "#e2f3dc", fog: 0.14, mist: 0.22, mistY: 0.48, shimmer: 0.3, focus: 0.16, ap: 0.0026, fx: 3, rays: 0.75, grade: [0.03, 0.06, 0.05] },
+  ladakh:       { sun: [0.13, 1.02], haze: "#d4e8ff", fog: 0.06, mist: 0.05, mistY: 0.55, shimmer: 0.0, focus: 0.62, ap: 0.0022, fx: 4, rays: 0.55, grade: [0.03, 0.05, 0.08] },
 };
 const DEFAULT_LOOK = LOOK["delhi-agra"];
 const lookFor = (photoId) => {
@@ -342,7 +342,7 @@ const BOKEH_FS = `
     float rim = smoothstep(.62, .88, d) * body;
     float dR = hexd(q * 1.03), dB = hexd(q * .97);
     vec3 fringe = vec3(1. - smoothstep(.86, .9, dR), body, 1. - smoothstep(.86, .9, dB));
-    float a = (body * .22 + rim * .55) * vA;
+    float a = (body * .12 + rim * .32) * vA;
     if (a < .002) discard;
     vec3 c = mix(uCol, vec3(1., .94, .82), fract(vS * 7.1) * .55) * fringe;
     gl_FragColor = vec4(c * a * 1.25, 1.);
@@ -430,7 +430,7 @@ class DepthHero {
     return pts;
   }
   makeBokeh(n) {
-    const g = this.geo(n, () => 0.06 + Math.random() * 0.11, () => Math.random());
+    const g = this.geo(n, () => 0.018 + Math.pow(Math.random(), 2) * 0.05, () => Math.random());
     const u = { uTime: this.u.uTime, uScale: { value: 1 }, uH: { value: 1 }, uW: { value: 1 }, uZ0: { value: 0 }, uZ1: { value: 1 },
                 uFade: this.u.uFade, uCol: { value: col(this.items[0].accent) } };
     const pts = new THREE.Points(g, addBlend(new THREE.ShaderMaterial({ uniforms: u, vertexShader: BOKEH_VS, fragmentShader: BOKEH_FS })));
