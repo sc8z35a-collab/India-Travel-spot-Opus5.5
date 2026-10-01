@@ -145,12 +145,12 @@ const HERO_FS = `
     c += mix(-grade * vec3(1., .4, -.6) * .6, grade * (acc - .4), smoothstep(.15, .8, L)) * .5;
 
     // film-burn dissolve seam: white-hot core → accent → charred ember rim (HDR → bloom)
-    float active = step(.001, uP) * step(uP, .999);
+    float dActive = step(.001, uP) * step(uP, .999);
     float edge = m * (1. - m) * 4.;
     float flick = .75 + .5 * n(vUv * 60. + uTime * 8.);
     vec3 burn = mix(acc * vec3(1.2, .55, .25), vec3(1.6, 1.35, 1.05), smoothstep(.55, 1., edge));
-    c += burn * pow(edge, 2.2) * 3.4 * flick * active;
-    c *= 1. - smoothstep(.02, .3, m) * (1. - smoothstep(.3, .6, m)) * .55 * active;   // char just behind the seam
+    c += burn * pow(edge, 2.2) * 3.4 * flick * dActive;
+    c *= 1. - smoothstep(.02, .3, m) * (1. - smoothstep(.3, .6, m)) * .55 * dActive;   // char just behind the seam
 
     // god-ray emitter mask in alpha: bright, far, upper pixels (read by the RAYS pass, then discarded)
     float emit = smoothstep(.55, .95, lum) * pow(far, 2.5) * smoothstep(.25, .75, vUv.y);
@@ -337,7 +337,6 @@ const BOKEH_FS = `
   float hexd(vec2 p){ p = abs(p); return max(p.x * .866 + p.y * .5, p.y); }
   void main(){
     vec2 q = (gl_PointCoord - .5) * 2.;
-    float cr = cos(vS * 6.), sr = sin(vS * 6.); q = vec2(cr * q.x - sr * q.y, sr * q.x + cr * q.y) * .0 + q;
     float d = hexd(q);
     float body = 1. - smoothstep(.86, .9, d);
     float rim = smoothstep(.62, .88, d) * body;
@@ -453,7 +452,7 @@ class DepthHero {
     this.mesh.scale.set(this.W * 1.16, H * 1.16, 1);
     this.u.uStr.value = H * 0.24; this.u.uAspect.value = w / h; this.rays.uniforms.uAspect.value = w / h;
     const scale = (h * DPR) / (2 * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))) * H;
-    for (const [pts, z0, z1] of [[this.fxA, 0.35, 2.3], [this.fxB, 0.35, 2.3], [this.dust, 0.05, 1.6], [this.bokeh, 1.9, 2.6]]) {
+    for (const [pts, z0, z1] of [[this.fxA, 0.3, 1.9], [this.fxB, 0.3, 1.9], [this.dust, 0.1, 1.3], [this.bokeh, 1.7, 2.45]]) {
       const u = pts.material.uniforms;
       u.uScale.value = scale; u.uH.value = H; u.uW.value = this.W * 1.25; u.uZ0.value = z0; u.uZ1.value = z1;
     }
