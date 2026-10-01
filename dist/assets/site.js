@@ -800,6 +800,9 @@
     const sp = $(".spots"); if (sp) flow(sp, $$(".spot", sp));
   }
 
+  // shared hooks for the per-agent modules (src/js/site/*.js) — e.g. D's city:pick opens the drawer
+  window.__site = { openSheet, closeSheet, lock, trap, vibrate, emit, esc, reduced, R, AX, DATA, ROOT, landscape };
+
   const boot = () => {
     finishLoader();
     try { initMotion(); } catch (e) { console.warn("[motion] disabled", e); }

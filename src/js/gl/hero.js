@@ -376,7 +376,7 @@ class DepthHero {
       uTexelA: { value: new THREE.Vector2(1 / 1920, 1 / 1440) }, uTexelB: { value: new THREE.Vector2(1 / 1920, 1 / 1440) },
       uDTex: { value: new THREE.Vector2(1 / 1024, 1 / 768) },
       uP: { value: 0 }, uStr: { value: 0.3 }, uTime: { value: 0 }, uFade: { value: 0 }, uScroll: { value: 0 }, uAspect: { value: 2 },
-      uTaps: { value: QA ? 6 : 16 },
+      uTaps: { value: QA ? 4 : 16 },
       uAccA: { value: col(items[0].accent) }, uAccB: { value: col(items[0].accent) },
       uHazeA: { value: col(L.haze) }, uHazeB: { value: col(L.haze) },
       uSunA: { value: v2(L.sun) }, uSunB: { value: v2(L.sun) },
@@ -396,7 +396,7 @@ class DepthHero {
     Object.assign(this, makeComposer(this.renderer, this.scene, this.camera, { bloom: [0.6, 0.72, 0.84] }));
     this.final.uniforms.uFlare.value = 1;
     this.rays = new ShaderPass(RAYS);
-    this.rays.uniforms.uTaps.value = QA ? 24 : 64;
+    this.rays.uniforms.uTaps.value = QA ? 12 : 64;   // SwiftShader watchdog: keep QA taps tiny
     this.composer.insertPass(this.rays, 1);                       // RenderPass → RAYS → Bloom → Output → Final
     this.dirtU = dirtyBloom(this.bloomPass, makeDirt());
     this.focusT = { a: 1, b: L.focus, t0: performance.now(), dur: 2.6 };   // opening rack-focus pull
