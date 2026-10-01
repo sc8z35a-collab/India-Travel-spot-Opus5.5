@@ -106,11 +106,16 @@ const FINAL_SHADER = {
       vec2 c = vUv - .5; float r2 = dot(c, c);
       // spectral CA: 5 taps from red (outer) to violet (inner), weights sum to 1 per channel
       vec2 off = c * r2 * .022 * uCA;
+    #ifdef LITE
+      vec3 col = vec3(texture2D(tDiffuse, vUv + off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - off).b);
+    #else
       vec3 col = texture2D(tDiffuse, vUv + off).rgb * vec3(.55, .05, 0.)
                + texture2D(tDiffuse, vUv + off * .5).rgb * vec3(.35, .30, 0.)
                + texture2D(tDiffuse, vUv).rgb * vec3(.10, .30, .10)
                + texture2D(tDiffuse, vUv - off * .5).rgb * vec3(0., .30, .35)
                + texture2D(tDiffuse, vUv - off).rgb * vec3(0., .05, .55);
+    #endif
+    #ifndef LITE
       if (uFlare > 0.) {                     // anamorphic streak: horizontal smear of the brightest pixels
         vec3 st = vec3(0.);
         for (int i = -6; i <= 6; i++) { if (i == 0) continue; float o = float(i) * .045; vec3 t = texture2D(tDiffuse, vec2(vUv.x + o, vUv.y)).rgb;
@@ -129,6 +134,7 @@ const FINAL_SHADER = {
         vec3 dirt = texture2D(tDirt, vUv * vec2(uRes.x / uRes.y, 1.) * .55).rgb;
         col += dirt * (luma(glow) * 3.2 + .015) * uDirt;
       }
+    #endif
       col *= uTint;
       col *= 1. - smoothstep(.12, .62, r2 * 1.35) * uVig;
       // grain: strongest in the mid-tones (as on film), invisible in pure black / white
@@ -209,6 +215,8 @@ function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88], smaa 
   let smaaPass = null;
   if (smaa) { smaaPass = new SMAAPass(Math.max(1, size.x * DPR), Math.max(1, size.y * DPR)); composer.addPass(smaaPass); }
   const final = new ShaderPass(FINAL_SHADER);
+  // ?qa=1 (SwiftShader / CPU): ~21 taps per pixel tripped the GPU watchdog → context lost. LITE = 3 taps.
+  if (QA) { final.material.defines = { ...(final.material.defines || {}), LITE: 1 }; final.material.needsUpdate = true; }
   final.uniforms.tDirt.value = dirtTexture(); final.uniforms.uDirt.value = dirt; final.uniforms.uHal.value = halation;
   composer.addPass(final);
   return { composer, bloomPass, final, smaaPass };
