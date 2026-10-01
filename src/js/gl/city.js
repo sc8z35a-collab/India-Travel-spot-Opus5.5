@@ -202,8 +202,8 @@ const SPARK_F = `uniform vec3 uCol; varying float vA;
   void main(){ vec2 d = gl_PointCoord - .5; float r = length(d); float a = (1. - smoothstep(0., .5, r)); a = a * a;
     gl_FragColor = vec4(uCol * a * vA * 3., 1.); }`;
 const BACK_F = `varying vec3 vP; uniform vec3 uA, uB;
-  void main(){ vec3 d = normalize(vP); float h = d.y; float g = exp(-pow(max(h + .05, 0.) * 3.2, 2.)) ;
-    gl_FragColor = vec4(mix(uB, uA, g * (1. - smoothstep(-.4, -.05, -abs(d.x) * .2 - .1) * .2)), 1.); }`;
+  void main(){ vec3 d = normalize(vP); float g = exp(-pow(max(d.y + .05, 0.) * 3.2, 2.)) * (.75 + .25 * max(-d.z, 0.));
+    gl_FragColor = vec4(mix(uB, uA, g), 1.); }`;
 
 class ScoreCity {
   constructor(host) {
@@ -214,7 +214,6 @@ class ScoreCity {
     this.renderer = makeRenderer(canvas);
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.transmissionResolutionScale = QA ? 0.5 : 1;
     this.scene = new THREE.Scene(); this.scene.background = col("#0b0807");
     this.scene.fog = new THREE.Fog(0x0b0807, 16, 34);
     const pm = new THREE.PMREMGenerator(this.renderer);
@@ -238,7 +237,17 @@ class ScoreCity {
     new IntersectionObserver((es) => es.forEach((e) => { this.visible = e.isIntersecting; if (e.isIntersecting && !this.t0) this.t0 = performance.now(); }), { threshold: 0.15 }).observe(host);
     document.addEventListener("axis:select", (e) => { if (e.detail !== this.sel) { this.sel = e.detail; this.selT = this.t; } });
     this.bindInput();
+    // canvas labels were drawn before the webfonts arrived → redraw once they are ready
+    document.fonts?.ready.then(() => this.relabel()).catch(() => {});
     this.ready = true;
+  }
+
+  relabel() {
+    const swap = (s, t) => { const old = s.material.map; s.material.map = t; s.material.needsUpdate = true; old?.dispose(); };
+    this.plaques.forEach((s, j) => { const n = plaque(DATA.regions[j].short, DATA.regions[j].accent); swap(s, n.material.map); s.userData.aspect = n.userData.aspect; s.scale.set(0.3 * n.userData.aspect, 0.3, 1); });
+    this.axisLabels.forEach((s, i) => swap(s, axisTag(DATA.axes[i]).material.map));
+    this.cols.forEach((c) => swap(c.cap, engraving(c.v)));
+    this.vals.forEach((o) => (o.shown = -1));
   }
 
   build() {
@@ -291,8 +300,11 @@ class ScoreCity {
     const ix0 = x0 - sx / 2, ix1 = x0 + (A.length - 0.5) * sx, iz0 = z0 - sz / 2, iz1 = z0 + (Rg.length - 0.5) * sz;
     for (let i = 0; i <= A.length; i++) strip(0.012, iz1 - iz0, ix0 + i * sx, (iz0 + iz1) / 2, 0.003, 0.004);
     for (let j = 0; j <= Rg.length; j++) strip(ix1 - ix0, 0.012, (ix0 + ix1) / 2, iz0 + j * sz, 0.003, 0.004);
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(1, 0.012, 6, 4), new THREE.MeshBasicMaterial({ color: col("#ffb35c").multiplyScalar(1.4), toneMapped: false }));
-    rim.rotation.set(Math.PI / 2, 0, Math.PI / 4); rim.scale.set(PW / Math.SQRT2 + 0.01, PD / Math.SQRT2 + 0.01, 1); rim.position.y = -PH - 0.002; S.add(rim);
+    // thin glowing seam where the plinth meets the floor (warm under-light)
+    const rimM = new THREE.MeshBasicMaterial({ color: col("#ffb35c").multiplyScalar(1.4), toneMapped: false });
+    [[PW + 0.02, 0.02, 0, PD / 2], [PW + 0.02, 0.02, 0, -PD / 2], [0.02, PD + 0.02, PW / 2, 0], [0.02, PD + 0.02, -PW / 2, 0]].forEach(([w, d, x, z]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.014, d), rimM); m.position.set(x, -PH + 0.007, z); S.add(m);
+    });
     const rose = new THREE.CylinderGeometry(0.09, 0.09, 0.01, 8);
     [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([a, b]) => { const m = new THREE.Mesh(rose, gold); m.position.set(a * (PW / 2 - 0.17), 0.006, b * (PD / 2 - 0.17)); S.add(m); });
 
@@ -320,7 +332,7 @@ class ScoreCity {
           : new THREE.MeshPhysicalMaterial({ color: c.clone().lerp(new THREE.Color(1, 1, 1), 0.55), roughness: 0.04, metalness: 0, transmission: 1, thickness: 0.46, ior: 1.52,
               dispersion: 0.35, attenuationColor: c, attenuationDistance: 0.55, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.03,
               iridescence: 0.25, iridescenceIOR: 1.3, iridescenceThicknessRange: [120, 420], emissive: c, emissiveIntensity: 0.0, envMapIntensity: 1.25 });
-        const mesh = new THREE.Mesh(g, m); mesh.castShadow = true; mesh.receiveShadow = !QA ? false : true;
+        const mesh = new THREE.Mesh(g, m); mesh.castShadow = true; mesh.receiveShadow = QA;
         mesh.position.set(px, 0, pz); mesh.scale.set(1, 0.001, 1);
         // luminous filament core, seen refracted through the glass
         const core = new THREE.Mesh(new THREE.BoxGeometry(0.1, Math.max(0.02, h - 0.14), 0.1).translate(0, (h - 0.14) / 2 + 0.07, 0),
@@ -329,9 +341,9 @@ class ScoreCity {
         const cap = new THREE.Mesh(topG, new THREE.MeshBasicMaterial({ map: engraving(v), transparent: true, depthWrite: false, toneMapped: false, opacity: 0, color: new THREE.Color(1.6, 1.4, 1.1) }));
         cap.rotation.order = "YXZ"; cap.rotation.x = -Math.PI / 2; cap.position.set(px, 0, pz);
         const foot = new THREE.Mesh(footG, gold); foot.position.set(px, 0.025, pz); foot.castShadow = true; foot.receiveShadow = true;
-        const ao = new THREE.Mesh(aoG, new THREE.MeshBasicMaterial({ map: aoT, transparent: true, depthWrite: false, blending: THREE.MultiplyBlending, premultipliedAlpha: true, color: 0xffffff }));
+        // contact AO: soft dark pool right under the foot (the shadow map alone can't resolve it)
+        const ao = new THREE.Mesh(aoG, new THREE.MeshBasicMaterial({ map: aoT, transparent: true, depthWrite: false, opacity: 0.75, color: 0x000000 }));
         ao.rotation.x = -Math.PI / 2; ao.position.set(px, 0.0025, pz);
-        ao.material.blending = THREE.NormalBlending; ao.material.opacity = 0.75;
         const ring = new THREE.Mesh(ringG, new THREE.MeshBasicMaterial({ color: c.clone().multiplyScalar(3), toneMapped: false, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
         ring.rotation.x = -Math.PI / 2; ring.position.set(px, 0.055, pz);
         // caustic: light focused by the glass, thrown away from the key light (+x, -z)
@@ -341,10 +353,12 @@ class ScoreCity {
         caus.rotation.x = -Math.PI / 2; caus.rotation.z = 0.7; caus.position.set(px + 0.36, 0.004, pz - 0.3);
         caus.visible = !QA;
         S.add(mesh, cap, foot, ao, ring, caus);
-        this.cols.push({ mesh, core, cap, ring, caus, h, v, axis: a.id, region: r.id, i, j, lead: v === lead[a.id], lift: 0 });
+        this.cols.push({ mesh, core, cap, ring, caus, h, v, axis: a.id, region: r.id, i, j, lead: v === lead[a.id], lift: 0,
+          coreC: c.clone().lerp(new THREE.Color(1, 1, 1), 0.25) });
       });
       const lab = plaque(r.short, r.accent);
       lab.position.set(x0 - sx * 1.2, 0.3, z0 + j * sz); lab.scale.set(0.3 * lab.userData.aspect, 0.3, 1); S.add(lab);
+      (this.plaques ||= []).push(lab);
     });
     this.axisLabels = A.map((a, i) => {
       const s = axisTag(a); s.position.set(x0 + i * sx, 0.36, z0 + (Rg.length - 0.1) * sz + 0.42); s.scale.set(0.62 * s.userData.aspect, 0.62, 1); S.add(s); return s;
@@ -450,7 +464,7 @@ class ScoreCity {
       c.mesh.scale.y = Math.max(0.001, k);
       c.mesh.position.y = c.lift * 0.06;
       const hh = c.h * k + c.lift * 0.06;
-      c.core.material.color.copy(col(DATA.regions[c.j].accent)).lerp(new THREE.Color(1, 1, 1), 0.25).multiplyScalar(0.9 + c.lift * 2.6 + (c.lead ? 0.5 : 0) + (pk ? Math.max(0, 1.5 - (T - this.pickT)) * 2 : 0));
+      c.core.material.color.copy(c.coreC).multiplyScalar(0.9 + c.lift * 2.6 + (c.lead ? 0.5 : 0) + (pk ? Math.max(0, 1.5 - (T - this.pickT)) * 2 : 0));
       if (c.mesh.material.emissiveIntensity !== undefined && QA) c.mesh.material.emissiveIntensity = 0.04 + c.lift * 0.35;
       c.cap.position.y = hh + 0.004; c.cap.rotation.y = this.az; c.cap.material.opacity = k * (0.55 + c.lift * 0.45);
       c.ring.material.opacity = (c.lift * 0.6 + (c.lead && on ? 0.4 + Math.sin(T * 4) * 0.2 : 0) + (pk ? Math.max(0, 1 - (T - this.pickT)) : 0)) * k;
