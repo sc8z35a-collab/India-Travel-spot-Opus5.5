@@ -2,13 +2,13 @@
   "agent": "a6_site_builder",
   "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
   "ok": true,
-  "started": 1790851706.4526186,
-  "duration_s": 0.42,
+  "started": 1790851826.1107907,
+  "duration_s": 0.35,
   "stats": {
     "pages": 6,
-    "build_id": "23d2c13dfe",
+    "build_id": "4321c4183e",
     "css_kb": 153.7,
-    "js_kb": 50.5,
+    "js_kb": 50.7,
     "gl_kb": 68.3,
     "depth_maps": 55,
     "photos_credited": 55

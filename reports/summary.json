@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 0.4,
+  "duration_s": 0.3,
   "llm": {
     "ok": false,
     "model": null,
@@ -39,7 +39,7 @@
       "task": "a6",
       "agent": "⑤",
       "start": 0.0,
-      "end": 0.42,
+      "end": 0.35,
       "ok": true
     }
   ],
@@ -52,14 +52,14 @@
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.42,
+      "duration_s": 0.35,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "23d2c13dfe",
+        "build_id": "4321c4183e",
         "css_kb": 153.7,
-        "js_kb": 50.5,
+        "js_kb": 50.7,
         "gl_kb": 68.3,
         "depth_maps": 55,
         "photos_credited": 55
