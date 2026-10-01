@@ -81,7 +81,8 @@ ensure_pr() {
     url=$(timeout 60 gh pr create --base "$base" --head "$br" \
       --title "wip(autosave/$(agent_id)): ${br} — work in progress" \
       --body "自動保存システム (pipeline/autosave.sh v2) が作成したPRです（3分ごとに自動push）。作業完了時に squash され、正式なタイトル・説明に更新されます。" 2>&1) \
-      && log "opened PR ($br → $base): $url" || log "PR create failed: $(echo "$url" | tail -1)"
+      && log "opened PR ($br → $base): $url" \
+      || { echo "$url" | grep -q "already exists" && log "PR already exists ($br → $base)" || log "PR create failed: $(echo "$url" | tail -1)"; }
   fi
 }
 
@@ -153,7 +154,8 @@ sync_collab() {
       git merge -q --no-edit -X theirs origin/collab >/dev/null 2>&1 || git merge --abort >/dev/null 2>&1
     fi
     if [ "$(git rev-list --count origin/collab..HEAD 2>/dev/null || echo 1)" != "0" ]; then
-      timeout 120 git push -q origin HEAD:collab >/dev/null 2>&1 && log "collab pushed" || log "collab push failed (retry next cycle)"
+      if timeout 120 git push -q origin HEAD:collab >/dev/null 2>&1; then log "collab pushed"
+      else timeout 60 git fetch -q origin collab 2>/dev/null; [ "$(git rev-list --count origin/collab..HEAD 2>/dev/null)" = "0" ] || log "collab push failed (retry next cycle)"; fi
     fi
   )
 }
