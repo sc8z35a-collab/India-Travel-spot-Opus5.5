@@ -1,0 +1,14 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= CREDITS ================= #}
+<section class="credits" id="credits">
+  <div class="wrap">
+    <details class="credits-box">
+      <summary><span class="eyebrow">Photo credits</span><h2 class="h3">写真クレジット（{{ credit_list|length }}点）</h2><i aria-hidden="true"></i></summary>
+      <p class="body">写真はすべて、クリエイティブ・コモンズ／パブリックドメイン等で公開されている実写真です（AI生成画像は不使用）。撮影者・ライセンスを明記し、各写真の出典ページとライセンス条文へリンクしています。CC BY-SA の写真はリサイズ・トリミングのみ行い、同じライセンスで提供しています。</p>
+      <ul class="credit-list">
+        {% for a in credit_list %}<li><a href="{{ a.link }}" target="_blank" rel="noopener"><span>{{ a.title or a.alt }}</span><small>{{ a.author or a.source }}{% if a.author %} / {{ a.source }}{% endif %}</small></a>{% if a.license_url %}<a class="lic" href="{{ a.license_url }}" target="_blank" rel="noopener license">{{ a.license }}</a>{% else %}<span class="lic">{{ a.license }}</span>{% endif %}</li>{% endfor %}
+      </ul>
+    </details>
+  </div>
+</section>

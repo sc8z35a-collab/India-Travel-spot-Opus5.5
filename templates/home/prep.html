@@ -1,0 +1,30 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= PREP ================= #}
+<section class="prep section" id="prep">
+  <div class="sec-backdrop" aria-hidden="true">{{ pic("india-spice-jars", "100vw", "", false, true) }}</div>
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">09 — Before you fly</p>
+    <h2 class="h2 reveal-lines">出発前に、<br>これだけは。</h2>
+    </div>
+    <div class="sec-body">
+    <div class="acc">
+      {% for f in facts %}
+      <details class="acc-item"{% if loop.first %} open{% endif %}>
+        <summary><span class="prep-n">{{ '%02d' % loop.index }}</span><h3>{{ f.label }}</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>{{ f.value }}</p><a href="{{ f.url }}" target="_blank" rel="noopener" class="src">出典: {{ f.source }} ↗</a></div>
+      </details>
+      {% endfor %}
+      <details class="acc-item">
+        <summary><span class="prep-n">{{ '%02d' % (facts|length + 1) }}</span><h3>大学生の予算感</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>航空券（往復・直行便）は時期により約8〜15万円前後。現地費用は1日{{ yen(min_daily_jpy) }}〜が目安。国際学生証（ISIC）や、デリー・メトロの乗車カードで移動費を抑えられます。</p><span class="src">1ルピー＝{{ currency.inr_to_jpy }}円で概算（{{ currency.source }}）</span></div>
+      </details>
+      <details class="acc-item">
+        <summary><span class="prep-n">{{ '%02d' % (facts|length + 2) }}</span><h3>体を守る</h3><i aria-hidden="true"></i></summary>
+        <div class="acc-body"><p>水はボトル入りのみ。生野菜・カットフルーツ・氷は慎重に。整腸剤、経口補水塩、虫除けは必携。渡航前にトラベルクリニックで予防接種（A型肝炎など）の相談を。海外旅行保険には必ず加入を。</p><a href="https://www.forth.go.jp/" target="_blank" rel="noopener" class="src">出典: 厚生労働省検疫所 FORTH ↗</a></div>
+      </details>
+    </div>
+    </div>
+  </div>
+</section>

@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "duration_s": 0.8,
+  "duration_s": 0.3,
   "llm": {
     "ok": false,
     "model": null,
@@ -39,14 +39,7 @@
       "task": "a6",
       "agent": "⑤",
       "start": 0.0,
-      "end": 0.2,
-      "ok": true
-    },
-    {
-      "task": "a8",
-      "agent": "⑥",
-      "start": 0.2,
-      "end": 0.75,
+      "end": 0.31,
       "ok": true
     }
   ],
@@ -59,70 +52,17 @@
       "name": "a6_site_builder",
       "role": "テンプレートからHTML生成・静的アセット配置・構造化データ/サイトマップ出力",
       "ok": true,
-      "duration_s": 0.2,
+      "duration_s": 0.31,
       "warnings": 0,
       "errors": 0,
       "stats": {
         "pages": 6,
-        "build_id": "9f690f207a",
-        "css_kb": 153.0,
+        "build_id": "bc9b3fbf97",
+        "css_kb": 153.2,
         "js_kb": 50.0,
-        "gl_kb": 61.3,
+        "gl_kb": 63.6,
         "depth_maps": 55,
         "photos_credited": 55
-      }
-    },
-    {
-      "task": "a8",
-      "agent": "⑥",
-      "name": "a8_qa_auditor",
-      "role": "完成サイトの品質監査（リンク切れ・画像・アクセシビリティ・SEO・容量）",
-      "ok": true,
-      "duration_s": 0.55,
-      "warnings": 0,
-      "errors": 0,
-      "stats": {
-        "pages": 6,
-        "checks": 2315,
-        "issues": 0,
-        "per_page": {
-          "delhi-agra/index.html": {
-            "checks": 330,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 100.8
-          },
-          "index.html": {
-            "checks": 710,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 221.6
-          },
-          "jaipur/index.html": {
-            "checks": 327,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 99.7
-          },
-          "kerala/index.html": {
-            "checks": 307,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 99.4
-          },
-          "ladakh/index.html": {
-            "checks": 321,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 100.3
-          },
-          "varanasi/index.html": {
-            "checks": 320,
-            "issues": [],
-            "score": 100.0,
-            "html_kb": 99.9
-          }
-        }
       }
     }
   ]

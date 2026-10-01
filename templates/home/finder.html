@@ -1,0 +1,49 @@
+{# OWNER: Agent D (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= FINDER ================= #}
+<section class="finder section" id="finder">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">04 — Find your India</p>
+    <h2 class="h2 reveal-lines">あなたはどんな旅人？<br><em>タイプ別</em>ランキング。</h2>
+    <p class="body reveal">同じ8軸の点数でも、何を重視するかで1位は変わります。タイプを選ぶと、その重みで総合点（100点満点）を再計算。「カスタム」で自分だけの重みも作れます。</p>
+    </div>
+    <div class="sec-body">
+
+    <div class="personas" role="group" aria-label="旅のタイプ">
+      {% for p in personas %}
+      <button type="button" class="persona{% if loop.first %} is-active{% endif %}" aria-controls="ranking" aria-pressed="{{ 'true' if loop.first else 'false' }}" data-persona="{{ p.id }}">
+        <span class="p-icon" aria-hidden="true">{{ p.icon }}</span><span class="p-label">{{ p.label }}</span>
+      </button>
+      {% endfor %}
+      <button type="button" class="persona" aria-controls="weights ranking" aria-pressed="false" data-persona="custom"><span class="p-icon" aria-hidden="true">⚙</span><span class="p-label">カスタム</span></button>
+    </div>
+    <p class="persona-desc" aria-live="polite">{{ personas[0].desc }}</p>
+
+    <div class="weights" id="weights" role="group" aria-label="8軸の重みの調整（0〜4）">
+      {% for a in axes %}
+      <label class="weight"><span class="w-l">{{ a.short }}</span>
+        <input type="range" min="0" max="4" step="1" value="1" data-axis="{{ a.id }}" aria-label="{{ a.label }}の重み">
+        <output>1</output></label>
+      {% endfor %}
+    </div>
+
+    <ol class="ranking" id="ranking" aria-label="タイプ別ランキング">
+      {% set bp = analysis.personas[personas[0].id] %}
+      {% for rid in bp.ranking %}{% set r = region_map[rid] %}
+      <li class="rank{% if bp.rank[rid] == 1 %} is-top{% endif %}" data-region="{{ r.id }}" data-rank="{{ bp.rank[rid] }}" style="--accent:{{ r.theme.accent }}">
+        <a href="{{ root }}{{ r.id }}/index.html">
+          <span class="rank-pos">{{ bp.rank[rid] }}</span>
+          <div class="rank-img">{{ pic(r.hero, "72px") }}</div>
+          <div class="rank-main">
+            <p class="rank-name">{{ r.name }}{% if bp.totals.values()|select('equalto', bp.totals[rid])|list|length > 1 %}<span class="rank-tie">同点</span>{% endif %}</p>
+            <div class="rank-bar"><i style="--w:{{ bp.totals[rid] }}%"></i></div>
+          </div>
+          <span class="rank-score"><b>{{ bp.totals[rid] }}</b></span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    </div>
+  </div>
+</section>

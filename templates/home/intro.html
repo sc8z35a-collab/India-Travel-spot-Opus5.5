@@ -1,0 +1,18 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= INTRO / NUMBERS ================= #}
+<section class="intro section" id="intro">
+  <div class="wrap intro-grid">
+    <div class="intro-text">
+      <p class="eyebrow">01 — Why India</p>
+      <h2 class="h2 reveal-lines">国土は日本の約9倍。<br>ひとつの国に、<br><em>いくつもの世界</em>。</h2>
+      <p class="body reveal">砂漠の宮殿、聖なる川、ヤシの水郷、ヒマラヤの湖。インドは「どこに行くか」で旅の性格がまるで変わる国です。日本の大学生が長期休みに行きやすい5地域を、<strong>文化・自然・コスパ・アクセス・安心・食・体験・写真映え</strong>の8軸で採点。点数にはすべて理由を書き、弱点も隠さず載せています。</p>
+    </div>
+    <dl class="stats">
+      <div class="stat"><dt><svg class="ax-i" aria-hidden="true"><use href="#ax-access"/></svg>日本からの直行便</dt><dd><b data-count="9">9</b><small>時間〜</small></dd><dd class="stat-note">羽田・成田 → デリー</dd></div>
+      <div class="stat"><dt><svg class="ax-i" aria-hidden="true"><use href="#i-evaluation"/></svg>評価の視点</dt><dd><b data-count="{{ axes|length }}">{{ axes|length }}</b><small>軸 × {{ personas|length }}</small></dd><dd class="stat-note">{{ axes|length }}つの軸 × {{ personas|length }}タイプの旅人</dd></div>
+      <div class="stat"><dt><svg class="ax-i" aria-hidden="true"><use href="#i-compare"/></svg>検証した重みづけ</dt><dd><b data-count="{{ analysis.robust_samples }}" data-format="yen">{{ "{:,}".format(analysis.robust_samples) }}</b><small>通り</small></dd><dd class="stat-note">ランダムな価値観で順位を検証</dd></div>
+      <div class="stat"><dt><svg class="ax-i" aria-hidden="true"><use href="#ax-budget"/></svg>1日の予算の目安</dt><dd><b data-count="{{ min_daily_jpy }}" data-format="yen">{{ "{:,}".format(min_daily_jpy) }}</b><small>円〜</small></dd><dd class="stat-note">宿・食・移動込み</dd></div>
+    </dl>
+  </div>
+</section>

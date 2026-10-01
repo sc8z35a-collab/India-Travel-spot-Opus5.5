@@ -1,0 +1,39 @@
+{# OWNER: Agent D (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= COMPARE: heatmap + axis explorer ================= #}
+<section class="compare section" id="compare">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">05 — Multi-angle evaluation</p>
+    <h2 class="h2 reveal-lines">8つの視点で、<br>正直に比べる。</h2>
+    <p class="body reveal">10点満点。<b class="hint-tap">マスをタップ</b>すると採点の理由が読めます。★は各軸の1位。完璧な場所はありません。</p>
+    </div>
+    <div class="sec-body">
+
+    <div class="heat" role="table" aria-label="8軸×5地域の評価表">
+      <div class="heat-row heat-head" role="row"><span role="columnheader"><span class="sr-only">評価軸</span></span>{% for r in regions %}<span role="columnheader" style="--accent:{{ r.theme.accent }}">{{ r.short }}</span>{% endfor %}</div>
+      {% for a in axes %}{% set ai = loop.index0 %}
+      <div class="heat-row" role="row">
+        <span class="heat-name" role="rowheader"><svg class="ax-i" aria-hidden="true"><use href="#ax-{{ a.id }}"/></svg>{{ a.short }}</span>
+        {% for r in regions %}{% set s = r.scores[a.id] %}
+        <span class="heat-td" role="cell"><button type="button" class="heat-cell{% if r.id in analysis.axis_leaders[a.id] %} lead{% endif %}" aria-haspopup="dialog" style="--heat:{{ charts.heat[r.id][a.id] }};--cell-ink:{{ charts.heat_ink[r.id][a.id] }};--i:{{ ai + loop.index0 }};--v:{{ s.v }}" data-why="{{ s.why }}" data-title="{{ r.name }} × {{ a.label }}" data-v="{{ s.v }}" data-accent="{{ r.theme.accent }}" aria-label="{{ r.name }} {{ a.label }} {{ s.v }}点{% if r.id in analysis.axis_leaders[a.id] %}（1位）{% endif %}">{{ s.v }}</button></span>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div class="heat-row heat-total" role="row"><span class="heat-name" role="rowheader">総合</span>{% for r in regions %}<span role="cell" style="--accent:{{ r.theme.accent }}">{{ analysis.regions[r.id].balanced }}</span>{% endfor %}</div>
+    </div>
+
+    <div class="axis-x">
+      <h3 class="h3 sub">軸ごとに見る</h3>
+      <div class="chips axis-chips" role="group" aria-label="評価軸">
+        {% for a in axes %}<button type="button" class="chip{% if loop.first %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.first else 'false' }}" data-axis="{{ a.id }}"><svg class="ax-i" aria-hidden="true"><use href="#ax-{{ a.id }}"/></svg>{{ a.short }}</button>{% endfor %}
+      </div>
+      <p class="axis-desc" aria-live="polite"></p>
+      <div class="city3d" aria-hidden="true">
+        <p class="city3d-cap"><b>3D</b>{{ axes|length }}軸 × {{ regions|length }}地域の立体スコア<span>ドラッグで回転 · 軸を選ぶと強調</span></p>
+      </div>
+      <ol class="axis-bars"></ol>
+    </div>
+    </div>
+  </div>
+</section>

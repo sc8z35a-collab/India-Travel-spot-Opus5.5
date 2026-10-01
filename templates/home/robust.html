@@ -1,0 +1,25 @@
+{# OWNER: Agent D (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= ROBUSTNESS ================= #}
+<section class="robust section" id="robust">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">07 — Stress test</p>
+    <h2 class="h2 reveal-lines">{{ "{:,}".format(analysis.robust_samples) }}通りの<br>価値観で試した。</h2>
+    <p class="body reveal">7つのタイプだけでは偏りが出るかもしれません。そこで8軸の重みをランダムに{{ "{:,}".format(analysis.robust_samples) }}通り生成し、それぞれで1位になった回数を数えました。「誰にとっても外しにくい旅先」がわかります。</p>
+    </div>
+    <div class="sec-body">
+    <ul class="robust-list">
+      {% for r in robust_order %}{% set rb = analysis.regions[r.id].robust %}
+      <li class="reveal" style="--accent:{{ r.theme.accent }};--w:{{ rb.win }};--w2:{{ rb.top2 }}">
+        <div class="rb-ring" aria-hidden="true"><i></i><span>{{ loop.index }}</span></div>
+        <p class="rb-name">{{ r.name }}</p>
+        <div class="rb-bars"><span class="rb-top2"><i></i></span><span class="rb-win"><i></i></span></div>
+        <p class="rb-v"><b>{{ rb.win }}<small>%</small></b><span>1位率</span><em>{{ rb.top2 }}%<span>2位以内</span></em></p>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="note">乱数シード固定・指数分布による重みづけ（ビルドごとに再現可能）。</p>
+    </div>
+  </div>
+</section>

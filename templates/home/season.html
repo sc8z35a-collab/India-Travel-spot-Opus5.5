@@ -1,0 +1,28 @@
+{# OWNER: Agent C (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= SEASON ================= #}
+<section class="season section" id="season">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">08 — When to go</p>
+    <h2 class="h2 reveal-lines">春休み、夏休み。<br><em>いつ</em>、どこへ？</h2>
+    <p class="body reveal">北インドの平原は10〜3月が快適、4〜6月は40℃超の酷暑。ラダックは逆に6〜9月だけが旅の季節。休みを選ぶと答えが出ます。</p>
+    </div>
+    <div class="sec-body">
+    <div class="chips holiday-tabs" role="group" aria-label="休みの時期">
+      <button type="button" class="chip ht is-active" aria-pressed="true" data-hol="all">すべて</button>
+      {% for k, h in holidays.items() %}<button type="button" class="chip ht" aria-pressed="false" data-hol="{{ k }}" data-months="{{ h.months|join(',') }}">{{ h.label }}<small>{{ h.months|join('・') }}月</small></button>{% endfor %}
+    </div>
+    <div class="cal" role="table" aria-label="月別のおすすめ度（5段階）">
+      <div class="cal-row cal-head" role="row"><span role="columnheader"><span class="sr-only">地域</span></span>{% for m in range(1, 13) %}<span role="columnheader" data-m="{{ m }}">{{ m }}</span>{% endfor %}</div>
+      {% for r in regions %}
+      <div class="cal-row" role="row" style="--accent:{{ r.theme.accent }}"><span class="cal-name" role="rowheader">{{ r.short }}</span>
+        {% for v in r.months %}<span class="cal-cell" role="cell" data-m="{{ loop.index }}" data-v="{{ v }}" style="--heat:{{ charts.season[r.id][loop.index0] }};--v:{{ v }}" aria-label="{{ loop.index }}月 おすすめ度{{ v }}"></span>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="cal-legend" aria-hidden="true"><span>おすすめ度</span>{% for i in range(1, 6) %}<i style="--heat:{{ season_ramp[i - 1] }}"></i>{% endfor %}<span>低 → 高　◎最適 ○良い</span></div>
+    <div class="hol-answer" aria-live="polite"><p>休みを選ぶと、おすすめの行き先を表示します。</p></div>
+    </div>
+  </div>
+</section>

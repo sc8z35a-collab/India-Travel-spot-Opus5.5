@@ -1,0 +1,11 @@
+{# OWNER: Agent A (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-overview" id="overview">
+  <div class="wrap">
+    <div class="ch-intro">
+      <p class="ch-lead reveal">{{ r.lead }}</p>
+      <dl class="ch-facts">{% for f in r.keyfacts %}<div class="reveal"><dt>{{ f.k }}</dt><dd>{{ f.v }}</dd></div>{% endfor %}</dl>
+    </div>
+    <p class="phrase-big reveal"><span lang="{{ r.phrase.lang if r.phrase.lang is defined else 'hi' }}">{{ r.phrase.text }}</span><em>{{ r.phrase.roman }}</em><small>{{ r.phrase.meaning }}</small></p>
+  </div>
+</section>

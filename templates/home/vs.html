@@ -1,0 +1,38 @@
+{# OWNER: Agent D (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{# ================= VS + RADAR ================= #}
+<section class="vs section" id="vs">
+  <div class="wrap">
+    <div class="sec-head">
+    <p class="eyebrow">06 — Head to head</p>
+    <h2 class="h2 reveal-lines">迷ったら、<br><em>1対1</em>で比べる。</h2>
+    <p class="body reveal">2つの地域を選ぶと、8軸それぞれでどちらが勝つかを左右に並べて表示します。</p>
+    </div>
+    <div class="sec-body">
+    <div class="vs-pick">
+      <div class="chips vs-a" role="group" aria-label="左の地域">{% for r in regions %}<button type="button" class="chip{% if loop.index == 1 %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.index == 1 else 'false' }}"{% if loop.index == [4, regions|length]|min %} disabled{% endif %} data-id="{{ r.id }}" style="--accent:{{ r.theme.accent }}">{{ r.short }}</button>{% endfor %}</div>
+      <button type="button" class="vs-mark" aria-label="左右を入れ替える"><span>VS</span><i aria-hidden="true">⇄</i></button>
+      <div class="chips vs-b" role="group" aria-label="右の地域">{% for r in regions %}<button type="button" class="chip{% if loop.index == [4, regions|length]|min %} is-active{% endif %}" aria-pressed="{{ 'true' if loop.index == [4, regions|length]|min else 'false' }}"{% if loop.index == 1 %} disabled{% endif %} data-id="{{ r.id }}" style="--accent:{{ r.theme.accent }}">{{ r.short }}</button>{% endfor %}</div>
+    </div>
+    <div class="vs-board">
+      <div class="vs-head"><p class="vs-na"></p><p class="vs-score"></p><p class="vs-nb"></p></div>
+      <ul class="vs-rows">
+        {% for a in axes %}
+        <li data-axis="{{ a.id }}"><span class="vs-bar vs-l"><i></i><b></b></span><span class="vs-ax"><svg class="ax-i" aria-hidden="true"><use href="#ax-{{ a.id }}"/></svg>{{ a.short }}</span><span class="vs-bar vs-r"><i></i><b></b></span></li>
+        {% endfor %}
+      </ul>
+      <p class="vs-verdict" aria-live="polite"></p>
+    </div>
+
+    <div class="radar-compare">
+      <h3 class="h3 sub">レーダーで重ねる<small>地域をタップして表示を切り替え（最大{{ regions|length }}つ）</small></h3>
+      <div class="rc-chart"><svg class="rc-svg" viewBox="-40 -10 {{ charts.radar_js.size + 80 }} {{ charts.radar_js.size + 20 }}" role="img" aria-label="レーダーチャート比較"></svg></div>
+      <div class="chips rc-controls">
+        {% for r in regions %}
+        <label class="chip rc-toggle" style="--accent:{{ r.theme.accent }}"><input type="checkbox" value="{{ r.id }}" {% if loop.index in [1, 5] %}checked{% endif %}><span>{{ r.short }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+{# OWNER: Agent D (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+{% set an = analysis.regions[r.id] %}
+<section class="section rp-eval" id="evaluation">
+  <div class="wrap">
+    <p class="eyebrow">Multi-angle evaluation</p>
+    <h2 class="h2 reveal-lines">8つの視点で見た<br><em>{{ r.name }}</em>。</h2>
+    <div class="ch-eval">
+      <div class="ch-radar reveal">{{ charts.radar[r.id]|safe }}</div>
+      <div class="ch-verdict">
+        <p class="ch-score"><b data-count="{{ an.balanced }}" data-decimals="1">{{ "%.1f"|format(an.balanced) }}</b><small>/100 バランス型の総合点</small></p>
+        <p class="ch-verdict-t">{{ an.verdict }}</p>
+        <p class="rp-robust">{{ "{:,}".format(analysis.robust_samples) }}通りのランダムな価値観で試すと、1位になる確率 <b>{{ an.robust.win }}%</b>・2位以内 <b>{{ an.robust.top2 }}%</b></p>
+        <div class="persona-scores">
+          {% for p in personas %}{% set pv = analysis.personas[p.id] %}
+          <div class="ps"><span class="ps-l">{{ p.label }}</span><span class="ps-bar"><i style="--w:{{ pv.totals[r.id] }}%"></i></span><span class="ps-v">{{ pv.totals[r.id] }}</span><span class="ps-rank">{{ pv.rank[r.id] }}位{% if pv.totals.values()|select('equalto', pv.totals[r.id])|list|length > 1 %}<small class="ps-tie">同点</small>{% endif %}</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="why-grid">
+      {% for a in axes %}{% set s = r.scores[a.id] %}
+      <article class="why-card reveal" style="--v:{{ s.v }}">
+        <header><h3><svg class="ax-i" aria-hidden="true"><use href="#ax-{{ a.id }}"/></svg>{{ a.label }}</h3><p class="why-v"><b>{{ s.v }}</b>/10</p></header>
+        <div class="why-meter"><i></i></div>
+        <p>{{ s.why }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>

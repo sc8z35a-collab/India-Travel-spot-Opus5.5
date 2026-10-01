@@ -1,0 +1,28 @@
+{# OWNER: Agent B (collab/ROLES.md). Included with the full page context. #}
+{% from "_macros.html" import pic, credit, split, yen with context %}
+<section class="section rp-highlights" id="highlights">
+  <div class="wrap">
+    <div class="spots-head">
+      <div>
+        <p class="eyebrow">Highlights</p>
+        <h2 class="h2 reveal-lines">見逃せない<br>{{ r.highlights|length }}つの場所。</h2>
+      </div>
+      <div class="deck-nav" role="group" aria-label="見どころの移動">
+        <button type="button" class="deck-prev" aria-label="前の見どころ" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="deck-next" aria-label="次の見どころ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="spots" tabindex="0" role="region" aria-label="見どころ（横にスワイプ・左右キーで移動）">
+    {% for h in r.highlights %}
+    <article class="spot{% if loop.index is even %} spot-rev{% endif %}">
+      <div class="spot-img">{{ pic(h.photo, "(orientation: landscape) %dvw, 84vw" % (40 * [1, assets[h.photo].ratio / 1.25]|max), "", false, true) }}{{ credit(h.photo) }}</div>
+      <div class="spot-text">
+        <p class="spot-n">{{ '%02d' % loop.index }}<span>{{ h.tag }}</span></p>
+        <h3 class="spot-name reveal">{{ h.name }}<small>{{ h.en }}</small></h3>
+        <p class="spot-body reveal">{{ h.text }}</p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>

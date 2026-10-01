@@ -67,19 +67,25 @@ class SiteBuilder(Agent):
 
         # ---- static assets -------------------------------------------------
         (DIST / "assets" / "vendor").mkdir(parents=True, exist_ok=True)
-        css = (SRC / "css" / "site.css").read_text(encoding="utf-8") + "\n" + \
-            (SRC / "css" / "mobile.css").read_text(encoding="utf-8") + "\n" + \
-            (SRC / "css" / "landscape.css").read_text(encoding="utf-8") + "\n" + \
-            (SRC / "css" / "polish.css").read_text(encoding="utf-8") + "\n" + \
-            (SRC / "css" / "graphics.css").read_text(encoding="utf-8")
-        js = (SRC / "js" / "site.js").read_text(encoding="utf-8")
+        # layer order matters: base → mobile → landscape → polish → graphics → per-agent fx layers.
+        # Each agent owns ONE fx file (collab/ROLES.md) so parallel work never conflicts:
+        #   src/css/fx-a-core.css · fx-b-photo.css · fx-c-world.css · fx-d-data.css (sorted, loaded last)
+        css_files = [SRC / "css" / f for f in ("site.css", "mobile.css", "landscape.css", "polish.css", "graphics.css")]
+        css_files += sorted((SRC / "css").glob("fx-*.css"))
+        css = "\n".join(f"/* ==== {f.name} ==== */\n" + f.read_text(encoding="utf-8") for f in css_files)
+        # site.js + per-agent behaviour modules src/js/site/*.js (each an IIFE; concatenated in name order)
+        js_files = [SRC / "js" / "site.js"] + sorted((SRC / "js" / "site").glob("*.js"))
+        js = "\n;\n".join(f.read_text(encoding="utf-8") for f in js_files)
         (DIST / "assets" / "site.css").write_text(css, encoding="utf-8")
         (DIST / "assets" / "site.js").write_text(js, encoding="utf-8")
         for f in (SRC / "vendor").glob("*.js"):
             shutil.copy(f, DIST / "assets" / "vendor" / f.name)
         shutil.copytree(SRC / "vendor" / "three", DIST / "assets" / "vendor" / "three", dirs_exist_ok=True)
-        gl = (SRC / "js" / "gl.js").read_text(encoding="utf-8")
-        (DIST / "assets" / "gl.js").write_text(gl, encoding="utf-8")
+        # WebGL: gl.js boot + one ES module per scene in src/js/gl/ (owners in collab/ROLES.md)
+        gl_files = [SRC / "js" / "gl.js"] + sorted((SRC / "js" / "gl").glob("*.js"))
+        gl = "".join(f.read_text(encoding="utf-8") for f in gl_files)
+        shutil.rmtree(DIST / "assets" / "gl", ignore_errors=True)
+        (DIST / "assets" / "gl").mkdir(parents=True, exist_ok=True)
         (DIST / "manifest.webmanifest").write_text(json.dumps({
             "id": "./", "name": cfg["site"]["title"], "short_name": "IN/5", "lang": "ja", "dir": "ltr",
             "description": cfg["site"]["description"], "start_url": "./", "scope": "./",
@@ -93,8 +99,16 @@ class SiteBuilder(Agent):
         (DIST / "favicon.svg").write_text(FAVICON, encoding="utf-8")
         (DIST / ".nojekyll").write_text("")
         # the cache-buster must also change when page data changes, not only css/js/gl
-        build_id = hashlib.sha1((css + js + gl + json.dumps([assets, regions, analysis], sort_keys=True,
+        build_id = hashlib.sha1((css + js + gl + "".join(sorted(p.read_text(encoding="utf-8") for p in TEMPLATES.rglob("*.html"))) + json.dumps([assets, regions, analysis], sort_keys=True,
                                                              ensure_ascii=False)).encode()).hexdigest()[:10]
+
+        import re as _re
+        # every own relative import gets the SAME ?v= (a module imported under two URLs would run twice);
+        # vendor/ is left alone — three's addons import each other without a query string
+        _bust = lambda txt: _re.sub(r'(from\s+"\.{1,2}/(?!vendor/)[^"?]+\.js)"', rf'\1?v={build_id}"', txt)
+        (DIST / "assets" / "gl.js").write_text(_bust(gl_files[0].read_text(encoding="utf-8")), encoding="utf-8")
+        for f in gl_files[1:]:
+            (DIST / "assets" / "gl" / f.name).write_text(_bust(f.read_text(encoding="utf-8")), encoding="utf-8")
 
         env = Environment(loader=FileSystemLoader(TEMPLATES), autoescape=True,
                           undefined=StrictUndefined, trim_blocks=True, lstrip_blocks=True)
