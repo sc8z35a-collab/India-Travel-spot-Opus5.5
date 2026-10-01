@@ -6,6 +6,7 @@ import { RenderPass } from "../vendor/three/addons/postprocessing/RenderPass.js"
 import { UnrealBloomPass } from "../vendor/three/addons/postprocessing/UnrealBloomPass.js";
 import { ShaderPass } from "../vendor/three/addons/postprocessing/ShaderPass.js";
 import { OutputPass } from "../vendor/three/addons/postprocessing/OutputPass.js";
+import { SMAAPass } from "../vendor/three/addons/postprocessing/SMAAPass.js";
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const DATA = JSON.parse($("#site-data").textContent);
@@ -85,29 +86,90 @@ const Input = {
 };
 Input.init();
 
-/* ============================ shared post chain ============================ */
+/* ============================ shared post chain ============================
+   Final grade (runs after OutputPass, i.e. on display-referred sRGB):
+     spectral chromatic aberration (5 wavelength taps, radial) · anamorphic streak ·
+     halation (warm bleed around highlights, as on film) · lens dirt lit by the
+     surrounding highlights · vignette · luminance-weighted animated grain ·
+     triangular-PDF dither (kills 8-bit banding in the dark gradients).            */
 const FINAL_SHADER = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) },
-              uVig: { value: 0.55 }, uCA: { value: 1.0 }, uGrain: { value: 0.035 }, uFlare: { value: 0 } },
+  uniforms: { tDiffuse: { value: null }, tDirt: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) },
+              uVig: { value: 0.55 }, uCA: { value: 1.0 }, uGrain: { value: 0.035 }, uFlare: { value: 0 },
+              uDirt: { value: 0.0 }, uHal: { value: 0.35 }, uTint: { value: new THREE.Vector3(1, 1, 1) } },
   vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }",
   fragmentShader: `
-    uniform sampler2D tDiffuse; uniform float uTime, uVig, uCA, uGrain, uFlare; uniform vec2 uRes; varying vec2 vUv;
+    uniform sampler2D tDiffuse, tDirt; uniform float uTime, uVig, uCA, uGrain, uFlare, uDirt, uHal; uniform vec2 uRes; uniform vec3 uTint;
+    varying vec2 vUv;
     float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    float luma(vec3 c){ return dot(c, vec3(.2126, .7152, .0722)); }
     void main(){
       vec2 c = vUv - .5; float r2 = dot(c, c);
-      vec2 off = c * r2 * .018 * uCA;
-      vec3 col = vec3(texture2D(tDiffuse, vUv + off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - off).b);
+      // spectral CA: 5 taps from red (outer) to violet (inner), weights sum to 1 per channel
+      vec2 off = c * r2 * .022 * uCA;
+      vec3 col = texture2D(tDiffuse, vUv + off).rgb * vec3(.55, .05, 0.)
+               + texture2D(tDiffuse, vUv + off * .5).rgb * vec3(.35, .30, 0.)
+               + texture2D(tDiffuse, vUv).rgb * vec3(.10, .30, .10)
+               + texture2D(tDiffuse, vUv - off * .5).rgb * vec3(0., .30, .35)
+               + texture2D(tDiffuse, vUv - off).rgb * vec3(0., .05, .55);
       if (uFlare > 0.) {                     // anamorphic streak: horizontal smear of the brightest pixels
         vec3 st = vec3(0.);
         for (int i = -6; i <= 6; i++) { if (i == 0) continue; float o = float(i) * .045; vec3 t = texture2D(tDiffuse, vec2(vUv.x + o, vUv.y)).rgb;
           st += max(t - .82, 0.) * (1. - abs(float(i)) / 7.); }
         col += st * vec3(.55, .7, 1.) * .5 * uFlare;
       }
+      // wide 8-tap highlight estimate → halation + lens dirt (cheap stand-in for a blurred bloom buffer)
+      vec3 glow = vec3(0.);
+      for (int i = 0; i < 8; i++) {
+        float a = float(i) * .785398 + .3; vec2 d = vec2(cos(a), sin(a) * uRes.x / uRes.y) * .035;
+        glow += max(texture2D(tDiffuse, vUv + d).rgb - .7, 0.) + max(texture2D(tDiffuse, vUv + d * 2.6).rgb - .7, 0.) * .6;
+      }
+      glow /= 12.8;
+      col += glow * vec3(1., .42, .2) * uHal;                                     // film halation: red-orange bleed
+      if (uDirt > 0.) {
+        vec3 dirt = texture2D(tDirt, vUv * vec2(uRes.x / uRes.y, 1.) * .55).rgb;
+        col += dirt * (luma(glow) * 3.2 + .015) * uDirt;
+      }
+      col *= uTint;
       col *= 1. - smoothstep(.12, .62, r2 * 1.35) * uVig;
-      col += (h(vUv * uRes + fract(uTime * 7.3) * 91.) - .5) * uGrain;
+      // grain: strongest in the mid-tones (as on film), invisible in pure black / white
+      float L = luma(col);
+      float g = (h(vUv * uRes + fract(uTime * 7.3) * 91.) - .5) * uGrain * (.35 + 2.6 * L * (1. - L));
+      col += g;
+      // triangular dither (±1 LSB)
+      col += (h(vUv * uRes + 17.31) + h(vUv * uRes - 9.7) - 1.) / 255.;
       gl_FragColor = vec4(col, 1.);
     }`,
 };
+
+// procedural lens-dirt plate (soft dust specks, smudges, a few hairline scratches) — generated once, shared
+let DIRT = null;
+function dirtTexture() {
+  if (DIRT) return DIRT;
+  const N = 512, c = document.createElement("canvas"); c.width = c.height = N;
+  const g = c.getContext("2d"); g.fillStyle = "#000"; g.fillRect(0, 0, N, N);
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  g.globalCompositeOperation = "lighter";
+  for (let i = 0; i < 220; i++) {                       // dust specks
+    const x = rnd() * N, y = rnd() * N, r = 1 + Math.pow(rnd(), 3) * 26, a = .05 + rnd() * .22;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, `rgba(255,244,228,${a})`); gr.addColorStop(.6, `rgba(255,236,210,${a * .35})`); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+  }
+  for (let i = 0; i < 9; i++) {                         // greasy smudges
+    const x = rnd() * N, y = rnd() * N, r = 40 + rnd() * 110;
+    const gr = g.createRadialGradient(x, y, r * .2, x, y, r);
+    gr.addColorStop(0, "rgba(255,240,220,.06)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  g.lineCap = "round";
+  for (let i = 0; i < 14; i++) {                        // hairline scratches
+    g.strokeStyle = `rgba(255,248,236,${.04 + rnd() * .08})`; g.lineWidth = .6 + rnd();
+    const x = rnd() * N, y = rnd() * N, a = rnd() * 6.28, l = 20 + rnd() * 90;
+    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + .4) * l * .5, y + Math.sin(a + .4) * l * .5, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+  }
+  DIRT = new THREE.CanvasTexture(c); DIRT.wrapS = DIRT.wrapT = THREE.RepeatWrapping; DIRT.colorSpace = THREE.NoColorSpace;
+  return DIRT;
+}
 
 // a restored context has lost every texture/program → rebuild once (several canvases may fire)
 let reloading = false;
@@ -134,7 +196,7 @@ function makeRenderer(canvas, { alpha = false } = {}) {
   return r;
 }
 
-function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88] } = {}) {
+function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88], smaa = !QA, dirt = 0.0, halation = 0.35 } = {}) {
   const size = renderer.getSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(Math.max(1, size.x * DPR), Math.max(1, size.y * DPR), { type: THREE.HalfFloatType, samples: QA ? 0 : (DPR >= 2.5 ? 2 : 4) });
   const composer = new EffectComposer(renderer, rt);
@@ -143,9 +205,13 @@ function makeComposer(renderer, scene, camera, { bloom = [0.5, 0.6, 0.88] } = {}
   const bloomPass = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), ...bloom);
   composer.addPass(bloomPass);
   composer.addPass(new OutputPass());
+  // SMAA on the display-referred image (after tone mapping), before grain so grain is never "anti-aliased" away
+  let smaaPass = null;
+  if (smaa) { smaaPass = new SMAAPass(Math.max(1, size.x * DPR), Math.max(1, size.y * DPR)); composer.addPass(smaaPass); }
   const final = new ShaderPass(FINAL_SHADER);
+  final.uniforms.tDirt.value = dirtTexture(); final.uniforms.uDirt.value = dirt; final.uniforms.uHal.value = halation;
   composer.addPass(final);
-  return { composer, bloomPass, final };
+  return { composer, bloomPass, final, smaaPass };
 }
 
 const GPU = { aniso: 8, maxTex: 16384 };
@@ -171,5 +237,5 @@ function photoUrl(id, cssW) {
 }
 
 export { THREE, $, $$, DATA, ROOT, reduced, QA, DPR_MAX, DPR, html, Gov, clamp, lerp, ease, easeIO, col,
-         GL_OK, Input, FINAL_SHADER, onRestore, makeRenderer, makeComposer, GPU, loadTex, photoUrl,
-         EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass };
+         GL_OK, Input, FINAL_SHADER, dirtTexture, onRestore, makeRenderer, makeComposer, GPU, loadTex, photoUrl,
+         EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass, SMAAPass };

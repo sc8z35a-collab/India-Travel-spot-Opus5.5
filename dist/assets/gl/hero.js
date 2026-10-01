@@ -1,5 +1,5 @@
 /* DepthHero — OWNER: Agent B */
-import { THREE, $, $$, DATA, ROOT, reduced, QA, DPR_MAX, DPR, html, Gov, clamp, lerp, ease, easeIO, col, GL_OK, Input, FINAL_SHADER, onRestore, makeRenderer, makeComposer, GPU, loadTex, photoUrl } from "./core.js?v=bc9b3fbf97";
+import { THREE, $, $$, DATA, ROOT, reduced, QA, DPR_MAX, DPR, html, Gov, clamp, lerp, ease, easeIO, col, GL_OK, Input, FINAL_SHADER, onRestore, makeRenderer, makeComposer, GPU, loadTex, photoUrl } from "./core.js?v=047c1bb6c8";
 /* ============================ DEPTH HERO ============================ */
 const HERO_VS = `
   uniform sampler2D uDepA, uDepB; uniform vec2 uCovA, uCovB; uniform float uP, uStr, uTime;

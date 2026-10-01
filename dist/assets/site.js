@@ -807,3 +807,27 @@
   };
   document.readyState !== "loading" ? boot() : addEventListener("DOMContentLoaded", boot);
 })();
+
+;
+/* site/a-core.js — behaviour module (IIFE). OWNER: Agent A. Loaded after site.js. */
+(() => {
+  "use strict";
+})();
+
+;
+/* site/b-photo.js — behaviour module (IIFE). OWNER: Agent B. Loaded after site.js. */
+(() => {
+  "use strict";
+})();
+
+;
+/* site/c-world.js — behaviour module (IIFE). OWNER: Agent C. Loaded after site.js. */
+(() => {
+  "use strict";
+})();
+
+;
+/* site/d-data.js — behaviour module (IIFE). OWNER: Agent D. Loaded after site.js. */
+(() => {
+  "use strict";
+})();
