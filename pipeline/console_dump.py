@@ -3,6 +3,12 @@
 import functools, http.server, socketserver, sys, threading
 from playwright.sync_api import sync_playwright
 from .agents.base import DIST
+
+# ---- shared heavy-process lock: 4 agents share one 1 GB sandbox → Chromium/ONNX runs one at a time ----
+import fcntl as _fcntl, os as _os
+_HEAVY = open("/tmp/webapp-heavy.lock", "w")
+if not _os.environ.get("HEAVY_LOCK_HELD"):
+    print("  (waiting for /tmp/webapp-heavy.lock …)", flush=True); _fcntl.flock(_HEAVY, _fcntl.LOCK_EX); _os.environ["HEAVY_LOCK_HELD"] = "1"
 path = sys.argv[1] if len(sys.argv) > 1 else "index.html"; wait = int(sys.argv[2]) if len(sys.argv) > 2 else 6000
 class _Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass

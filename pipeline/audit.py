@@ -20,6 +20,12 @@ from playwright.sync_api import sync_playwright
 
 from .agents.base import DIST, REPORTS
 
+# ---- shared heavy-process lock: 4 agents share one 1 GB sandbox → Chromium/ONNX runs one at a time ----
+import fcntl as _fcntl, os as _os
+_HEAVY = open("/tmp/webapp-heavy.lock", "w")
+if not _os.environ.get("HEAVY_LOCK_HELD"):
+    print("  (waiting for /tmp/webapp-heavy.lock …)", flush=True); _fcntl.flock(_HEAVY, _fcntl.LOCK_EX); _os.environ["HEAVY_LOCK_HELD"] = "1"
+
 PROBE = r"""() => {
   const out = {overflow: [], clipped: [], rail: [], upscaled: [], broken: []};
   const W = innerWidth, doc = document.documentElement;
