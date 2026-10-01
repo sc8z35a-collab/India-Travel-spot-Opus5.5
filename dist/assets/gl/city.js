@@ -16,7 +16,7 @@
                    staggered growth on first view, tap a column → `city:pick` {region, axis}
    ?qa=1 (SwiftShader) keeps the same composition but swaps transmission / reflector / HDRI for
    cheap stand-ins so CI still renders in seconds.                                             */
-import { THREE, $, DATA, ROOT, reduced, QA, DPR, Gov, clamp, lerp, ease, col, Input, makeRenderer, makeComposer, loadTex } from "./core.js?v=4c87cec662";
+import { THREE, $, DATA, ROOT, reduced, QA, DPR, Gov, clamp, lerp, ease, col, Input, makeRenderer, makeComposer, loadTex } from "./core.js?v=36b6d9c2a3";
 import { RoundedBoxGeometry } from "../vendor/three/addons/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "../vendor/three/addons/environments/RoomEnvironment.js";
 import { RGBELoader } from "../vendor/three/addons/loaders/RGBELoader.js";

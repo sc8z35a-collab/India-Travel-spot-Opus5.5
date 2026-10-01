@@ -9,6 +9,10 @@ Always run under the shared lock:  flock -w 900 /tmp/webapp-heavy.lock python3 -
 import functools, http.server, socketserver, sys, threading, json
 from playwright.sync_api import sync_playwright
 from .agents.base import DIST, REPORTS
+import fcntl as _fcntl, os as _os
+_HEAVY = open("/tmp/webapp-heavy.lock", "w")
+if not _os.environ.get("HEAVY_LOCK_HELD"):
+    _fcntl.flock(_HEAVY, _fcntl.LOCK_EX); _os.environ["HEAVY_LOCK_HELD"] = "1"
 
 args = sys.argv[1:]
 full = "--full" in args
