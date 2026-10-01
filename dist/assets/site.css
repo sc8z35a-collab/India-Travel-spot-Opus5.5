@@ -2045,3 +2045,15 @@ input[type=range]::-webkit-slider-thumb { background: radial-gradient(circle at 
 
 /* ambient canvas not painted yet → never flash the UA white behind a transparent body */
 html { background: #0d0b0a; }
+
+/* ==== fx-a-core.css ==== */
+/* fx-a-core.css — OWNER: Agent A. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-b-photo.css ==== */
+/* fx-b-photo.css — OWNER: Agent B. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-c-world.css ==== */
+/* fx-c-world.css — OWNER: Agent C. Loaded after graphics.css (last layer). Only this agent edits this file. */
+
+/* ==== fx-d-data.css ==== */
+/* fx-d-data.css — OWNER: Agent D. Loaded after graphics.css (last layer). Only this agent edits this file. */
